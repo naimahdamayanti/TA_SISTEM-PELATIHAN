@@ -1,189 +1,183 @@
 <?php
 
 namespace App\Http\Controllers\Web;
-
-use Illuminate\Support\Facades\DB;
-use App\Models\UserModel;
-use App\Models\LogbookModel;
-use App\Models\PendaftaranModel;
-use App\Models\PelatihanModel;
-use App\Models\SesiPelatihanModel;
-use App\Models\SertifikatModel;
 use App\Http\Controllers\Controller;
+use App\Models\PelatihanModel;
+use App\Models\PendaftaranModel;
+use App\Models\SertifikatModel;
+use App\Models\SesiPelatihanModel;
+use App\Models\LogbookModel;
+use App\Models\KualifikasiSertifikasiModel;
+use App\Models\UserModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-     public function index()
+    /**
+     * Redirect ke dashboard sesuai role pengguna yang sedang login.
+     */
+    public function index()
     {
-        $user = (object) [
-            'id' => session('id_user'),
-            'nama' => session('nama', 'User'),
-            'email' => session('email'),
-            'role' => session('role', 'user')
-        ];
+        $user = Auth::user();
 
-        // ================= ADMIN =================
-        if ($user->role === 'admin') {
+        return match ($user->role) {
+            'admin'      => $this->dashboardAdmin(),
+            'instruktur' => $this->dashboardInstruktur(),
+            'peserta'    => $this->dashboardPeserta(),
+            default      => abort(403, 'Role tidak dikenali.'),
+        };
+    }
 
-            $totalPeserta = PendaftaranModel::count();
+    /* ──────────────────────────────────────────
+     |  ADMIN DASHBOARD
+     ────────────────────────────────────────── */
+    private function dashboardAdmin()
+    {
 
-            $pelatihanBerlangsung = PelatihanModel::where('status', 'berlangsung')->count();
-            $pelatihanSelesai = PelatihanModel::where('status', 'selesai')->count();
+        $totalPeserta     = UserModel::where('role', 'peserta')->count();
+        $totalInstruktur  = UserModel::where('role', 'instruktur')->count();
+        $pelatihanAktif   = PelatihanModel::where('status', 'tersedia')->count();
+        $pelatihanSelesai = PelatihanModel::where('status', 'selesai')->count();
+        $totalSertifikat  = SertifikatModel::count();
 
-            $sertifikatTerkirim = SertifikatModel::count();
-
-            $totalInstruktur = UserModel::where('role', 'instruktur')->count();
-
-            // Grafik bulanan
-            $grafik = PendaftaranModel::select(
-                DB::raw('MONTH(tgl_daftar) as bulan'),
-                DB::raw('COUNT(*) as total')
-            )
+        // Grafik: jumlah pelatihan yang mulai per bulan di tahun berjalan
+        $tahun = request('tahun', Carbon::now()->year);
+        $grafikBulanan = PelatihanModel::selectRaw('MONTH(tgl_mulai) as bulan, COUNT(*) as total')
+            ->whereYear('tgl_mulai', $tahun)
             ->groupBy('bulan')
             ->orderBy('bulan')
-            ->pluck('total');
+            ->pluck('total', 'bulan')
+            ->toArray();
 
-            // Top 5 pelatihan
-            $topPelatihan = PendaftaranModel::selectRaw('pelatihan_id, count(*) as total')
-                ->groupBy('pelatihan_id')
-                ->orderByDesc('total')
-                ->with('pelatihan')
-                ->limit(5)
-                ->get();
-
-            return view('dashboard', compact(
-                'user',
-                'totalPeserta',
-                'pelatihanBerlangsung',
-                'pelatihanSelesai',
-                'sertifikatTerkirim',
-                'totalInstruktur',
-                'grafik',
-                'topPelatihan'
-            ));
+        // Susun data 12 bulan (isi 0 untuk bulan yang kosong)
+        $grafikData = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $grafikData[$i] = $grafikBulanan[$i] ?? 0;
         }
 
-        // ================= INSTRUKTUR =================
-        if ($user->role === 'instruktur') {
+        // Top pelatihan berdasarkan jumlah pendaftar
+        $topPelatihan = PelatihanModel::withCount(['pendaftaran' => function ($q) {
+            $q->where('status', 'diterima');
+        }])
+            ->orderByDesc('pendaftaran_count')
+            ->limit(5)
+            ->get();
 
-            $pelatihanBerlangsung = SesiPelatihanModel::where('id_instruktur', $user->id)
-                ->whereHas('pelatihan', fn($q) => $q->where('status', 'berlangsung'))
-                ->count();
+        // Pendaftaran menunggu konfirmasi
+        $pendaftaranMenunggu = PendaftaranModel::with(['peserta', 'pelatihan'])
+            ->where('status', 'menunggu')
+            ->latest('tgl_daftar')
+            ->limit(10)
+            ->get();
 
-            $pelatihanSelesai = SesiPelatihanModel::where('id_instruktur', $user->id)
-                ->whereHas('pelatihan', fn($q) => $q->where('status', 'selesai'))
-                ->count();
-
-            $totalPeserta = PendaftaranModel::whereHas('pelatihan.sesi', function ($q) use ($user) {
-                $q->where('id_instruktur', $user->id);
-            })->count();
-
-            $totalSertifikat = SertifikatModel::whereHas('pelatihan.sesi', function ($q) use ($user) {
-                $q->where('id_instruktur', $user->id);
-            })->count();
-
-            return view('dashboard', compact(
-                'user',
-                'pelatihanBerlangsung',
-                'pelatihanSelesai',
-                'totalPeserta',
-                'totalSertifikat'
-            ));
-        }
-
-        // ================= PESERTA =================
-        if ($user->role === 'user') {
-
-            $pelatihanTerdaftar = PendaftaranModel::where('id_user', $user->id)->count();
-
-            $pelatihanBerlangsung = PendaftaranModel::where('id_user', $user->id)
-                ->whereHas('pelatihan', fn($q) => $q->where('status', 'berlangsung'))
-                ->count();
-
-            $pelatihanSelesai = PendaftaranModel::where('id_user', $user->id)
-                ->whereHas('pelatihan', fn($q) => $q->where('status', 'selesai'))
-                ->count();
-
-            $sertifikat = SertifikatModel::where('id_user', $user->id)->count();
-
-            return view('dashboard', compact(
-                'user',
-                'pelatihanTerdaftar',
-                'pelatihanBerlangsung',
-                'pelatihanSelesai',
-                'sertifikat'
-            ));
-        }
-
-        // fallback
-        return view('dashboard', compact('user'));
-    }
-    
-
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return view('dashboard.admin', compact(
+            'totalPeserta',
+            'totalInstruktur',
+            'pelatihanAktif',
+            'pelatihanSelesai',
+            'totalSertifikat',
+            'grafikData',
+            'tahun',
+            'topPelatihan',
+            'pendaftaranMenunggu'
+        ));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
+    /* ──────────────────────────────────────────
+     |  INSTRUKTUR DASHBOARD
+     ────────────────────────────────────────── */
+    private function dashboardInstruktur()
     {
-        //
+        $instruktur = Auth::user();
+
+        $pelatihan = PelatihanModel::where('instruktur_id', $instruktur->id_user)
+            ->withCount(['pendaftaran' => fn($q) => $q->where('status', 'diterima')])
+            ->get();
+
+        $totalPelatihan   = $pelatihan->count();
+        $pelatihanAktif   = $pelatihan->where('status', 'tersedia')->count();
+        $pelatihanSelesai = $pelatihan->where('status', 'selesai')->count();
+
+        // Sesi terdekat yang akan datang
+        $sesiMendatang = SesiPelatihanModel::whereHas('pelatihan', fn($q) =>
+            $q->where('instruktur_id', $instruktur->id_user)
+        )
+            ->where('tanggal', '>=', Carbon::today())
+            ->with('pelatihan')
+            ->orderBy('tanggal')
+            ->orderBy('waktu_mulai')
+            ->limit(5)
+            ->get();
+
+        // Jumlah peserta yang sudah diisi logbook-nya (kehadiran hari ini)
+        $logbookHariIni = LogbookModel::where('instruktur_id', $instruktur->id_user)
+            ->whereHas('sesiPelatihan', fn($q) => $q->whereDate('tanggal', Carbon::today()))
+            ->count();
+
+        // Peserta menunggu penilaian kelayakan
+        $menungguKelayakan = PendaftaranModel::whereHas('pelatihan', fn($q) =>
+            $q->where('instruktur_id', $instruktur->id_user)->where('status', 'selesai')
+        )
+            ->where('status', 'diterima')
+            ->whereDoesntHave('kualifikasiSertifikasi')
+            ->count();
+
+        return view('dashboard.instruktur', compact(
+            'pelatihan',
+            'totalPelatihan',
+            'pelatihanAktif',
+            'pelatihanSelesai',
+            'sesiMendatang',
+            'logbookHariIni',
+            'menungguKelayakan'
+        ));
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
+    /* ──────────────────────────────────────────
+     |  PESERTA DASHBOARD
+     ────────────────────────────────────────── */
+    private function dashboardPeserta()
     {
-        //
-    }
+        $peserta = Auth::user();
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
+        // Pendaftaran peserta beserta status
+        $pendaftaran = PendaftaranModel::with(['pelatihan'])
+            ->where('peserta_id', $peserta->id_user)
+            ->latest('tgl_daftar')
+            ->get();
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
+        $totalDaftar    = $pendaftaran->count();
+        $diterima       = $pendaftaran->where('status', 'diterima')->count();
+        $menunggu       = $pendaftaran->where('status', 'menunggu')->count();
+        $totalSertifikat = SertifikatModel::whereHas('pendaftaran', fn($q) =>
+            $q->where('peserta_id', $peserta->id_user)
+        )->count();
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        // Pelatihan yang sedang diikuti (status tersedia, pendaftaran diterima)
+        $pelatihanAktif = $pendaftaran->filter(fn($p) =>
+            $p->status === 'diterima' && $p->pelatihan?->status === 'tersedia'
+        );
+
+        // Sesi mendatang untuk peserta ini
+        $sesiMendatang = SesiPelatihanModel::whereHas('pelatihan.pendaftaran', fn($q) =>
+            $q->where('peserta_id', $peserta->id_user)->where('status', 'diterima')
+        )
+            ->where('tanggal', '>=', Carbon::today())
+            ->with('pelatihan')
+            ->orderBy('tanggal')
+            ->limit(3)
+            ->get();
+
+        return view('dashboard.peserta', compact(
+            'pendaftaran',
+            'totalDaftar',
+            'diterima',
+            'menunggu',
+            'totalSertifikat',
+            'pelatihanAktif',
+            'sesiMendatang'
+        ));
     }
 }

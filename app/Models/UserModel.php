@@ -2,30 +2,94 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
-class UserModel extends Model
+class UserModel extends Authenticatable
 {
-    protected $table = 'users';
+    use HasApiTokens, Notifiable;
+
+    protected $table      = 'users';
     protected $primaryKey = 'id_user';
-    public $timestamps = false;
 
     protected $fillable = [
         'nama',
         'email',
         'username',
         'password',
-        'role'
+        'no_hp',
+        'foto_profil',
+        'role',
+        'api_token',
+        'token_reset',
+        'token_exp',
     ];
 
-    // Relasi
-    public function pelatihan()
+    protected $hidden = [
+        'password',
+        'api_token',
+        'token_reset',
+    ];
+
+    protected function casts(): array
     {
-        return $this->hasMany(PelatihanModel::class, 'instruktur_id');
+        return [
+            'password'  => 'hashed',
+            'token_exp' => 'datetime',
+        ];
     }
 
+    // ----------------------------------------------------------------
+    // RELATIONS
+    // ----------------------------------------------------------------
+
+    /** Pelatihan yang diampu oleh instruktur ini */
+    public function pelatihan()
+    {
+        return $this->hasMany(PelatihanModel::class, 'instruktur_id', 'id_user');
+    }
+
+    /** Pendaftaran pelatihan milik peserta ini */
     public function pendaftaran()
     {
-        return $this->hasMany(PendaftaranModel::class, 'peserta_id');
+        return $this->hasMany(PendaftaranModel::class, 'peserta_id', 'id_user');
+    }
+
+    /** Logbook absensi sebagai peserta */
+    public function logbookSebagaiPeserta()
+    {
+        return $this->hasMany(LogbookModel::class, 'peserta_id', 'id_user');
+    }
+
+    /** Logbook absensi yang dicatat sebagai instruktur */
+    public function logbookSebagaiInstruktur()
+    {
+        return $this->hasMany(LogbookModel::class, 'instruktur_id', 'id_user');
+    }
+
+    /** Penilaian kualifikasi yang diberikan sebagai instruktur */
+    public function kualifikasiSertifikasi()
+    {
+        return $this->hasMany(KualifikasiSertifikasiModel::class, 'instruktur_id', 'id_user');
+    }
+
+    // ----------------------------------------------------------------
+    // HELPERS
+    // ----------------------------------------------------------------
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isInstruktur(): bool
+    {
+        return $this->role === 'instruktur';
+    }
+
+    public function isPeserta(): bool
+    {
+        return $this->role === 'peserta';
     }
 }

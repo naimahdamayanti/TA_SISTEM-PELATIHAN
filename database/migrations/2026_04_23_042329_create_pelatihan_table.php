@@ -6,26 +6,29 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('pelatihan', function (Blueprint $table) {
             $table->id('id_pelatihan');
-            $table->foreignId('instruktur_id')->constrained('users', 'id_user')->cascadeOnDelete();
-            $table->string('nama_pelatihan', 50);
-            $table->string('kode_pelatihan', 10);
-            $table->string('kategori', 20);
+            $table->foreignId('instruktur_id')
+                  ->constrained('users', 'id_user')
+                  ->cascadeOnDelete();
+            $table->string('nama_pelatihan', 100);
+            $table->string('kode_pelatihan', 15)->unique();
+            $table->unsignedBigInteger('kategori_id')->nullable()->after('kode_pelatihan');
+            $table->foreign('kategori_id')
+                  ->references('id_kategori')
+                  ->on('kategori')
+                  ->onUpdate('cascade');
             $table->text('deskripsi');
-            $table->string('kuota', 10);
-            $table->enum('status', ['tersedia','penuh']);
+            $table->integer('kuota')->comment('Maksimal jumlah peserta');
+            $table->date('tgl_mulai')->nullable()->comment('Tanggal sesi pertama');
+            $table->date('tgl_selesai')->nullable()->comment('Tanggal sesi terakhir');
+            $table->enum('status', ['tersedia', 'penuh', 'selesai'])->default('tersedia');
+            $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('pelatihan');
