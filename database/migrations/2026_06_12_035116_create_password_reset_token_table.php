@@ -11,11 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('kategori', function (Blueprint $table) {
-            $table->id('id_kategori');
-            $table->string('nama_kategori', 50)->unique();
-            $table->boolean('aktif')->default(true);
-            $table->timestamps();
+        Schema::create('password_reset_token', function (Blueprint $table) {
+            $table->string('email')->primary();
+            $table->string('token');
+            $table->timestamp('created_at')->nullable();
         });
     }
 
@@ -24,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('kategori');
+        Schema::dropIfExists('password_reset_token');
     }
 };

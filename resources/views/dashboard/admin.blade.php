@@ -31,7 +31,6 @@
                         {{ $totalPeserta }}
                     </div>
                     <div class="fw-semibold small">Total Peserta</div>
-                    <div class="text-muted" style="font-size:11px">Terdaftar di sistem</div>
                 </div>
             </div>
         </div>
@@ -50,7 +49,6 @@
                         {{ $pelatihanAktif }}
                     </div>
                     <div class="fw-semibold small">Pelatihan Berlangsung</div>
-                    <div class="text-muted" style="font-size:11px">Status tersedia</div>
                 </div>
             </div>
         </div>
@@ -69,7 +67,6 @@
                         {{ $pelatihanSelesai }}
                     </div>
                     <div class="fw-semibold small">Pelatihan Selesai</div>
-                    <div class="text-muted" style="font-size:11px">Sudah terlaksana</div>
                 </div>
             </div>
         </div>
@@ -88,7 +85,6 @@
                         {{ $totalSertifikat }}
                     </div>
                     <div class="fw-semibold small">Sertifikat Terkirim</div>
-                    <div class="text-muted" style="font-size:11px">Total diterbitkan</div>
                 </div>
             </div>
         </div>
@@ -107,7 +103,6 @@
                         {{ $totalInstruktur }}
                     </div>
                     <div class="fw-semibold small">Total Instruktur</div>
-                    <div class="text-muted" style="font-size:11px">Aktif di sistem</div>
                 </div>
             </div>
         </div>
@@ -157,7 +152,7 @@
                     <div class="flex-fill min-w-0">
                         <div class="fw-semibold small text-truncate">{{ $item->nama_pelatihan }}</div>
                         <div class="text-muted" style="font-size:11px">
-                            {{ $item->kategori }} &middot; {{ $item->kode_pelatihan }}
+                            {{ $item->kategori->nama_kategori ?? '-' }} &middot; {{ $item->kode_pelatihan }}
                         </div>
                     </div>
                     <div class="fw-bold small text-primary text-nowrap">

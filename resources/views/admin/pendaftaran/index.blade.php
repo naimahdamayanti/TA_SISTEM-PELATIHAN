@@ -136,7 +136,6 @@
                         <th class="py-3">Pelatihan</th>
                         <th class="py-3">Tanggal Daftar</th>
                         <th class="py-3 text-center" style="width:110px">Status</th>
-                        <th class="py-3 text-center pe-4" style="width:160px">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -229,14 +228,6 @@
                                         </button>
                                     </form>
                                 @endif
-
-                                {{-- Detail --}}
-                                <a href="{{ route('admin.pendaftaran.show', $item->id_pendaftaran) }}"
-                                   class="btn btn-sm btn-outline-secondary rounded-3"
-                                   title="Detail">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-
                             </div>
                         </td>
                     </tr>

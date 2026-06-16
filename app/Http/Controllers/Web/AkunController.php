@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Helpers\MailHelper;
 use App\Models\UserModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules\Password;
@@ -17,9 +19,6 @@ class AkunController extends Controller
      |  ADMIN – Kelola Akun Seluruh Pengguna
      ═══════════════════════════════════════════════ */
 
-    /**
-     * [ADMIN] Daftar seluruh akun pengguna di sistem.
-     */
     public function index(Request $request)
     {
         $this->authorizeAdmin();
@@ -49,9 +48,6 @@ class AkunController extends Controller
         return view('admin.akun.index', compact('users', 'stats'));
     }
 
-    /**
-     * [ADMIN] Form tambah akun baru.
-     */
     public function create()
     {
         $this->authorizeAdmin();
@@ -59,7 +55,7 @@ class AkunController extends Controller
     }
 
     /**
-     * [ADMIN] Simpan akun baru.
+     * [ADMIN] Simpan akun baru + kirim email notifikasi ke pengguna.
      */
     public function store(Request $request)
     {
@@ -74,31 +70,41 @@ class AkunController extends Controller
             'role'     => 'required|in:admin,instruktur,peserta',
         ]);
 
-        UserModel::create([
+        $plainPassword = $validated['password'];
+
+        $user = UserModel::create([
             'nama'     => $validated['nama'],
             'email'    => $validated['email'],
             'username' => $validated['username'],
-            'password' => Hash::make($validated['password']),
+            'password' => Hash::make($plainPassword),
             'no_hp'    => $validated['no_hp'] ?? null,
             'role'     => $validated['role'],
         ]);
 
+        $result = MailHelper::sendAkunCreatedEmail(
+            $user->email,
+            $user->nama,
+            $user->username,
+            $plainPassword,
+            $user->role
+        );
+
+        if ($result['status'] === 'success') {
+            return redirect()->route('admin.akun.index')
+                ->with('success', "Akun berhasil dibuat dan email dikirim ke {$user->email}.");
+        }
+
+        // Akun tetap tersimpan walau email gagal
         return redirect()->route('admin.akun.index')
-            ->with('success', 'Akun baru berhasil dibuat.');
+            ->with('error', "Akun berhasil dibuat, namun email gagal dikirim. Cek logs/email.log.");
     }
 
-    /**
-     * [ADMIN] Form edit akun pengguna manapun.
-     */
     public function edit(UserModel $user)
     {
         $this->authorizeAdmin();
         return view('admin.akun.edit', compact('user'));
     }
 
-    /**
-     * [ADMIN] Perbarui akun pengguna manapun.
-     */
     public function update(Request $request, UserModel $user)
     {
         $this->authorizeAdmin();
@@ -134,9 +140,6 @@ class AkunController extends Controller
             ->with('success', 'Akun berhasil diperbarui.');
     }
 
-    /**
-     * [ADMIN] Hapus akun pengguna.
-     */
     public function destroy(UserModel $user)
     {
         $this->authorizeAdmin();
@@ -145,7 +148,6 @@ class AkunController extends Controller
             return back()->with('error', 'Anda tidak dapat menghapus akun sendiri.');
         }
 
-        // Hapus foto profil jika ada
         if ($user->foto_profil && Storage::disk('public')->exists($user->foto_profil)) {
             Storage::disk('public')->delete($user->foto_profil);
         }
@@ -160,18 +162,12 @@ class AkunController extends Controller
      |  SEMUA ROLE – Profil & Update Akun Sendiri
      ═══════════════════════════════════════════════ */
 
-    /**
-     * [ADMIN | INSTRUKTUR | PESERTA] Tampilkan profil pengguna yang sedang login.
-     */
     public function profil()
     {
         $user = Auth::user();
         return view('shared.profil', compact('user'));
     }
 
-    /**
-     * [ADMIN | INSTRUKTUR | PESERTA] Perbarui data profil sendiri (nama, email, no_hp).
-     */
     public function updateProfil(Request $request)
     {
         /** @var UserModel $user */
@@ -190,9 +186,6 @@ class AkunController extends Controller
         return back()->with('success', 'Profil berhasil diperbarui.');
     }
 
-    /**
-     * [ADMIN | INSTRUKTUR | PESERTA] Perbarui foto profil.
-     */
     public function updateFoto(Request $request)
     {
         $request->validate([
@@ -202,7 +195,6 @@ class AkunController extends Controller
         /** @var UserModel $user */
         $user = Auth::user();
 
-        // Hapus foto lama
         if ($user->foto_profil && Storage::disk('public')->exists($user->foto_profil)) {
             Storage::disk('public')->delete($user->foto_profil);
         }
@@ -213,20 +205,16 @@ class AkunController extends Controller
         return back()->with('success', 'Foto profil berhasil diperbarui.');
     }
 
-    /**
-     * [ADMIN | INSTRUKTUR | PESERTA] Ubah password sendiri.
-     */
     public function gantiPassword(Request $request)
     {
         /** @var UserModel $user */
         $user = Auth::user();
 
         $request->validate([
-            'password_lama'     => 'required|string',
-            'password_baru'     => ['required', Password::min(8)->mixedCase()->numbers(), 'confirmed'],
+            'password_lama' => 'required|string',
+            'password_baru' => ['required', Password::min(8)->mixedCase()->numbers(), 'confirmed'],
         ]);
 
-        // Verifikasi password lama
         if (!Hash::check($request->password_lama, $user->password)) {
             return back()->withErrors(['password_lama' => 'Password lama tidak sesuai.']);
         }

@@ -216,6 +216,51 @@
             #main-content { margin-left: 0; padding: 20px 16px 32px; }
         }
 
+        /* ─── SIDEBAR COLLAPSED (desktop) ─── */
+        #sidebar {
+            transition: transform .25s ease, width .25s ease;
+        }
+
+        @media (min-width: 992px) {
+            #sidebar.collapsed {
+                width: 64px;
+            }
+            #sidebar.collapsed .nav-section-label,
+            #sidebar.collapsed .link-text,
+            #sidebar.collapsed .sf-name,
+            #sidebar.collapsed .sf-role {
+                display: none;
+            }
+            #sidebar.collapsed .sidebar-brand {
+                justify-content: center;
+                padding: 0;
+            }
+            #sidebar.collapsed .sidebar-brand img {
+                height: 28px;
+                max-width: 40px;
+                object-fit: contain;
+            }
+            #sidebar.collapsed .sidebar-link {
+                justify-content: center;
+                padding: 10px 0;
+            }
+            #sidebar.collapsed .sidebar-link i {
+                font-size: 20px;
+                margin: 0;
+            }
+            #sidebar.collapsed .sidebar-footer {
+                justify-content: center;
+                padding: 14px 0;
+            }
+
+            #sidebar.collapsed ~ #topbar       { left: 64px; }
+            #sidebar.collapsed ~ #main-content { margin-left: 64px; }
+
+            #topbar, #main-content {
+                transition: left .25s ease, margin-left .25s ease;
+            }
+        }
+
         /* ─── BTN PRIMARY brand color ─── */
         .btn-primary {
             background-color: var(--brand);
@@ -258,37 +303,51 @@
     <nav class="sidebar-nav">
         <div class="nav-section-label">Utama</div>
         <a href="{{ route('dashboard') }}"
-           class="sidebar-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-            <i class="bi bi-house-door"></i> Dashboard
+        class="sidebar-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"
+        title="Dashboard">
+            <i class="bi bi-house-door"></i>
+            <span class="link-text">Dashboard</span>
         </a>
 
         <div class="nav-section-label">Manajemen</div>
         <a href="{{ route('admin.pelatihan.index') }}"
-           class="sidebar-link {{ request()->routeIs('admin.pelatihan.*') ? 'active' : '' }}">
-            <i class="bi bi-journal-bookmark"></i> Kelola Pelatihan
+        class="sidebar-link {{ request()->routeIs('admin.pelatihan.*') ? 'active' : '' }}"
+        title="Kelola Pelatihan">
+            <i class="bi bi-journal-bookmark"></i>
+            <span class="link-text">Kelola Pelatihan</span>
         </a>
         <a href="{{ route('admin.pendaftaran.index') }}"
-           class="sidebar-link {{ request()->routeIs('admin.pendaftaran.*') ? 'active' : '' }}">
-            <i class="bi bi-people"></i> Kelola Pendaftaran
+        class="sidebar-link {{ request()->routeIs('admin.pendaftaran.*') ? 'active' : '' }}"
+        title="Kelola Pendaftaran">
+            <i class="bi bi-people"></i>
+            <span class="link-text">Kelola Pendaftaran</span>
         </a>
         <a href="{{ route('admin.instruktur.index') }}"
-           class="sidebar-link {{ request()->routeIs('admin.instruktur.*') ? 'active' : '' }}">
-            <i class="bi bi-person-video3"></i> Kelola Instruktur
+        class="sidebar-link {{ request()->routeIs('admin.instruktur.*') ? 'active' : '' }}"
+        title="Kelola Instruktur">
+            <i class="bi bi-person-video3"></i>
+            <span class="link-text">Kelola Instruktur</span>
         </a>
         <a href="{{ route('admin.sertifikat.index') }}"
-           class="sidebar-link {{ request()->routeIs('admin.sertifikat.*') ? 'active' : '' }}">
-            <i class="bi bi-award"></i> Sertifikat
+        class="sidebar-link {{ request()->routeIs('admin.sertifikat.*') ? 'active' : '' }}"
+        title="Sertifikat">
+            <i class="bi bi-award"></i>
+            <span class="link-text">Sertifikat</span>
         </a>
         <a href="{{ route('admin.laporan.index') }}"
-           class="sidebar-link {{ request()->routeIs('admin.laporan.*') ? 'active' : '' }}">
-            <i class="bi bi-bar-chart-line"></i> Laporan
-        </a>
+        class="sidebar-link {{ request()->routeIs('admin.laporan.*') ? 'active' : '' }}"
+        title="Laporan">
+            <i class="bi bi-bar-chart-line"></i>
+            <span class="link-text">Laporan</span>
+            </a>
 
-        <div class="nav-section-label">Sistem</div>
-        <a href="{{ route('admin.akun.index') }}"
-           class="sidebar-link {{ request()->routeIs('admin.akun.*') ? 'active' : '' }}">
-            <i class="bi bi-person-gear"></i> Kelola Akun
-        </a>
+            <div class="nav-section-label">Sistem</div>
+            <a href="{{ route('admin.akun.index') }}"
+            class="sidebar-link {{ request()->routeIs('admin.akun.*') ? 'active' : '' }}"
+            title="Kelola Akun">
+                <i class="bi bi-person-gear"></i>
+                <span class="link-text">Kelola Akun</span>
+            </a>
     </nav>
 
     {{-- Footer: klik buka modal profil --}}
@@ -351,8 +410,14 @@
     const overlay = document.getElementById('sidebarOverlay');
 
     document.getElementById('sidebarToggle').addEventListener('click', () => {
-        const isOpen = sidebar.classList.toggle('open');
-        overlay.style.display = isOpen ? 'block' : 'none';
+        if (window.innerWidth >= 992) {
+            // Desktop: toggle collapsed (icon only ↔ icon + teks)
+            sidebar.classList.toggle('collapsed');
+        } else {
+            // Mobile: toggle open (overlay)
+            const isOpen = sidebar.classList.toggle('open');
+            overlay.style.display = isOpen ? 'block' : 'none';
+        }
     });
 
     function closeSidebar() {

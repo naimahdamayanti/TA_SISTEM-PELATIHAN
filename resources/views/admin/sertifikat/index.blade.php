@@ -143,7 +143,7 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-light">
                     <tr>
-                        <th class="ps-4 py-3">Kode Sertifikat <span class="text-muted fw-normal">(unik)</span></th>
+                        <th class="ps-4 py-3">Kode Sertifikat</th>
                         <th class="py-3">Nama Peserta</th>
                         <th class="py-3">Pelatihan</th>
                         <th class="py-3">Tanggal Terbit</th>
@@ -280,7 +280,11 @@
                             onchange="filterKandidat()">
                         <option value="">Semua Pelatihan</option>
                         @foreach($pelatihan as $p)
-                            <option value="{{ $p->id_pelatihan }}">{{ $p->nama_pelatihan }}</option>
+                            <option value="{{ $p->id_pelatihan }}"
+                                    data-has-template="{{ $p->template_sertifikat ? '1' : '0' }}"
+                                    data-template-url="{{ $p->template_sertifikat ? Storage::url($p->template_sertifikat) : '' }}">
+                                {{ $p->nama_pelatihan }}
+                            </option>
                         @endforeach
                     </select>
                 </div>
@@ -354,20 +358,64 @@
                 {{-- Upload Template --}}
                 <div class="mb-3">
                     <label class="form-label fw-semibold small">
-                        Upload Template Sertifikat
-                        <span class="text-muted fw-normal">(PNG/PDF/DOCX)</span>
+                        Template Sertifikat
+                        <span class="text-muted fw-normal">(PNG/JPG · Landscape A4)</span>
                     </label>
-                    <div class="border border-dashed rounded-3 text-center py-4 px-3"
-                         style="border-style:dashed!important;cursor:pointer"
-                         onclick="document.getElementById('templateFile').click()">
-                        <i class="bi bi-cloud-upload fs-3 text-muted d-block mb-1"></i>
-                        <div class="small text-muted">Klik atau seret file template sertifikat</div>
-                        <div class="text-muted" style="font-size:11px">Maks. 5 MB</div>
-                        <div id="namaFileTemplate" class="small text-primary mt-1 fw-semibold"></div>
+
+                    {{-- Preview template yang sudah ada untuk pelatihan terpilih --}}
+                    <div id="previewTemplateAda" class="rounded-3 border p-2 text-center bg-light mb-2" style="display:none">
+                        <img id="imgTemplateAda" src="" style="max-height:80px;object-fit:contain" alt="template">
+                        <div class="small text-success mt-1">
+                            <i class="bi bi-check-circle me-1"></i>Template sudah ada · akan diganti jika upload baru
+                        </div>
                     </div>
-                    <input type="file" id="templateFile" class="d-none"
-                           accept=".png,.pdf,.docx"
-                           onchange="tampilkanNamaFile(this)">
+
+                    <form id="formUploadTemplate" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="border rounded-3 text-center py-3 px-3"
+                            style="border-style:dashed!important;cursor:pointer;border-color:#dee2e6"
+                            onclick="document.getElementById('templateFile').click()">
+                            <i class="bi bi-cloud-upload fs-4 text-muted d-block mb-1"></i>
+                            <div class="small text-muted">Klik untuk upload template baru</div>
+                            <div class="text-muted" style="font-size:11px">Maks. 5 MB</div>
+                            <div id="namaFileTemplate" class="small text-primary mt-1 fw-semibold"></div>
+                        </div>
+                        <input type="file" id="templateFile" name="template" class="d-none"
+                            accept=".png,.jpg,.jpeg"
+                            onchange="tampilkanNamaFile(this)">
+                        <button type="button" class="btn btn-outline-primary btn-sm mt-2 w-100 rounded-3"
+                                onclick="submitUploadTemplate()">
+                            <i class="bi bi-upload me-1"></i> Simpan Template untuk Pelatihan Ini
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary btn-sm mt-2 w-100 rounded-3" onclick="openModalPosisi()">
+                            <i class="bi bi-arrows-move me-1"></i> Atur Posisi Teks
+                        </button>
+                    </form>
+                </div>
+
+                {{-- Upload Tanda Tangan --}}
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small">
+                        Tanda Tangan
+                        <span class="text-muted fw-normal">(PNG transparan lebih bagus)</span>
+                    </label>
+                    <form id="formUploadTandaTangan" method="POST" enctype="multipart/form-data">
+                        @csrf
+                        <div class="border rounded-3 text-center py-2 px-3"
+                            style="border-style:dashed!important;cursor:pointer;border-color:#dee2e6"
+                            onclick="document.getElementById('ttdFile').click()">
+                            <i class="bi bi-pen fs-5 text-muted d-block mb-1"></i>
+                            <div class="small text-muted">Klik untuk upload tanda tangan</div>
+                            <div id="namaTtdFile" class="small text-primary mt-1 fw-semibold"></div>
+                        </div>
+                        <input type="file" id="ttdFile" name="tanda_tangan" class="d-none"
+                            accept=".png,.jpg,.jpeg"
+                            onchange="document.getElementById('namaTtdFile').textContent = this.files[0]?.name ?? ''">
+                        <button type="button" class="btn btn-outline-secondary btn-sm mt-2 w-100 rounded-3"
+                                onclick="submitUploadTandaTangan()">
+                            <i class="bi bi-upload me-1"></i> Simpan Tanda Tangan
+                        </button>
+                    </form>
                 </div>
 
                 {{-- Tanggal & Diterbitkan Oleh --}}
@@ -405,6 +453,47 @@
     </div>
 </div>
 
+<div class="modal fade" id="modalPosisi" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-xl">
+    <div class="modal-content border-0 shadow rounded-4">
+      <div class="modal-header border-0 px-4 pt-4 pb-2">
+        <h5 class="modal-title fw-bold">
+            <i class="bi bi-arrows-move text-primary"></i> Atur Posisi Teks pada Template
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body px-4">
+        <p class="text-muted small mb-3">
+            Pilih data di kiri, lalu klik pada gambar template untuk menentukan posisinya.
+        </p>
+        <div class="row g-3">
+          <div class="col-md-3">
+            <div class="list-group" id="posisiFieldList">
+              <button type="button" class="list-group-item list-group-item-action active" data-field="nama_peserta">Nama Peserta</button>
+              <button type="button" class="list-group-item list-group-item-action" data-field="nama_pelatihan">Nama Pelatihan</button>
+              <button type="button" class="list-group-item list-group-item-action" data-field="nomor_sertifikat">Nomor Sertifikat</button>
+              <button type="button" class="list-group-item list-group-item-action" data-field="tanda_tangan">Tanda Tangan</button>
+              <button type="button" class="list-group-item list-group-item-action" data-field="tgl_terbit">Tanggal Terbit</button>
+              <button type="button" class="list-group-item list-group-item-action" data-field="diterbitkan_oleh">Diterbitkan Oleh</button>
+              <button type="button" class="list-group-item list-group-item-action" data-field="kode">Kode Sertifikat</button>
+            </div>
+          </div>
+          <div class="col-md-9">
+            <div id="posisiCanvas" style="position:relative;width:100%;aspect-ratio:297/210;border:1px solid #dee2e6;overflow:hidden;cursor:crosshair;">
+              <img id="posisiTemplateImg" src="" style="width:100%;height:100%;object-fit:fill;display:block;">
+              <div id="posisiMarkers" style="position:absolute;top:0;left:0;width:100%;height:100%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0 px-4 pb-4">
+        <button type="button" class="btn btn-outline-secondary rounded-3" data-bs-dismiss="modal">Tutup</button>
+        <button type="button" class="btn btn-primary rounded-3" onclick="simpanPosisi()">Simpan Posisi</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 {{-- Form hidden untuk generate massal --}}
 <form id="formGenerateMassal" method="POST" style="display:none">
     @csrf
@@ -430,50 +519,56 @@
                 </p>
 
                 {{-- Preview Card --}}
-                <div class="rounded-3 border p-4 mb-4 text-center"
-                     style="background:linear-gradient(135deg,#fff8f7,#fff);min-height:340px">
+                <div class="rounded-3 border mb-4 overflow-hidden position-relative"
+                    style="min-height:340px;background:#f9f9f9">
 
-                    {{-- Ikon trophy --}}
-                    <div class="mb-2" style="font-size:2.5rem">🏆</div>
+                    {{-- Gambar template sebagai background --}}
+                    <img id="prev_template_img" src="" alt="template"
+                        style="width:100%;max-height:400px;object-fit:contain;display:none">
 
-                    <div class="fw-bold text-uppercase mb-1" style="font-size:1.1rem;letter-spacing:.1em">
-                        Sertifikat Kelulusan
+                    {{-- Fallback kalau tidak ada template --}}
+                    <div id="prev_fallback"
+                        style="min-height:340px;display:flex;align-items:center;justify-content:center;flex-direction:column">
+                        <i class="bi bi-image fs-1 text-muted d-block mb-2"></i>
+                        <div class="text-muted small">Belum ada template untuk pelatihan ini</div>
+                        <div class="text-muted" style="font-size:11px">Upload template terlebih dahulu</div>
                     </div>
-                    <div class="text-muted small text-uppercase mb-3" style="letter-spacing:.08em">
-                        Certificate of Completion
+
+                    <div id="prev_pdf_embed" class="d-none mb-3" style="height:380px;border:1px solid #dee2e6;border-radius:8px;overflow:hidden;">
+                        <iframe id="prev_pdf_iframe" src="" style="width:100%;height:100%;border:0;"></iframe>
                     </div>
 
-                    <hr class="mx-auto" style="width:60px;border-top:2px solid #e84e3a">
-
-                    <div class="text-muted small mb-1 mt-3">Diberikan kepada</div>
-                    <div class="fw-bold fst-italic mb-3" id="prev_nama_peserta"
-                         style="font-size:1.5rem;color:#e84e3a;font-family:Georgia,serif">—</div>
-
-                    <div class="small text-muted mb-1">
-                        telah berhasil menyelesaikan dan dinyatakan<br>lulus dalam program pelatihan
-                    </div>
-                    <div class="fw-bold mb-1" id="prev_pelatihan" style="font-size:1rem">—</div>
-                    <div class="text-muted small mb-4" id="prev_meta">—</div>
-
-                    {{-- Footer sertifikat --}}
-                    <div class="d-flex justify-content-between align-items-end mt-3 pt-3 border-top">
-                        <div class="text-start">
-                            <div class="fw-bold small" id="prev_diterbitkan_oleh">—</div>
-                            <div class="text-muted" style="font-size:11px">Diterbitkan Oleh</div>
+                    {{-- Info overlay di bawah gambar --}}
+                    <div class="p-3 border-top bg-white" id="prev_info_box" style="display:none">
+                        <div class="row text-center g-2">
+                            <div class="col-4">
+                                <div class="text-muted" style="font-size:10px">Nama Peserta</div>
+                                <div class="fw-bold small" id="prev_nama_peserta">—</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-muted" style="font-size:10px">Pelatihan</div>
+                                <div class="fw-bold small" id="prev_pelatihan">—</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-muted" style="font-size:10px">Info</div>
+                                <div class="small text-muted" id="prev_meta">—</div>
+                            </div>
                         </div>
-                        <div class="text-center">
-                            <div class="font-monospace fw-bold small text-muted" id="prev_kode"
-                                 style="font-size:11px">—</div>
-                            <div class="text-muted" style="font-size:10px">Kode Sertifikat Unik</div>
+                        <hr class="my-2">
+                        <div class="row text-center g-2">
+                            <div class="col-4">
+                                <div class="text-muted" style="font-size:10px">Diterbitkan Oleh</div>
+                                <div class="small fw-semibold" id="prev_diterbitkan_oleh">—</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-muted" style="font-size:10px">Kode Sertifikat</div>
+                                <div class="small font-monospace text-muted" id="prev_kode">—</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="text-muted" style="font-size:10px">Instruktur</div>
+                                <div class="small fw-semibold" id="prev_instruktur">—</div>
+                            </div>
                         </div>
-                        <div class="text-end">
-                            <div class="fw-bold small" id="prev_instruktur">—</div>
-                            <div class="text-muted" style="font-size:11px">Instruktur Pelaksana</div>
-                        </div>
-                    </div>
-
-                    <div class="text-muted mt-3" style="font-size:10px">
-                        Verifikasi: simperti.id/cek-sertifikat &nbsp;|&nbsp; SIMPERTI &copy; {{ date('Y') }}
                     </div>
                 </div>
 
@@ -508,25 +603,238 @@
 
 @push('scripts')
 <script>
+    const routeUploadTemplate  = "{{ route('admin.sertifikat.uploadTemplate', ['pelatihan' => '__ID__']) }}";
+    const routeGenerateMassal  = "{{ route('admin.sertifikat.generateMassal') }}";
+    const routeGetPosisi  = "{{ route('admin.sertifikat.getPosisi', ['pelatihan' => '__ID__']) }}";
+    const routeSavePosisi = "{{ route('admin.sertifikat.savePosisi', ['pelatihan' => '__ID__']) }}";
+    const ALIGN_PER_FIELD = {
+    nama_peserta: 'center', nama_pelatihan: 'center', nomor_sertifikat: 'center', // ← ganti persen_hadir
+    tgl_terbit: 'left', diterbitkan_oleh: 'right', kode: 'center', tanda_tangan: 'center',
+    };
+    const LABEL_PER_FIELD = {
+        nama_peserta: 'Nama', nama_pelatihan: 'Pelatihan', nomor_sertifikat: 'No. Sertifikat', // ← ganti
+        tgl_terbit: 'Tgl Terbit', diterbitkan_oleh: 'Diterbitkan Oleh', kode: 'Kode', tanda_tangan: 'Tanda Tangan',
+    };
+    const routeUploadTandaTangan = "{{ route('admin.sertifikat.uploadTandaTangan', ['pelatihan' => '__ID__']) }}";
+
+    function submitUploadTandaTangan() {
+        const pelId = document.getElementById('filterPelatihanKandidat').value;
+        if (!pelId) {
+            alert('Pilih pelatihan di filter atas terlebih dahulu.');
+            return;
+        }
+        const file = document.getElementById('ttdFile').files[0];
+        if (!file) {
+            alert('Pilih file tanda tangan terlebih dahulu.');
+            return;
+        }
+        const form = document.getElementById('formUploadTandaTangan');
+        form.action = routeUploadTandaTangan.replace('__ID__', pelId);
+        form.submit();
+    }
+
+    let currentPelatihanIdForPosisi = null;
+    let posisiData = {};
+    let activeField = 'nama_peserta';
+
+    function openModalPosisi() {
+        const pelId = document.getElementById('filterPelatihanKandidat').value;
+        if (!pelId) {
+            alert('Pilih pelatihan di filter atas terlebih dahulu.');
+            return;
+        }
+        currentPelatihanIdForPosisi = pelId;
+
+        fetch(routeGetPosisi.replace('__ID__', pelId))
+            .then(res => res.json())
+            .then(data => {
+                if (!data.template_url) {
+                    alert('Upload template untuk pelatihan ini terlebih dahulu.');
+                    return;
+                }
+                document.getElementById('posisiTemplateImg').src = data.template_url;
+                posisiData = data.posisi;
+                renderMarkers();
+                new bootstrap.Modal(document.getElementById('modalPosisi')).show();
+            });
+    }
+
+    document.getElementById('posisiFieldList').addEventListener('click', e => {
+        const btn = e.target.closest('[data-field]');
+        if (!btn) return;
+        document.querySelectorAll('#posisiFieldList .list-group-item').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeField = btn.dataset.field;
+        renderMarkers();
+    });
+
+    document.getElementById('posisiCanvas').addEventListener('click', e => {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+
+        posisiData[activeField] = {
+            x: Math.round(x * 100) / 100,
+            y: Math.round(y * 100) / 100,
+            align: ALIGN_PER_FIELD[activeField],
+        };
+        renderMarkers();
+    });
+
+    function renderMarkers() {
+        const container = document.getElementById('posisiMarkers');
+        container.innerHTML = '';
+        Object.entries(posisiData).forEach(([field, pos]) => {
+            const marker = document.createElement('div');
+            marker.textContent = LABEL_PER_FIELD[field] || field;
+            marker.style.position = 'absolute';
+            marker.style.left = pos.x + '%';
+            marker.style.top = pos.y + '%';
+            marker.style.transform = 'translate(-50%, -50%)';
+            marker.style.background = (field === activeField) ? '#1565C0' : 'rgba(0,0,0,0.6)';
+            marker.style.color = '#fff';
+            marker.style.fontSize = '10px';
+            marker.style.padding = '2px 6px';
+            marker.style.borderRadius = '4px';
+            marker.style.whiteSpace = 'nowrap';
+            marker.style.pointerEvents = 'none';
+            container.appendChild(marker);
+        });
+    }
+
+    function simpanPosisi() {
+        const formData = new FormData();
+        formData.append('_token', document.querySelector('meta[name="csrf-token"]').content);
+        Object.entries(posisiData).forEach(([field, pos]) => {
+            formData.append(`posisi[${field}][x]`, pos.x);
+            formData.append(`posisi[${field}][y]`, pos.y);
+            formData.append(`posisi[${field}][align]`, pos.align);
+        });
+
+        fetch(routeSavePosisi.replace('__ID__', currentPelatihanIdForPosisi), {
+            method: 'POST', body: formData,
+        })
+            .then(res => res.json())
+            .then(() => {
+                alert('Posisi berhasil disimpan.');
+                bootstrap.Modal.getInstance(document.getElementById('modalPosisi')).hide();
+            });
+    }
     // ── Buka modal terbitkan ──
     function openModalTerbitkan() {
         new bootstrap.Modal(document.getElementById('modalTerbitkan')).show();
     }
 
-    // ── Preview dari tabel (sertifikat yang sudah terbit) ──
+    // ── Upload template untuk pelatihan terpilih ──
+    function submitUploadTemplate() {
+        const pelId = document.getElementById('filterPelatihanKandidat').value;
+        if (!pelId) {
+            alert('Pilih pelatihan di filter atas terlebih dahulu.');
+            return;
+        }
+        const file = document.getElementById('templateFile').files[0];
+        if (!file) {
+            alert('Pilih file template terlebih dahulu.');
+            return;
+        }
+
+        const form = document.getElementById('formUploadTemplate');
+        form.action = routeUploadTemplate.replace('__ID__', pelId);
+        form.submit();
+    }
+
+    function openModalPreviewGenerate() {
+        const checked = document.querySelectorAll('.kandidat-check:checked');
+        if (checked.length === 0) {
+            alert('Pilih minimal satu peserta untuk dipreview.');
+            return;
+        }
+
+        const row    = checked[0].closest('tr');
+        const cells  = row.querySelectorAll('td');
+        const nama   = cells[1].textContent.trim();
+        const kode   = cells[2].textContent.trim();
+        const pel    = cells[3].textContent.trim();
+        const hadir  = cells[4].textContent.trim();
+        const tgl    = document.getElementById('tgl_terbit_generate').value;
+        const oleh   = document.getElementById('diterbitkan_oleh_generate').value;
+        const tglFmt = tgl ? new Date(tgl).toLocaleDateString('id-ID',
+            { day:'numeric', month:'long', year:'numeric' }) : '—';
+
+        // Ambil template URL dari PELATIHAN MILIK KANDIDAT YANG DICEK,
+        // bukan dari pelatihan yang sedang dipilih di filter.
+        const candidatePelId = row.dataset.pelatihan;
+        const select  = document.getElementById('filterPelatihanKandidat');
+        const matchOpt = Array.from(select.options)
+            .find(o => o.value === candidatePelId);
+        const templateUrl = matchOpt?.dataset.templateUrl ?? '';
+
+        // Tampilkan gambar template atau fallback
+        const templateImg = document.getElementById('prev_template_img');
+        const fallback    = document.getElementById('prev_fallback');
+        const infoBox     = document.getElementById('prev_info_box');
+
+        if (templateUrl) {
+            templateImg.src           = templateUrl;
+            templateImg.style.display = 'block';
+            fallback.style.display    = 'none';
+            infoBox.style.display     = 'block';
+        } else {
+            templateImg.style.display = 'none';
+            fallback.style.display    = 'flex';
+            infoBox.style.display     = 'none';
+        }
+
+        document.getElementById('prev_nama_peserta').textContent     = nama;
+        document.getElementById('prev_pelatihan').textContent        = pel;
+        document.getElementById('prev_instruktur').textContent       = '—';
+        document.getElementById('prev_diterbitkan_oleh').textContent = oleh;
+        document.getElementById('prev_kode').textContent             = kode !== '— belum terbit —' ? kode : '(akan digenerate)';
+
+        let metaText = `${tglFmt} | Hadir: ${hadir}`;
+        if (checked.length > 1) {
+            metaText += ` | +${checked.length - 1} peserta lain akan menggunakan template masing-masing`;
+        }
+        document.getElementById('prev_meta').textContent = metaText;
+
+        document.getElementById('prev_download_section').classList.add('d-none');
+        document.getElementById('btnGenerateDariPreview').classList.remove('d-none');
+
+        bootstrap.Modal.getInstance(document.getElementById('modalTerbitkan'))?.hide();
+        setTimeout(() => {
+            new bootstrap.Modal(document.getElementById('modalPreview')).show();
+        }, 300);
+    }
+
     function openModalPreview(data) {
-        // Set konten preview
-        document.getElementById('prev_nama_peserta').textContent    = data.nama_peserta  || '—';
-        document.getElementById('prev_pelatihan').textContent       = data.pelatihan     || '—';
-        document.getElementById('prev_instruktur').textContent      = data.instruktur    || '—';
-        document.getElementById('prev_diterbitkan_oleh').textContent= data.diterbitkan_oleh || '—';
-        document.getElementById('prev_kode').textContent            = data.kode          || '—';
+        const templateImg = document.getElementById('prev_template_img');
+        const fallback    = document.getElementById('prev_fallback');
+        const infoBox     = document.getElementById('prev_info_box');
+
+        if (data.file) {
+            templateImg.style.display = 'none';
+            fallback.style.display    = 'none';
+            infoBox.style.display     = 'block';
+
+            document.getElementById('prev_pdf_iframe').src = data.file;
+            document.getElementById('prev_pdf_embed').classList.remove('d-none');
+        } else {
+            templateImg.style.display = 'none';
+            fallback.style.display    = 'flex';
+            infoBox.style.display     = 'none';
+            document.getElementById('prev_pdf_embed').classList.add('d-none');
+        }
+
+        document.getElementById('prev_nama_peserta').textContent     = data.nama_peserta     || '—';
+        document.getElementById('prev_pelatihan').textContent        = data.pelatihan        || '—';
+        document.getElementById('prev_instruktur').textContent       = data.instruktur       || '—';
+        document.getElementById('prev_diterbitkan_oleh').textContent = data.diterbitkan_oleh || '—';
+        document.getElementById('prev_kode').textContent             = data.kode             || '—';
 
         const hadir = data.persen_hadir !== null ? data.persen_hadir + '%' : '—';
         document.getElementById('prev_meta').textContent =
-            `${data.tgl_terbit} | Kehadiran: ${hadir} | Kode Pelatihan: ${data.kode_pelatihan}`;
+            `${data.tgl_terbit} | Kehadiran: ${hadir} | ${data.kode_pelatihan}`;
 
-        // Tampilkan link download jika ada file
         const dlSection = document.getElementById('prev_download_section');
         const dlLink    = document.getElementById('prev_download_link');
         if (data.file) {
@@ -536,50 +844,8 @@
             dlSection.classList.add('d-none');
         }
 
-        // Sembunyikan tombol generate karena ini preview sertifikat yang sudah terbit
         document.getElementById('btnGenerateDariPreview').classList.add('d-none');
-
         new bootstrap.Modal(document.getElementById('modalPreview')).show();
-    }
-
-    // ── Preview dari modal generate (sebelum terbit) ──
-    function openModalPreviewGenerate() {
-        const checked = document.querySelectorAll('.kandidat-check:checked');
-        if (checked.length === 0) {
-            alert('Pilih minimal satu peserta untuk dipreview.');
-            return;
-        }
-
-        // Ambil data baris pertama yang dicentang
-        const row    = checked[0].closest('tr');
-        const cells  = row.querySelectorAll('td');
-        const nama   = cells[1].textContent.trim();
-        const kode   = cells[2].textContent.trim();
-        const pel    = cells[3].textContent.trim();
-        const hadir  = cells[4].textContent.trim();
-
-        const tgl    = document.getElementById('tgl_terbit_generate').value;
-        const oleh   = document.getElementById('diterbitkan_oleh_generate').value;
-
-        const tglFmt = tgl ? new Date(tgl).toLocaleDateString('id-ID',
-            { day:'numeric', month:'long', year:'numeric' }) : '—';
-
-        document.getElementById('prev_nama_peserta').textContent     = nama;
-        document.getElementById('prev_pelatihan').textContent        = pel;
-        document.getElementById('prev_instruktur').textContent       = '—';
-        document.getElementById('prev_diterbitkan_oleh').textContent = oleh;
-        document.getElementById('prev_kode').textContent             = kode !== '— belum terbit —' ? kode : '(akan digenerate)';
-        document.getElementById('prev_meta').textContent             =
-            `${tglFmt} | Kehadiran: ${hadir} | —`;
-
-        document.getElementById('prev_download_section').classList.add('d-none');
-        document.getElementById('btnGenerateDariPreview').classList.remove('d-none');
-
-        // Tutup modal terbitkan, buka preview
-        bootstrap.Modal.getInstance(document.getElementById('modalTerbitkan'))?.hide();
-        setTimeout(() => {
-            new bootstrap.Modal(document.getElementById('modalPreview')).show();
-        }, 300);
     }
 
     // ── Submit generate massal ──
@@ -597,15 +863,10 @@
             return;
         }
 
-        // Ambil pelatihan_id dari baris pertama yang dicentang untuk route massal
-        const row       = checked[0].closest('tr');
-        const pelId     = row.dataset.pelatihan;
-
         const form = document.getElementById('formGenerateMassal');
-        form.action = `/admin/sertifikat/generate-massal/${pelId}`;
+        form.action = routeGenerateMassal;
         document.getElementById('hidden_diterbitkan_oleh').value = oleh;
 
-        // Hapus input lama
         form.querySelectorAll('input[name="pendaftaran_ids[]"]').forEach(e => e.remove());
         checked.forEach(cb => {
             const inp = document.createElement('input');
@@ -624,24 +885,44 @@
             .forEach(cb => cb.checked = el.checked);
     }
 
-    // ── Filter kandidat dalam modal ──
+    // ── Filter kandidat + update preview template ──
     function filterKandidat() {
         const search = document.getElementById('searchKandidatInput').value.toLowerCase();
         const pelId  = document.getElementById('filterPelatihanKandidat').value;
 
         document.querySelectorAll('#bodyKandidat tr').forEach(row => {
-            const nama = row.dataset.nama ?? '';
-            const pel  = row.dataset.pelatihan ?? '';
+            const nama     = row.dataset.nama ?? '';
+            const pel      = row.dataset.pelatihan ?? '';
             const matchNama = nama.includes(search);
             const matchPel  = !pelId || pel === pelId;
             row.style.display = (matchNama && matchPel) ? '' : 'none';
         });
+
+        updatePreviewTemplate();
+    }
+
+    // ── Update preview template berdasarkan pelatihan dipilih (untuk seksi upload) ──
+    function updatePreviewTemplate() {
+        const select = document.getElementById('filterPelatihanKandidat');
+        const opt    = select.options[select.selectedIndex];
+        const hasTemplate = opt?.dataset.hasTemplate === '1';
+        const url         = opt?.dataset.templateUrl ?? '';
+
+        const previewDiv = document.getElementById('previewTemplateAda');
+        const img        = document.getElementById('imgTemplateAda');
+
+        if (hasTemplate && url) {
+            img.src = url;
+            previewDiv.style.display = 'block';
+        } else {
+            previewDiv.style.display = 'none';
+        }
     }
 
     // ── Tampilkan nama file yang diupload ──
     function tampilkanNamaFile(input) {
-        const el = document.getElementById('namaFileTemplate');
-        el.textContent = input.files.length ? input.files[0].name : '';
+        document.getElementById('namaFileTemplate').textContent =
+            input.files.length ? input.files[0].name : '';
     }
 </script>
 @endpush

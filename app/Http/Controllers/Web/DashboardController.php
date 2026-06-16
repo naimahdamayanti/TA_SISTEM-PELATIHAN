@@ -30,15 +30,15 @@ class DashboardController extends Controller
         };
     }
 
-    /* ──────────────────────────────────────────
-     |  ADMIN DASHBOARD
-     ────────────────────────────────────────── */
     private function dashboardAdmin()
     {
 
-        $totalPeserta     = UserModel::where('role', 'peserta')->count();
+        $totalPeserta = PendaftaranModel::where('status', 'diterima')
+            ->whereNotNull('peserta_id')
+            ->distinct('peserta_id')
+            ->count('peserta_id');
         $totalInstruktur  = UserModel::where('role', 'instruktur')->count();
-        $pelatihanAktif   = PelatihanModel::where('status', 'tersedia')->count();
+        $pelatihanAktif   = PelatihanModel::where('status', 'sedang berlangsung')->count();
         $pelatihanSelesai = PelatihanModel::where('status', 'selesai')->count();
         $totalSertifikat  = SertifikatModel::count();
 
@@ -46,12 +46,14 @@ class DashboardController extends Controller
         $tahun = request('tahun', Carbon::now()->year);
         $grafikBulanan = PelatihanModel::selectRaw('MONTH(tgl_mulai) as bulan, COUNT(*) as total')
             ->whereYear('tgl_mulai', $tahun)
+            ->whereHas('pendaftaran', function ($q) {
+                $q->where('status', 'diterima');
+            })
             ->groupBy('bulan')
             ->orderBy('bulan')
             ->pluck('total', 'bulan')
             ->toArray();
 
-        // Susun data 12 bulan (isi 0 untuk bulan yang kosong)
         $grafikData = [];
         for ($i = 1; $i <= 12; $i++) {
             $grafikData[$i] = $grafikBulanan[$i] ?? 0;
@@ -61,6 +63,7 @@ class DashboardController extends Controller
         $topPelatihan = PelatihanModel::withCount(['pendaftaran' => function ($q) {
             $q->where('status', 'diterima');
         }])
+            ->having('pendaftaran_count', '>', 0)
             ->orderByDesc('pendaftaran_count')
             ->limit(5)
             ->get();
@@ -85,9 +88,6 @@ class DashboardController extends Controller
         ));
     }
 
-    /* ──────────────────────────────────────────
-     |  INSTRUKTUR DASHBOARD
-     ────────────────────────────────────────── */
     private function dashboardInstruktur()
     {
         $instruktur = Auth::user();
@@ -135,9 +135,6 @@ class DashboardController extends Controller
         ));
     }
 
-    /* ──────────────────────────────────────────
-     |  PESERTA DASHBOARD
-     ────────────────────────────────────────── */
     private function dashboardPeserta()
     {
         $peserta = Auth::user();

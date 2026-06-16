@@ -25,9 +25,8 @@
                 <i class="bi bi-calendar-event" style="color:#e84e3a"></i>
             </div>
             <div>
-                <div class="stat-label">Pelatihan Berlangsung</div>
-                <div class="stat-value">{{ $pelatihanAktif }}</div>
-                <div class="stat-sub">Sedang diampu</div>
+                <div class="fw-semibold small">Pelatihan Berlangsung</div>
+                <div class="stat-number fw-bold lh-1 mb-1" style="font-size:1.8rem">{{ $pelatihanAktif }}</div>
             </div>
         </div>
     </div>
@@ -39,9 +38,8 @@
                 <i class="bi bi-check-circle" style="color:#16a34a"></i>
             </div>
             <div>
-                <div class="stat-label">Pelatihan Selesai</div>
-                <div class="stat-value">{{ $pelatihanSelesai }}</div>
-                <div class="stat-sub">Total diampu</div>
+                <div class="fw-semibold small">Pelatihan Selesai</div>
+                <div class="stat-number fw-bold lh-1 mb-1" style="font-size:1.8rem">{{ $pelatihanSelesai }}</div>
             </div>
         </div>
     </div>
@@ -53,9 +51,8 @@
                 <i class="bi bi-people" style="color:#2563eb"></i>
             </div>
             <div>
-                <div class="stat-label">Total Peserta Diampu</div>
-                <div class="stat-value">{{ $pelatihan->sum('pendaftaran_count') }}</div>
-                <div class="stat-sub">Status diterima</div>
+                <div class="fw-semibold small">Total Peserta Diampu</div>
+                <div class="stat-number fw-bold lh-1 mb-1" style="font-size:1.8rem">{{ $pelatihan->sum('pendaftaran_count') }}</div>
             </div>
         </div>
     </div>
@@ -67,9 +64,8 @@
                 <i class="bi bi-award" style="color:#ca8a04"></i>
             </div>
             <div>
-                <div class="stat-label">Sertifikat Diterbitkan</div>
-                <div class="stat-value">{{ $totalPelatihan }}</div>
-                <div class="stat-sub">Pelatihan saya</div>
+                <div class="fw-semibold small">Sertifikat Diterbitkan</div>
+                <div class="stat-number fw-bold lh-1 mb-1" style="font-size:1.8rem">{{ $totalPelatihan }}</div>
             </div>
         </div>
     </div>

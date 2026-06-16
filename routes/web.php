@@ -74,6 +74,7 @@ Route::middleware('auth')->group(function () {
         // Kelola Pendaftaran
         Route::get('/pendaftaran',                [PendaftaranController::class, 'index'])->name('pendaftaran.index');
         Route::get('/pendaftaran/{pendaftaran}',  [PendaftaranController::class, 'show'])->name('pendaftaran.show');
+        Route::get('/pendaftaran/{pendaftaran}/detail', [PendaftaranController::class, 'detail'])->name('pendaftaran.detail');
         Route::post('/pendaftaran/{pendaftaran}/terima', [PendaftaranController::class, 'terima'])->name('pendaftaran.terima');
         Route::post('/pendaftaran/{pendaftaran}/tolak',  [PendaftaranController::class, 'tolak'])->name('pendaftaran.tolak');
         Route::delete('/pendaftaran/{pendaftaran}',      [PendaftaranController::class, 'destroy'])->name('pendaftaran.destroy');
@@ -84,9 +85,13 @@ Route::middleware('auth')->group(function () {
 
         // Sertifikat
         Route::get('/sertifikat',                              [SertifikatController::class, 'index'])->name('sertifikat.index');
+        Route::post('/sertifikat/tanda-tangan/{pelatihan}',    [SertifikatController::class, 'uploadTandaTangan'])->name('sertifikat.uploadTandaTangan');
+        Route::get('/sertifikat/pelatihan/{pelatihan}/posisi', [SertifikatController::class,'getPosisi'])->name('sertifikat.getPosisi');
+        Route::post('/sertifikat/pelatihan/{pelatihan}/posisi',[SertifikatController::class,'savePosisi'])->name('sertifikat.savePosisi');
         Route::get('/sertifikat/preview/{pendaftaran}',        [SertifikatController::class, 'preview'])->name('sertifikat.preview');
         Route::post('/sertifikat/generate/{pendaftaran}',      [SertifikatController::class, 'generate'])->name('sertifikat.generate');
-        Route::post('/sertifikat/generate-massal/{pelatihan}', [SertifikatController::class, 'generateMassal'])->name('sertifikat.generateMassal');
+        Route::post('/sertifikat/generate-massal', [SertifikatController::class, 'generateMassal'])->name('sertifikat.generateMassal');
+        Route::post('/sertifikat/template/{pelatihan}',        [SertifikatController::class, 'uploadTemplate'])->name('sertifikat.uploadTemplate');
         Route::delete('/sertifikat/{sertifikat}',              [SertifikatController::class, 'destroy'])->name('sertifikat.destroy');
 
         // Kualifikasi (read-only)

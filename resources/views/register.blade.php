@@ -345,16 +345,19 @@
             <input type="text" id="no_hp" name="no_hp" placeholder="Masukkan No HP" value="{{ old('no_hp') }}">
         </div>
         <div class="form-group">
-                    <label>Daftar sebagai</label>
-            <select name="role" required>
-                <option value="">-- Pilih Role --</option>
-                <option value="peserta">Peserta</option>
-                <option value="instruktur">Instruktur</option>
-            </select>
+            <label>Daftar sebagai</label>
+            <div style="display:flex; gap:24px; margin-top:4px;">
+                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                    <input type="radio" name="role" value="peserta" required>
+                    Peserta
+                </label>
+                <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                    <input type="radio" name="role" value="instruktur">
+                    Instruktur
+                </label>
+            </div>
         </div>
         <button type="submit" class="btn btn-primary w-100">Daftar</button>
-        <div class="divider">atau</div>
-
     </form>
     
     <div class="login-link">

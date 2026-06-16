@@ -1,9 +1,11 @@
+
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Lupa Password</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -14,7 +16,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient( to bottom, #ff0000ff 0%, #080301ff 100%);
+            background: linear-gradient(to bottom, #ff0000ff 0%, #080301ff 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -51,13 +53,20 @@
             right: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
             animation: pulse 15s ease-in-out infinite;
         }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
         }
 
         .logo {
@@ -74,6 +83,7 @@
             height: 40px;
             width: auto;
         }
+
         .logo i {
             font-size: 20px;
         }
@@ -294,45 +304,62 @@
         }
     </style>
 </head>
+
 <body>
-<div class="container">
-    <div class="left-section">
+    <div class="container">
+        <div class="left-section">
             <div class="logo">
                 <img src="{{ asset('template/assets/img/logo/logo-expertindo.png') }}" alt="logo" />
             </div>
-            
+
             <div class="left-content">
-                <h1>Lupa Password?</h1>
+                <h1>Lupa Kata Sandi?</h1>
                 <img src="{{ asset('template/assets/img/logo/login.png') }}" alt="logo">
             </div>
-    </div>
-    <div class="right-section">
-            <h2>Lupa Password</h2>
-                <p class="subtitle">Masukkan email terdaftar. Kami kirimkan tautan reset password.</p>
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            {{ $errors->first('login_error') }}
         </div>
-    @endif
+        <div class="right-section">
+            <h2>Lupa Kata Sandi</h2>
+            <p class="subtitle">Masukkan email terdaftar. Kami kirimkan tautan reset password.
 
-    <form method="POST" action="{{ route('password.forgot') }}">
-        @csrf
-        <div class="form-group">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" name="email" class="form-control" id="email" placeholder="Masukkan Email" required>
-            @error('email')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
+            </p>
+            {{-- Alert --}}
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+            @if($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
+                    <i class="bi bi-exclamation-circle-fill me-2"></i>{{ $errors->first() }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
+            @if ($errors->any())
+            <div class="alert alert-danger">
+                {{ $errors->first('login_error') }}
+            </div>
+            @endif
+
+            <form method="POST" action="{{ route('password.forgot.send') }}">
+                @csrf
+                <div class="form-group">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" name="email" class="form-control" id="email" placeholder="Masukkan Email" required>
+                    @error('email')
+                    <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                </div>
+
+                <button type="submit" class="btn btn-primary">Kirim Tautan Reset</button>
+
+            </form>
+
+            <div class="login-link">
+                <a href="{{ route('login.post') }}">Kembali ke Login</a>
+            </div>
         </div>
-        
-        <button type="submit" class="btn btn-primary">Kirim Tautan Reset</button>
-
-    </form>
-
-    <div class="login-link">
-        <a href="{{ route('login.post') }}">Kembali ke Login</a>
     </div>
-    </div>
-</div>
 </body>
+
 </html>

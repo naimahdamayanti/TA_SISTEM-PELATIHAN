@@ -31,7 +31,6 @@ return new class extends Migration
             $table->string('pekerjaan', 100)->nullable();
             $table->string('tlp_perusahaan', 20)->nullable();
             $table->text('pesan')->nullable();
-
             $table->enum('status', ['menunggu', 'diterima', 'ditolak'])->default('menunggu');
             $table->dateTime('tgl_daftar')->useCurrent();
             $table->timestamp('updated_at')->nullable()->useCurrentOnUpdate();

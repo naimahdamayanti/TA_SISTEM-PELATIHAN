@@ -161,29 +161,66 @@
                 $sertifikatTerbaru = \App\Models\SertifikatModel::whereHas('pendaftaran', fn($q) =>
                     $q->where('peserta_id', Auth::user()->id_user)
                 )->with('pendaftaran.pelatihan')->latest()->first();
+
+                $templateUrl = $sertifikatTerbaru?->pendaftaran?->pelatihan?->template_sertifikat
+                    ? \Illuminate\Support\Facades\Storage::url(
+                        $sertifikatTerbaru->pendaftaran->pelatihan->template_sertifikat
+                    )
+                    : null;
             @endphp
 
             @if($sertifikatTerbaru)
                 <div style="padding:16px 16px 8px">
-                    <div class="sertifikat-preview mb-3">
-                        <div style="font-size:28px;margin-bottom:6px">🏆</div>
-                        <div style="font-size:10px;font-weight:700;letter-spacing:.1em;color:#aaa;text-transform:uppercase;margin-bottom:6px">
-                            Sertifikat Kelulusan
+
+                    {{-- Preview --}}
+                    @if($templateUrl)
+                        <div style="position:relative; width:100%; aspect-ratio:297/210;
+                                    border-radius:10px; overflow:hidden; margin-bottom:12px;">
+                            <img src="{{ $templateUrl }}"
+                                style="width:100%;height:100%;object-fit:fill;display:block;">
+                            <div style="position:absolute;inset:0;background:rgba(0,0,0,0.18);"></div>
+                            <div style="position:absolute;inset:0;display:flex;flex-direction:column;
+                                        align-items:center;justify-content:center;gap:3px;padding:10px;">
+                                <div style="font-size:11px;font-weight:700;color:#fff;
+                                            text-shadow:0 1px 4px rgba(0,0,0,0.6);text-align:center;">
+                                    {{ Auth::user()->nama_lengkap ?? Auth::user()->name }}
+                                </div>
+                                <div style="font-size:9px;color:rgba(255,255,255,0.85);
+                                            text-shadow:0 1px 3px rgba(0,0,0,0.5);text-align:center;">
+                                    {{ $sertifikatTerbaru->pendaftaran?->pelatihan?->nama_pelatihan ?? '-' }}
+                                </div>
+                            </div>
                         </div>
-                        <div class="sertifikat-nama">
-                            {{ Auth::user()->nama_lengkap ?? Auth::user()->name }}
+                    @else
+                        {{-- Fallback --}}
+                        <div class="sertifikat-preview mb-3">
+                            <div style="font-size:28px;margin-bottom:6px">🏆</div>
+                            <div style="font-size:10px;font-weight:700;letter-spacing:.1em;
+                                        color:#aaa;text-transform:uppercase;margin-bottom:6px">
+                                Sertifikat Kelulusan
+                            </div>
+                            <div class="sertifikat-nama">
+                                {{ Auth::user()->nama_lengkap ?? Auth::user()->name }}
+                            </div>
+                            <div style="font-size:12px;color:#555;margin:4px 0">
+                                {{ $sertifikatTerbaru->pendaftaran?->pelatihan?->nama_pelatihan ?? '-' }}
+                            </div>
                         </div>
-                        <div style="font-size:12px;color:#555;margin:4px 0">
-                            {{ $sertifikatTerbaru->pendaftaran?->pelatihan?->nama_pelatihan ?? '-' }}
+                    @endif
+
+                    {{-- Nomor & Kode --}}
+                    <div style="text-align:center;margin-bottom:10px;">
+                        <div style="font-size:11px;color:#555;font-weight:600;">
+                            {{ $sertifikatTerbaru->nomor_sertifikat ?? '-' }}
                         </div>
-                        <div class="sertifikat-kode">
-                            {{ $sertifikatTerbaru->no_sertifikat ?? $sertifikatTerbaru->kode_sertifikat ?? '-' }}
+                        <div style="font-size:10px;color:#bbb;font-family:monospace;margin-top:2px;">
+                            {{ $sertifikatTerbaru->kode_sertifikat }}
                         </div>
                     </div>
 
                     <a href="{{ route('peserta.sertifikat.download', $sertifikatTerbaru->id_sertifikat ?? $sertifikatTerbaru->id) }}"
-                       class="btn btn-primary w-100 rounded-3 fw-semibold d-flex align-items-center justify-content-center gap-2"
-                       target="_blank">
+                    class="btn btn-primary w-100 rounded-3 fw-semibold d-flex align-items-center justify-content-center gap-2"
+                    target="_blank">
                         <i class="bi bi-download"></i> Unduh PDF
                     </a>
                 </div>

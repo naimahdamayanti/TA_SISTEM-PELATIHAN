@@ -150,11 +150,23 @@
 
     {{-- ── HEADER MERAH ── --}}
     <div class="doc-header">
+        @php
+            $logoPath = public_path('template/assets/img/logo/logo-expertindo.png');
+            $logoBase64 = file_exists($logoPath)
+                ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
+                : null;
+        @endphp
+
         <div class="dh-left">
-            <div class="dh-icon">&#128196;</div>
+            <div class="sidebar-brand">
+                @if($logoBase64)
+                    <img src="{{ $logoBase64 }}"
+                        style="height:14mm; width:auto;" alt="logo">
+                @endif
+            </div>
             <div>
                 <div class="dh-title">Formulir Pendaftaran Pelatihan</div>
-                <div class="dh-sub">Sistem Informasi Manajemen Pelatihan &amp; Sertifikasi — SIMPERI</div>
+                <div class="dh-sub">Sistem Informasi Manajemen Pelatihan &amp; Sertifikasi</div>
             </div>
         </div>
         <div class="dh-right">
@@ -300,7 +312,7 @@
 
     {{-- ── FOOTER ── --}}
     <div class="doc-footer">
-        SIMPERI – Sistem Informasi Manajemen Pelatihan &amp; Sertifikasi
+        Sistem Informasi Manajemen Pelatihan &amp; Sertifikasi
         &nbsp;|&nbsp;
         Dicetak: {{ $tgl_cetak->translatedFormat('j F Y') }} pukul {{ $tgl_cetak->format('H:i') }} WIB
     </div>

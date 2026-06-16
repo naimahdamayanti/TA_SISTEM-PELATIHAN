@@ -25,7 +25,7 @@ class PelatihanController extends Controller
     {
         $this->authorizeRole(['admin']);
 
-        $query = PelatihanModel::with('instruktur')
+        $query = PelatihanModel::with('instruktur', 'kategori')
             ->withCount(['pendaftaran' => fn($q) => $q->where('status', 'diterima')]);
 
         // Filter opsional
@@ -33,7 +33,7 @@ class PelatihanController extends Controller
             $query->where('status', $request->status);
         }
         if ($request->filled('kategori')) {
-            $query->where('kategori', $request->kategori);
+            $query->where('kategori_id', $request->kategori);
         }
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
@@ -72,12 +72,12 @@ class PelatihanController extends Controller
             'instruktur_id'  => 'required|exists:users,id_user',
             'nama_pelatihan' => 'required|string|max:100',
             'kode_pelatihan' => 'required|string|max:15|unique:pelatihan,kode_pelatihan',
-            'kategori'       => 'required|string|max:50',
+            'kategori_id'    => 'required|exists:kategori,id_kategori',
             'deskripsi'      => 'required|string',
             'kuota'          => 'required|integer|min:1|max:500',
             'tgl_mulai'      => 'nullable|date',
             'tgl_selesai'    => 'nullable|date|after_or_equal:tgl_mulai',
-            'status'         => 'required|in:tersedia,penuh,selesai',
+            'status'         => 'required|in:tersedia,sedang berlangsung,selesai',
         ]);
 
         PelatihanModel::create($validated);
@@ -111,12 +111,12 @@ class PelatihanController extends Controller
             'kode_pelatihan' => ['required', 'string', 'max:15',
                 Rule::unique('pelatihan', 'kode_pelatihan')->ignore($pelatihan->id_pelatihan, 'id_pelatihan'),
             ],
-            'kategori'       => 'required|string|max:50',
+            'kategori_id'    => 'required|exists:kategori,id_kategori',
             'deskripsi'      => 'required|string',
             'kuota'          => 'required|integer|min:1|max:500',
             'tgl_mulai'      => 'nullable|date',
             'tgl_selesai'    => 'nullable|date|after_or_equal:tgl_mulai',
-            'status'         => 'required|in:tersedia,penuh,selesai',
+            'status'         => 'required|in:tersedia,sedang berlangsung,selesai',
         ]);
 
         $pelatihan->update($validated);
@@ -202,21 +202,21 @@ class PelatihanController extends Controller
             ->pluck('pelatihan_id')
             ->toArray();
 
-        $query = PelatihanModel::with('instruktur')
+        $query = PelatihanModel::with('instruktur', 'kategori')
             ->withCount(['pendaftaran' => fn($q) => $q->where('status', 'diterima')]);
 
         if ($request->filled('search')) {
             $query->where('nama_pelatihan', 'like', '%' . $request->search . '%');
         }
         if ($request->filled('kategori')) {
-            $query->where('kategori', $request->kategori);
+            $query->where('kategori_id', $request->kategori);
         }
 
         // Hanya tampilkan yang tersedia
         $query->where('status', 'tersedia');
 
         $pelatihan = $query->latest()->paginate(9)->withQueryString();
-        $kategori  = PelatihanModel::where('status', 'tersedia')->distinct()->pluck('kategori');
+        $kategori  = KategoriModel::aktif()->get();
 
         return view('peserta.pelatihan.index', compact('pelatihan', 'kategori', 'sudahDaftar'));
     }

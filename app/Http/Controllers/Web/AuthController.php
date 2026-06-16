@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Web;
 
+use App\Helpers\MailHelper;
 use App\Http\Controllers\Controller;
 use App\Models\UserModel;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
-use Carbon\Carbon;
 
 class AuthController extends Controller
 {
@@ -17,17 +17,11 @@ class AuthController extends Controller
      |  LOGIN
      ═══════════════════════════════════════════════ */
 
-    /**
-     * [PUBLIC] Tampilkan halaman login (v-login di mockup).
-     */
     public function loginForm()
     {
         return view('login');
     }
 
-    /**
-     * [PUBLIC] Proses login.
-     */
     public function login(Request $request)
     {
         $credentials = $request->validate([
@@ -35,7 +29,6 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        // Coba login dengan field 'email' → column 'email' dan guard default
         $user = UserModel::where('email', $credentials['email'])->first();
 
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
@@ -54,29 +47,23 @@ class AuthController extends Controller
      |  REGISTER (Peserta)
      ═══════════════════════════════════════════════ */
 
-    /**
-     * [PUBLIC] Tampilkan halaman registrasi peserta (v-register di mockup).
-     */
     public function registerForm()
     {
         return view('register');
     }
 
-    /**
-     * [PUBLIC] Proses registrasi akun peserta baru.
-     */
     public function register(Request $request)
     {
         $validated = $request->validate([
-            'nama'            => 'required|string|max:100',
-            'email'           => 'required|email|max:100|unique:users,email',
-            'username'        => 'required|string|max:50|unique:users,username|alpha_dash',
-            'password'        => 'required|string|min:6',
-            'no_hp'           => 'nullable|string|max:20',
-            'role'            => 'required|in:peserta,instruktur', 
+            'nama'     => 'required|string|max:100',
+            'email'    => 'required|email|max:100|unique:users,email',
+            'username' => 'required|string|max:50|unique:users,username|alpha_dash',
+            'password' => 'required|string|min:6',
+            'no_hp'    => 'nullable|string|max:20',
+            'role'     => 'required|in:peserta,instruktur',
         ]);
 
-        $user = UserModel::create([
+        UserModel::create([
             'nama'     => $validated['nama'],
             'email'    => $validated['email'],
             'username' => $validated['username'],
@@ -93,13 +80,9 @@ class AuthController extends Controller
      |  LOGOUT
      ═══════════════════════════════════════════════ */
 
-    /**
-     * [AUTH] Proses logout.
-     */
     public function logout(Request $request)
     {
         Auth::logout();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
@@ -111,16 +94,13 @@ class AuthController extends Controller
      |  FORGOT PASSWORD
      ═══════════════════════════════════════════════ */
 
-    /**
-     * [PUBLIC] Tampilkan form lupa password (v-forgot di mockup).
-     */
     public function forgotForm()
     {
         return view('lupa-password');
     }
 
     /**
-     * [PUBLIC] Kirim token reset password ke email.
+     * [PUBLIC] Kirim link reset password ke email.
      * Token disimpan ke kolom token_reset & token_exp di tabel users.
      */
     public function forgotSend(Request $request)
@@ -131,11 +111,12 @@ class AuthController extends Controller
 
         $user = UserModel::where('email', $request->email)->first();
 
-        // Respons sama meskipun email tidak ditemukan (security: avoid email enumeration)
+        // Respons sama meskipun email tidak ditemukan (hindari email enumeration)
         if (!$user) {
             return back()->with('success', 'Jika email terdaftar, link reset password telah dikirim.');
         }
 
+        // Generate token & simpan ke kolom users
         $token  = Str::random(64);
         $expiry = Carbon::now()->addMinutes(60);
 
@@ -144,9 +125,13 @@ class AuthController extends Controller
             'token_exp'   => $expiry,
         ]);
 
-        // TODO: Kirim email menggunakan Mailable
-        // Mail::to($user->email)->send(new ResetPasswordMail($token, $user->nama));
+        $resetLink = url('/reset-password/' . $token);
 
+        $result = MailHelper::sendResetPasswordEmail($user->email, $resetLink);
+
+        if (($result['status'] ?? 'error') !== 'success') {
+            return back()->with('error', 'Gagal mengirim email. Silakan coba lagi atau hubungi admin.');
+        }
         return back()->with('success', 'Link reset password telah dikirim ke email Anda.');
     }
 
@@ -200,9 +185,6 @@ class AuthController extends Controller
      |  LANDING PAGE
      ═══════════════════════════════════════════════ */
 
-    /**
-     * [PUBLIC] Halaman landing (v-landing di mockup).
-     */
     public function landing()
     {
         if (Auth::check()) {
@@ -214,9 +196,6 @@ class AuthController extends Controller
 
     /* ─── Helper ─── */
 
-    /**
-     * Redirect ke dashboard berdasarkan role.
-     */
     private function redirectByRole(string $role): \Illuminate\Http\RedirectResponse
     {
         return match ($role) {

@@ -18,6 +18,7 @@ return new class extends Migration
                   ->cascadeOnDelete();
 
             $table->string('kode_sertifikat', 20)->unique();
+            $table->string('nomor_sertifikat', 60)->nullable();
             $table->dateTime('tgl_terbit');
             $table->string('diterbitkan_oleh', 100);
             $table->string('file', 255)->comment('Path file PDF sertifikat');

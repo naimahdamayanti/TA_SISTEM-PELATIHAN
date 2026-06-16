@@ -48,7 +48,13 @@ class PendaftaranController extends Controller
     {
         $this->authorizeRole(['admin']);
         $pendaftaran->load(['peserta', 'pelatihan.instruktur']);
-        return view('admin.pendaftaran.show', compact('pendaftaran'));
+        $stats = [
+            'menunggu' => PendaftaranModel::where('status', 'menunggu')->count(),
+            'diterima' => PendaftaranModel::where('status', 'diterima')->count(),
+            'ditolak'  => PendaftaranModel::where('status', 'ditolak')->count(),
+        ];
+        $pelatihan = PelatihanModel::orderBy('nama_pelatihan')->get();
+        return redirect()->route('admin.pendaftaran.index')->with(compact('pendaftaran', 'pelatihan', 'stats'))->with('showModal', true);
     }
 
     public function terima(PendaftaranModel $pendaftaran)
@@ -118,7 +124,7 @@ class PendaftaranController extends Controller
                 ->with('info', 'Anda sudah pernah mendaftar ke pelatihan ini.');
 
         $pelatihan->load('instruktur');
-        return view('peserta.pendaftaran.form', compact('pelatihan', 'peserta'));
+        return view('peserta.pendaftaran.index', compact('pelatihan', 'peserta'));
     }
 
     public function kirimPendaftaran(Request $request, PelatihanModel $pelatihan)
@@ -133,7 +139,7 @@ class PendaftaranController extends Controller
             ->where('pelatihan_id', $pelatihan->id_pelatihan)->exists();
 
         if ($sudahDaftar)
-            return redirect()->route('peserta.riwayat')
+            return redirect()->route('peserta.riwayat.index')
                 ->with('info', 'Anda sudah terdaftar di pelatihan ini.');
 
         $validated = $request->validate([
@@ -155,7 +161,7 @@ class PendaftaranController extends Controller
 
         PendaftaranModel::create($validated);
 
-        return redirect()->route('peserta.riwayat')
+        return redirect()->route('peserta.riwayat.index')
             ->with('success', 'Pendaftaran berhasil dikirim. Menunggu konfirmasi admin.');
     }
 
@@ -172,6 +178,40 @@ class PendaftaranController extends Controller
         return view('peserta.riwayat.index', compact('pendaftaran'));
     }
 
+    public function detail(PendaftaranModel $pendaftaran)
+    {
+        $pendaftaran->load(['pelatihan.instruktur', 'sertifikat']);
+
+        return response()->json([
+            'id'             => $pendaftaran->id_pendaftaran ?? $pendaftaran->id,
+            'id_label'       => 'PD-' . str_pad($pendaftaran->id_pendaftaran ?? $pendaftaran->id, 3, '0', STR_PAD_LEFT),
+            'nama_lengkap'   => trim($pendaftaran->first_name . ' ' . $pendaftaran->last_name),
+            'email'          => $pendaftaran->email,
+            'no_hp'          => $pendaftaran->no_hp ?? '-',
+            'alamat'         => $pendaftaran->alamat ?? '-',
+            'pekerjaan'      => $pendaftaran->pekerjaan ?? '-',
+            'perusahaan'     => $pendaftaran->perusahaan ?? '-',
+            'tlp_perusahaan' => $pendaftaran->tlp_perusahaan ?? '-',
+            'pesan'          => $pendaftaran->pesan ?? '-',
+            'status'         => $pendaftaran->status,
+            'tgl_daftar'     => $pendaftaran->tgl_daftar
+                                    ? Carbon::parse($pendaftaran->tgl_daftar)->translatedFormat('j M Y')
+                                    : '-',
+            'pelatihan' => [
+                'nama'       => $pendaftaran->pelatihan?->nama_pelatihan ?? '-',
+                'kode'       => $pendaftaran->pelatihan?->kode_pelatihan ?? '-',
+                'instruktur' => $pendaftaran->pelatihan?->instruktur?->nama_lengkap
+                                ?? $pendaftaran->pelatihan?->instruktur?->nama ?? '-',
+                'periode'    => ($pendaftaran->pelatihan?->tgl_mulai && $pendaftaran->pelatihan?->tgl_selesai)
+                                ? Carbon::parse($pendaftaran->pelatihan->tgl_mulai)->translatedFormat('j M Y')
+                                . ' – '
+                                . Carbon::parse($pendaftaran->pelatihan->tgl_selesai)->translatedFormat('j M Y')
+                                : '-',
+            ],
+            'url_pdf' => route('admin.pendaftaran.exportPDF', $pendaftaran->id_pendaftaran ?? $pendaftaran->id),
+        ]);
+    }
+
     /**
      * [PESERTA] Ambil data satu pendaftaran sebagai JSON untuk ditampilkan di modal.
      * Dipanggil via AJAX saat peserta klik tombol "Unduh PDF" di tabel riwayat.
@@ -180,7 +220,6 @@ class PendaftaranController extends Controller
     {
         $this->authorizeRole(['peserta']);
 
-        // Pastikan pendaftaran milik peserta yang login
         if ($pendaftaran->peserta_id !== Auth::user()->id_user) {
             abort(403, 'Akses ditolak.');
         }
@@ -219,7 +258,7 @@ class PendaftaranController extends Controller
             'sertifikat' => $pendaftaran->sertifikat
                             ? $pendaftaran->sertifikat->kode_sertifikat
                             : null,
-            'url_pdf' => route('peserta.pendaftaran.exportPDF', $pendaftaran->id_pendaftaran ?? $pendaftaran->id),
+            'url_pdf' => route('peserta.riwayat.exportPDF', $pendaftaran->id_pendaftaran ?? $pendaftaran->id),
         ]);
     }
 
@@ -237,7 +276,7 @@ class PendaftaranController extends Controller
 
         $pendaftaran->load(['pelatihan.instruktur', 'sertifikat']);
 
-        $pdf = Pdf::loadView('peserta.pendaftaran.export-pdf', [
+        $pdf = Pdf::loadView('peserta.riwayat.exportPDF', [
             'pendaftaran' => $pendaftaran,
             'tgl_cetak'   => Carbon::now(),
         ])

@@ -453,7 +453,7 @@
 
                     {{-- Footer dokumen --}}
                     <div class="modal-doc-footer">
-                        SIMPERI – Sistem Informasi Manajemen Pelatihan &amp; Sertifikasi
+                        Sistem Informasi Manajemen Pelatihan &amp; Sertifikasi
                         &nbsp;|&nbsp; Dicetak: {{ now()->translatedFormat('j M Y') }}
                     </div>
 

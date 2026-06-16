@@ -214,6 +214,51 @@
             #main-content { margin-left: 0; padding: 20px 16px 32px; }
         }
 
+        /* ─── SIDEBAR COLLAPSED (desktop) ─── */
+        #sidebar {
+            transition: transform .25s ease, width .25s ease;
+        }
+
+        @media (min-width: 992px) {
+            #sidebar.collapsed {
+                width: 64px;
+            }
+            #sidebar.collapsed .nav-section-label,
+            #sidebar.collapsed .link-text,
+            #sidebar.collapsed .sf-name,
+            #sidebar.collapsed .sf-role {
+                display: none;
+            }
+            #sidebar.collapsed .sidebar-brand {
+                justify-content: center;
+                padding: 0;
+            }
+            #sidebar.collapsed .sidebar-brand img {
+                height: 28px;
+                max-width: 40px;
+                object-fit: contain;
+            }
+            #sidebar.collapsed .sidebar-link {
+                justify-content: center;
+                padding: 10px 0;
+            }
+            #sidebar.collapsed .sidebar-link i {
+                font-size: 20px;
+                margin: 0;
+            }
+            #sidebar.collapsed .sidebar-footer {
+                justify-content: center;
+                padding: 14px 0;
+            }
+
+            #sidebar.collapsed ~ #topbar       { left: 64px; }
+            #sidebar.collapsed ~ #main-content { margin-left: 64px; }
+
+            #topbar, #main-content {
+                transition: left .25s ease, margin-left .25s ease;
+            }
+        }
+
         /* ─── BRAND OVERRIDES ─── */
         .btn-primary { background-color: var(--brand); border-color: var(--brand); }
         .btn-primary:hover, .btn-primary:focus { background-color: var(--brand-dark); border-color: var(--brand-dark); }
@@ -325,26 +370,36 @@
     <nav class="sidebar-nav">
         <div class="nav-section-label">Utama</div>
         <a href="{{ route('dashboard') }}"
-           class="sidebar-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-            <i class="bi bi-house-door"></i> Dashboard
+        class="sidebar-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"
+        title="Dashboard">
+            <i class="bi bi-house-door"></i>
+            <span class="link-text">Dashboard</span>
         </a>
 
         <div class="nav-section-label">Pelatihan</div>
         <a href="{{ route('peserta.pelatihan.index') }}"
-           class="sidebar-link {{ request()->routeIs('peserta.pelatihan*') ? 'active' : '' }}">
-            <i class="bi bi-collection"></i> Katalog Pelatihan
+        class="sidebar-link {{ request()->routeIs('peserta.pelatihan*') ? 'active' : '' }}"
+        title="Katalog Pelatihan">
+            <i class="bi bi-collection"></i>
+            <span class="link-text">Katalog Pelatihan</span>
         </a>
         <a href="{{ route('peserta.kehadiran.index') }}"
-           class="sidebar-link {{ request()->routeIs('peserta.kehadiran*') ? 'active' : '' }}">
-            <i class="bi bi-calendar-check"></i> Status Kehadiran
+        class="sidebar-link {{ request()->routeIs('peserta.kehadiran*') ? 'active' : '' }}"
+        title="Status Kehadiran">
+            <i class="bi bi-calendar-check"></i>
+            <span class="link-text">Status Kehadiran</span>
         </a>
         <a href="{{ route('peserta.sertifikat.index') }}"
-           class="sidebar-link {{ request()->routeIs('peserta.sertifikat*') ? 'active' : '' }}">
-            <i class="bi bi-award"></i> Sertifikat Saya
+        class="sidebar-link {{ request()->routeIs('peserta.sertifikat*') ? 'active' : '' }}"
+        title="Sertifikat Saya">
+            <i class="bi bi-award"></i>
+            <span class="link-text">Sertifikat Saya</span>
         </a>
         <a href="{{ route('peserta.riwayat.index') }}"
-           class="sidebar-link {{ request()->routeIs('peserta.riwayat*') ? 'active' : '' }}">
-            <i class="bi bi-clock-history"></i> Riwayat
+        class="sidebar-link {{ request()->routeIs('peserta.riwayat*') ? 'active' : '' }}"
+        title="Riwayat">
+            <i class="bi bi-clock-history"></i>
+            <span class="link-text">Riwayat</span>
         </a>
     </nav>
 
@@ -534,8 +589,12 @@
     const overlay = document.getElementById('sidebarOverlay');
 
     document.getElementById('sidebarToggle').addEventListener('click', () => {
-        const isOpen = sidebar.classList.toggle('open');
-        overlay.style.display = isOpen ? 'block' : 'none';
+        if (window.innerWidth >= 992) {
+            sidebar.classList.toggle('collapsed');
+        } else {
+            const isOpen = sidebar.classList.toggle('open');
+            overlay.style.display = isOpen ? 'block' : 'none';
+        }
     });
 
     function closeSidebar() {

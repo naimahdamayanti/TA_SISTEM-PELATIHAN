@@ -15,8 +15,8 @@ return new class extends Migration
                   ->cascadeOnDelete();
             $table->string('nama_pelatihan', 100);
             $table->string('kode_pelatihan', 15)->unique();
-            $table->unsignedBigInteger('kategori_id')->nullable()->after('kode_pelatihan');
-            $table->foreign('kategori_id')
+            $table->unsignedBigInteger('kategori_id')->nullable();
+            $table->foreign('kategori')
                   ->references('id_kategori')
                   ->on('kategori')
                   ->onUpdate('cascade');
@@ -24,7 +24,10 @@ return new class extends Migration
             $table->integer('kuota')->comment('Maksimal jumlah peserta');
             $table->date('tgl_mulai')->nullable()->comment('Tanggal sesi pertama');
             $table->date('tgl_selesai')->nullable()->comment('Tanggal sesi terakhir');
-            $table->enum('status', ['tersedia', 'penuh', 'selesai'])->default('tersedia');
+            $table->enum('status', ['tersedia', 'sedang berlangsung', 'selesai'])->default('tersedia');
+            $table->string('template_sertifikat')->nullable();
+            $table->json('posisi_sertifikat')->nullable();
+            $table->string('tanda_tangan')->nullable();
             $table->timestamps();
         });
     }

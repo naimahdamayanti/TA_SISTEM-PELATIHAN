@@ -288,8 +288,14 @@
             <tbody>
                 @forelse($sertifikat as $s)
                 @php
-                    $peserta   = $s->pendaftaran?->peserta;
-                    $pelatihan = $s->pendaftaran?->pelatihan;
+                    $peserta      = $s->pendaftaran?->peserta;
+                    $pelatihan    = $s->pendaftaran?->pelatihan;
+                    $templateUrl  = $pelatihan?->template_sertifikat
+                        ? \Illuminate\Support\Facades\Storage::url($pelatihan->template_sertifikat)
+                        : '';
+                    $fileUrl      = $s->file
+                        ? \Illuminate\Support\Facades\Storage::url($s->file)
+                        : '';
                 @endphp
                 <tr>
                     {{-- Kode --}}
@@ -315,17 +321,17 @@
 
                     {{-- Aksi: Lihat / Preview --}}
                     <td style="text-align:right">
-                        <button type="button" class="btn-lihat"
-                                onclick="bukaPreview(
+                        <button type="button" class="btn-lihat" onclick="bukaPreview(
                                     '{{ addslashes($s->kode_sertifikat) }}',
+                                    '{{ addslashes($s->nomor_sertifikat ?? '-') }}',
                                     '{{ addslashes($peserta?->nama ?? '-') }}',
                                     '{{ addslashes($pelatihan?->nama_pelatihan ?? '-') }}',
                                     '{{ addslashes($pelatihan?->kode_pelatihan ?? '-') }}',
                                     '{{ \Carbon\Carbon::parse($s->tgl_terbit)->translatedFormat('j M Y') }}',
                                     '{{ addslashes($s->diterbitkan_oleh) }}',
                                     '{{ addslashes(Auth::user()->nama) }}',
-                                    '{{ $s->pendaftaran?->kualifikasiSertifikasi?->persen_hadir ?? 0 }}',
-                                    '{{ $s->file ? Storage::url($s->file) : '' }}'
+                                    '{{ $fileUrl }}',
+                                    '{{ $templateUrl }}'
                                 )">
                             <i class="bi bi-eye"></i> Lihat
                         </button>
@@ -374,74 +380,59 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
 
-            <div class="modal-body px-4 py-3">
-                <p class="preview-hint">
-                    Tampilan sertifikat yang telah diterbitkan. Kode unik masing-masing peserta tercantum di bagian bawah.
-                </p>
+            <div class="modal-body px-3 py-3">
 
-                {{-- ── Sertifikat Card ── --}}
-                <div class="sertif-card">
-
-                    {{-- Trophy --}}
-                    <span class="trophy-icon">🏆</span>
-
-                    {{-- Judul --}}
-                    <p class="sertif-judul">Sertifikat Kelulusan</p>
-                    <p class="sertif-subjudul">Certificate of Completion</p>
-
-                    <hr class="sertif-divider">
-
-                    <p class="sertif-diberikan">Diberikan kepada</p>
-                    <p class="sertif-nama" id="prev-nama">—</p>
-
-                    <p class="sertif-kalimat">
-                        telah berhasil menyelesaikan dan dinyatakan<br>
-                        lulus dalam program pelatihan
-                    </p>
-
-                    <p class="sertif-pelatihan" id="prev-pelatihan">—</p>
-
-                    <div class="sertif-meta">
-                        <span id="prev-tgl">—</span>
-                        <span>Kehadiran: <strong id="prev-persen">0</strong>%</span>
-                        <span>Kode Pelatihan: <strong id="prev-kode-pel">—</strong></span>
-                    </div>
-
-                    {{-- QR placeholder --}}
-                    <div class="qr-box">
-                        <i class="bi bi-qr-code"></i>
-                    </div>
-
-                    {{-- Footer tiga kolom --}}
-                    <div class="sertif-footer">
-                        <div class="sf-col">
-                            <div class="sf-main" id="prev-diterbitkan">—</div>
-                            <div class="sf-sub">Diterbitkan Oleh</div>
-                        </div>
-                        <div class="sf-col">
-                            <div class="sf-kode" id="prev-kode">—</div>
-                            <div class="sf-sub mt-1">Kode Sertifikat Unik</div>
-                        </div>
-                        <div class="sf-col">
-                            <div class="sf-main" id="prev-instruktur">—</div>
-                            <div class="sf-sub">Instruktur Pelaksana</div>
-                        </div>
-                    </div>
-
-                    <p class="sertif-copy">
-                        Verifikasi: expertindo.id/cek-sertifikat | Expertindo © 2026
-                    </p>
+                {{-- iframe PDF --}}
+                <div id="prev-pdf-wrap"
+                    style="border:1px solid #dee2e6; border-radius:10px; overflow:hidden;
+                            background:#f5f5f5; height:420px; display:none;">
+                    <iframe id="prev-pdf-iframe" src=""
+                            style="width:100%;height:100%;border:0;"></iframe>
                 </div>
+
+                {{-- Fallback kalau belum ada PDF --}}
+                <div id="prev-pdf-fallback"
+                    style="height:200px;display:flex;flex-direction:column;
+                            align-items:center;justify-content:center;
+                            border:2px dashed #e5e5e5;border-radius:10px;
+                            background:#fafafa;color:#bbb;">
+                    <i class="bi bi-file-earmark-pdf" style="font-size:40px;margin-bottom:8px;"></i>
+                    <div style="font-size:13px;">PDF sertifikat belum tersedia</div>
+                </div>
+
+                {{-- Info strip di bawah iframe --}}
+                <div id="prev-info-strip"
+                    style="display:none;margin-top:10px;padding:10px 14px;
+                            background:#f9fafb;border:1px solid #f0f0f0;
+                            border-radius:8px;font-size:12px;color:#666;">
+                    <div class="d-flex justify-content-between flex-wrap gap-2">
+                        <span>
+                            <i class="bi bi-person me-1 text-muted"></i>
+                            <span id="prev-nama-strip">—</span>
+                        </span>
+                        <span>
+                            <i class="bi bi-hash me-1 text-muted"></i>
+                            <span id="prev-nomor-strip">—</span>
+                        </span>
+                        <span>
+                            <i class="bi bi-upc-scan me-1 text-muted"></i>
+                            <span id="prev-kode-strip">—</span>
+                        </span>
+                        <span>
+                            <i class="bi bi-calendar3 me-1 text-muted"></i>
+                            <span id="prev-tgl-strip">—</span>
+                        </span>
+                    </div>
+                </div>
+
             </div>
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-outline-secondary rounded-3 px-4"
                         data-bs-dismiss="modal">Kembali</button>
-
-                {{-- Tombol download PDF (hanya jika file tersedia) --}}
                 <a id="btn-download-pdf" href="#" target="_blank"
-                   class="btn btn-primary rounded-3 px-4 fw-semibold"
-                   style="display:none">
+                class="btn btn-primary rounded-3 px-4 fw-semibold"
+                style="display:none">
                     <i class="bi bi-download me-1"></i> Unduh PDF
                 </a>
             </div>
@@ -454,28 +445,38 @@
 
 @push('scripts')
 <script>
-    function bukaPreview(kode, nama, pelatihan, kodePel, tgl, diterbitkan, instruktur, persen, fileUrl) {
-        // Isi data ke dalam modal
-        document.getElementById('prev-kode').textContent        = kode;
-        document.getElementById('prev-nama').textContent        = nama;
-        document.getElementById('prev-pelatihan').textContent   = pelatihan;
-        document.getElementById('prev-kode-pel').textContent    = kodePel;
-        document.getElementById('prev-tgl').textContent         = tgl;
-        document.getElementById('prev-persen').textContent      = persen;
-        document.getElementById('prev-diterbitkan').textContent = diterbitkan;
-        document.getElementById('prev-instruktur').textContent  = instruktur;
+    function bukaPreview(kode, nomor, nama, pelatihan, kodePel, tgl, diterbitkan, instruktur, fileUrl, templateUrl) {
+    const iframe    = document.getElementById('prev-pdf-iframe');
+    const pdfWrap   = document.getElementById('prev-pdf-wrap');
+    const fallback  = document.getElementById('prev-pdf-fallback');
+    const infoStrip = document.getElementById('prev-info-strip');
 
-        // Tampilkan / sembunyikan tombol unduh PDF
-        const btnDownload = document.getElementById('btn-download-pdf');
-        if (fileUrl && fileUrl.trim() !== '') {
-            btnDownload.href = fileUrl;
-            btnDownload.style.display = 'inline-flex';
-        } else {
-            btnDownload.style.display = 'none';
-        }
-
-        // Buka modal
-        new bootstrap.Modal(document.getElementById('modalPreview')).show();
+    if (fileUrl && fileUrl.trim() !== '') {
+        iframe.src              = fileUrl;
+        pdfWrap.style.display   = 'block';
+        fallback.style.display  = 'none';
+        infoStrip.style.display = 'block';
+    } else {
+        iframe.src              = '';
+        pdfWrap.style.display   = 'none';
+        fallback.style.display  = 'flex';
+        infoStrip.style.display = 'none';
     }
+
+    document.getElementById('prev-nama-strip').textContent  = nama;
+    document.getElementById('prev-nomor-strip').textContent = nomor;
+    document.getElementById('prev-kode-strip').textContent  = kode;
+    document.getElementById('prev-tgl-strip').textContent   = tgl;
+
+    const btnDownload = document.getElementById('btn-download-pdf');
+    if (fileUrl && fileUrl.trim() !== '') {
+        btnDownload.href         = fileUrl;
+        btnDownload.style.display = 'inline-flex';
+    } else {
+        btnDownload.style.display = 'none';
+    }
+
+    new bootstrap.Modal(document.getElementById('modalPreview')).show();
+}
 </script>
 @endpush

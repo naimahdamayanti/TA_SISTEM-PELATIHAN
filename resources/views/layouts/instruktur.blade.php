@@ -216,6 +216,54 @@
             #main-content { margin-left: 0; padding: 20px 16px 32px; }
         }
 
+        /* ─── SIDEBAR COLLAPSED (desktop) ─── */
+        #sidebar {
+            /* tambahkan width ke transition yang sudah ada */
+            transition: transform .25s ease, width .25s ease;
+        }
+
+        @media (min-width: 992px) {
+            #sidebar.collapsed {
+                width: 64px;
+            }
+            #sidebar.collapsed .nav-section-label,
+            #sidebar.collapsed .link-text,
+            #sidebar.collapsed .sf-name,
+            #sidebar.collapsed .sf-role {
+                display: none;
+            }
+            #sidebar.collapsed .sidebar-brand {
+                justify-content: center;
+                padding: 0;
+            }
+            #sidebar.collapsed .sidebar-brand img {
+                height: 28px;
+                max-width: 40px;
+                object-fit: contain;
+            }
+            #sidebar.collapsed .sidebar-link {
+                justify-content: center;
+                padding: 10px 0;
+            }
+            #sidebar.collapsed .sidebar-link i {
+                font-size: 20px;
+                margin: 0;
+            }
+            #sidebar.collapsed .sidebar-footer {
+                justify-content: center;
+                padding: 14px 0;
+            }
+
+            /* Geser topbar & main saat collapsed */
+            #sidebar.collapsed ~ #topbar      { left: 64px; }
+            #sidebar.collapsed ~ #main-content { margin-left: 64px; }
+
+            /* Animasi smooth untuk topbar & main */
+            #topbar, #main-content {
+                transition: left .25s ease, margin-left .25s ease;
+            }
+        }
+
         /* ─── BRAND OVERRIDES ─── */
         .btn-primary { background-color: var(--brand); border-color: var(--brand); }
         .btn-primary:hover, .btn-primary:focus { background-color: var(--brand-dark); border-color: var(--brand-dark); }
@@ -338,28 +386,38 @@
     </div>
 
     <nav class="sidebar-nav">
-        <div class="nav-section-label">Utama</div>
-        <a href="{{ route('dashboard') }}"
-           class="sidebar-link {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-            <i class="bi bi-house-door"></i> Dashboard
-        </a>
+    <div class="nav-section-label">Utama</div>
+    <a href="{{ route('dashboard') }}"
+       class="sidebar-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"
+       title="Dashboard">
+        <i class="bi bi-house-door"></i>
+        <span class="link-text">Dashboard</span>
+    </a>
 
-        <div class="nav-section-label">Pelatihan</div>
-        <a href="{{ route('instruktur.pelatihan.index') }}"
-           class="sidebar-link {{ request()->routeIs('instruktur.pelatihan.*') ? 'active' : '' }}">
-            <i class="bi bi-journal-bookmark"></i> Pelatihan Saya
-        </a>
-        <a href="{{ route('instruktur.logbook.index') }}"
-           class="sidebar-link {{ request()->routeIs('instruktur.logbook.*') ? 'active' : '' }}">
-            <i class="bi bi-clipboard-check"></i> Logbook Kehadiran
-        </a>
-        <a href="{{ route('instruktur.kelayakan.index') }}"
-           class="sidebar-link {{ request()->routeIs('instruktur.kelayakan.*') ? 'active' : '' }}">
-            <i class="bi bi-shield-check"></i> Status Kelayakan
-        </a>
-        <a href="{{ route('instruktur.sertifikat.index') }}"
-           class="sidebar-link {{ request()->routeIs('instruktur.sertifikat.*') ? 'active' : '' }}">
-            <i class="bi bi-award"></i> Riwayat Sertifikat
+    <div class="nav-section-label">Pelatihan</div>
+    <a href="{{ route('instruktur.pelatihan.index') }}"
+       class="sidebar-link {{ request()->routeIs('instruktur.pelatihan.*') ? 'active' : '' }}"
+       title="Pelatihan Saya">
+        <i class="bi bi-journal-bookmark"></i>
+        <span class="link-text">Pelatihan Saya</span>
+    </a>
+    <a href="{{ route('instruktur.logbook.index') }}"
+       class="sidebar-link {{ request()->routeIs('instruktur.logbook.*') ? 'active' : '' }}"
+       title="Logbook Kehadiran">
+        <i class="bi bi-clipboard-check"></i>
+        <span class="link-text">Logbook Kehadiran</span>
+    </a>
+    <a href="{{ route('instruktur.kelayakan.index') }}"
+       class="sidebar-link {{ request()->routeIs('instruktur.kelayakan.*') ? 'active' : '' }}"
+       title="Status Kelayakan">
+        <i class="bi bi-shield-check"></i>
+        <span class="link-text">Status Kelayakan</span>
+    </a>
+    <a href="{{ route('instruktur.sertifikat.index') }}"
+        class="sidebar-link {{ request()->routeIs('instruktur.sertifikat.*') ? 'active' : '' }}"
+        title="Riwayat Sertifikat">
+            <i class="bi bi-award"></i>
+            <span class="link-text">Riwayat Sertifikat</span>
         </a>
     </nav>
 
@@ -533,8 +591,14 @@
     const overlay = document.getElementById('sidebarOverlay');
 
     document.getElementById('sidebarToggle').addEventListener('click', () => {
-        const isOpen = sidebar.classList.toggle('open');
-        overlay.style.display = isOpen ? 'block' : 'none';
+        if (window.innerWidth >= 992) {
+            // Desktop: toggle collapsed (icon only ↔ icon + teks)
+            sidebar.classList.toggle('collapsed');
+        } else {
+            // Mobile: toggle open (overlay)
+            const isOpen = sidebar.classList.toggle('open');
+            overlay.style.display = isOpen ? 'block' : 'none';
+        }
     });
 
     function closeSidebar() {

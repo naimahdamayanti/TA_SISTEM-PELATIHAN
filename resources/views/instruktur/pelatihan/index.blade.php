@@ -178,7 +178,7 @@
     <select name="status" class="form-select" style="width:auto;min-width:140px">
         <option value="">Semua Status</option>
         <option value="tersedia" {{ request('status') === 'tersedia' ? 'selected' : '' }}>Tersedia</option>
-        <option value="penuh"    {{ request('status') === 'penuh'    ? 'selected' : '' }}>Penuh</option>
+        <option value="sedang berlangsung"    {{ request('status') === 'sedang berlangsung'    ? 'selected' : '' }}>Sedang Berlangsung</option>
         <option value="selesai"  {{ request('status') === 'selesai'  ? 'selected' : '' }}>Selesai</option>
     </select>
 
@@ -218,7 +218,7 @@
             {{-- Nama & meta --}}
             <h6 class="card-title">{{ $p->nama_pelatihan }}</h6>
             <div class="card-meta">
-                <span>{{ $p->kategori }}</span>
+                <span>{{ $p->kategori?->nama_kategori ?? '-' }}</span>
                 @if($p->tgl_mulai && $p->tgl_selesai)
                 <span>
                     {{ \Carbon\Carbon::parse($p->tgl_mulai)->translatedFormat('j M Y') }}

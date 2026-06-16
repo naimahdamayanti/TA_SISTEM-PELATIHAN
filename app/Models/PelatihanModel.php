@@ -13,12 +13,15 @@ class PelatihanModel extends Model
         'instruktur_id',
         'nama_pelatihan',
         'kode_pelatihan',
-        'kategori',
+        'kategori_id',
         'deskripsi',
         'kuota',
         'tgl_mulai',
         'tgl_selesai',
         'status',
+        'template_sertifikat',
+        'posisi_sertifikat',
+        'tanda_tangan',
     ];
 
     protected function casts(): array
@@ -27,6 +30,7 @@ class PelatihanModel extends Model
             'tgl_mulai'   => 'date',
             'tgl_selesai' => 'date',
             'kuota'       => 'integer',
+            'posisi_sertifikat' => 'array',
         ];
     }
 
@@ -38,6 +42,11 @@ class PelatihanModel extends Model
     public function instruktur()
     {
         return $this->belongsTo(UserModel::class, 'instruktur_id', 'id_user');
+    }
+
+    public function kategori()
+    {
+        return $this->belongsTo(KategoriModel::class, 'kategori_id', 'id_kategori');
     }
 
     /** Semua sesi jadwal pelatihan ini */

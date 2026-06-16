@@ -107,7 +107,7 @@ class KualifikasiSertifikasiController extends Controller
 
                 // Hitung persen hadir dari logbook
                 $hadirCount  = LogbookModel::where('peserta_id', $pendaftaran->peserta_id)
-                    ->whereHas('sesi', fn($q) => $q->where('pelatihan_id', $pelatihan->id_pelatihan))
+                    ->whereHas('sesiPelatihan', fn($q) => $q->where('pelatihan_id', $pelatihan->id_pelatihan))
                     ->where('status', 'hadir')
                     ->count();
 
@@ -212,7 +212,7 @@ class KualifikasiSertifikasiController extends Controller
 
         return $pesertaList->map(function ($daftar) use ($totalSesi, $pelatihan) {
             $hadir = LogbookModel::where('peserta_id', $daftar->peserta_id)
-                ->whereHas('sesi', fn($q) => $q->where('pelatihan_id', $pelatihan->id_pelatihan))
+                ->whereHas('sesiPelatihan', fn($q) => $q->where('pelatihan_id', $pelatihan->id_pelatihan))
                 ->where('status', 'hadir')
                 ->count();
 

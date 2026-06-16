@@ -1,9 +1,10 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Reset Kata Sandi - ExpertIndo Training</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -14,7 +15,7 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient( to bottom, #ff0000ff 0%, #080301ff 100%);
+            background: linear-gradient(to bottom, #ff0000ff 0%, #080301ff 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -51,13 +52,17 @@
             right: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
             animation: pulse 15s ease-in-out infinite;
         }
 
         @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
         }
 
         .logo {
@@ -73,9 +78,6 @@
         .logo img {
             height: 40px;
             width: auto;
-        }
-        .logo i {
-            font-size: 20px;
         }
 
         .left-content {
@@ -99,23 +101,6 @@
         .illustration img {
             width: 100%;
             height: auto;
-        }
-
-        .home-link {
-            color: white;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            opacity: 0.9;
-            transition: opacity 0.3s;
-            position: relative;
-            z-index: 1;
-        }
-
-        .home-link:hover {
-            opacity: 1;
         }
 
         .right-section {
@@ -150,8 +135,6 @@
             margin-bottom: 8px;
         }
 
-        input[type="text"],
-        input[type="email"],
         input[type="password"] {
             width: 100%;
             padding: 12px 15px;
@@ -162,8 +145,6 @@
             background: #f8f9fa;
         }
 
-        input[type="text"]:focus,
-        input[type="email"]:focus,
         input[type="password"]:focus {
             outline: none;
             border-color: #e73c3c;
@@ -190,54 +171,6 @@
             box-shadow: 0 5px 15px rgba(231, 60, 60, 0.3);
         }
 
-        .divider {
-            text-align: center;
-            margin: 20px 0;
-            position: relative;
-            color: #999;
-            font-size: 14px;
-        }
-
-        .divider::before,
-        .divider::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            width: 45%;
-            height: 1px;
-            background: #ddd;
-        }
-
-        .divider::before {
-            left: 0;
-        }
-
-        .divider::after {
-            right: 0;
-        }
-
-        .btn-google {
-            width: 100%;
-            padding: 12px;
-            background: white;
-            color: #333;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.3s;
-        }
-
-        .btn-google:hover {
-            background: #f8f9fa;
-            border-color: #ccc;
-        }
-
         .login-link {
             text-align: center;
             margin-top: 20px;
@@ -258,21 +191,17 @@
         .error-message {
             background: #fee;
             color: #c33;
-            padding: 10px;
+            padding: 12px;
             border-radius: 8px;
+            border-left: 4px solid #c92a2a;
             margin-bottom: 20px;
             font-size: 14px;
-            display: none;
         }
 
-        .success-message {
-            background: #efe;
-            color: #3c3;
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            font-size: 14px;
-            display: none;
+        .error-message ul {
+            list-style-position: inside;
+            margin: 0;
+            padding: 0;
         }
 
         @media (max-width: 768px) {
@@ -294,71 +223,59 @@
         }
     </style>
 </head>
+
 <body>
-<div class="container">
-    <div class="left-section">
+    <div class="container">
+        <div class="left-section">
             <div class="logo">
                 <img src="{{ asset('template/assets/img/logo/logo-expertindo.png') }}" alt="logo" />
             </div>
-            
+
             <div class="left-content">
-                <h1>Selamat Datang<br>Kembali!</h1>
-                <img src="{{ asset('template/assets/img/logo/login.png') }}" alt="logo">
+                <h1>Atur Ulang Kata Sandi</h1>
+                <div class="illustration">
+                    <img src="{{ asset('template/assets/img/logo/login.png') }}" alt="logo">
+                </div>
             </div>
+        </div>
+
+        <div class="right-section">
+            <h2>Buat Kata Sandi Baru</h2>
+            <p class="subtitle">Amankan kembali akun Anda dengan memasukkan kata sandi yang baru.</p>
+
+            @if ($errors->any())
+                <div class="error-message">
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <form method="POST" action="{{ url('/reset-password') }}">
+                @csrf
+                
+                <input type="hidden" name="token" value="{{ $token }}">
+
+                <div class="form-group">
+                    <label for="password">Kata Sandi Baru</label>
+                    <input type="password" name="password" id="password" placeholder="Minimal 6 karakter" required minlength="6">
+                </div>
+
+                <div class="form-group">
+                    <label for="password_confirmation">Konfirmasi Kata Sandi Baru</label>
+                    <input type="password" name="password_confirmation" id="password_confirmation" placeholder="Ulangi kata sandi" required minlength="6">
+                </div>
+
+                <button type="submit" class="btn-primary">Perbarui Kata Sandi</button>
+            </form>
+
+            <div class="login-link">
+                <a href="{{ route('login') }}">Kembali ke Login</a>
+            </div>
+        </div>
     </div>
-    <div class="right-section">
-            <h2>Login</h2>
-                <p class="subtitle">Silahkan Masukkan email dan password anda!</p>
-    @if ($errors->any())
-        <div class="alert alert-danger">
-            {{ $errors->first('login_error') }}
-        </div>
-    @endif
-
-    {{-- Alert --}}
-    @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
-            <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-    @if($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show rounded-3 mb-4" role="alert">
-            <i class="bi bi-exclamation-circle-fill me-2"></i>{{ $errors->first() }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-    @endif
-
-    <form method="POST" action="{{ route('login.post') }}">
-        @csrf
-        <div class="form-group">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" name="email" class="form-control" id="email" placeholder="Masukkan Email" required>
-            @error('email')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
-        </div>
-        <div class="form-group">
-            <label for="password" class="form-label">Kata Sandi</label>
-            <input type="password" name="password" placeholder="Masukkan Kata Sandi" class="form-control" id="password" required>
-            @error('password')
-                <div class="text-danger">{{ $message }}</div>
-            @enderror
-        </div>
-        <div style="text-align: right;">
-            <a href="{{ route('password.forgot') }}" style="color: red;">
-                Lupa Kata Sandi?
-            </a>
-        </div>
-        
-        <button type="submit" class="btn btn-primary">Login</button>
-
-    </form>
-
-    <div class="login-link">
-        Belum Punya Akun? <a href="{{ route('register.post') }}">Daftar disini</a>
-    </div>
-    </div>
-</div>
 </body>
+
 </html>

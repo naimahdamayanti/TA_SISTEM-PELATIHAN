@@ -296,10 +296,11 @@
 
         <select name="kategori">
             <option value="">Semua Kategori</option>
-            @foreach($kategori as $kat)
-                <option value="{{ $kat }}" {{ request('kategori') == $kat ? 'selected' : '' }}>
-                    {{ $kat }}
-                </option>
+        @foreach($kategori as $kat)
+            <option value="{{ $kat->id_kategori }}" 
+                @selected(request('kategori') == $kat->id_kategori)>
+                {{ $kat->nama_kategori }}
+            </option>
             @endforeach
         </select>
 
@@ -325,9 +326,9 @@
             $sisa      = max(0, $kuota - $terisi);
             $persen    = $kuota > 0 ? min(100, round(($terisi / $kuota) * 100)) : 0;
             $sudah     = in_array($p->id_pelatihan, $sudahDaftar);
-            $penuh     = $sisa <= 0 || $p->status === 'penuh';
+            $sedangBerlangsung = $p->status === 'sedang berlangsung';
             $selesai   = $p->status === 'selesai';
-            $bisaDaftar = !$sudah && !$penuh && !$selesai;
+            $bisaDaftar = !$sudah && !$sedangBerlangsung && !$selesai;
         @endphp
 
         <div class="training-card">
@@ -385,7 +386,7 @@
                     <div class="btn-daftar-disabled">
                         <i class="bi bi-slash-circle"></i> Pelatihan Selesai
                     </div>
-                @elseif($penuh)
+                @elseif($sedangBerlangsung)
                     <div class="btn-daftar-disabled">
                         <i class="bi bi-x-circle"></i> Pendaftaran Ditutup
                     </div>

@@ -56,7 +56,7 @@
                 <select name="status" class="form-select">
                     <option value="">Semua Status</option>
                     <option value="tersedia" @selected(request('status') === 'tersedia')>Tersedia</option>
-                    <option value="penuh"    @selected(request('status') === 'penuh')>Penuh</option>
+                    <option value="sedang berlangsung"    @selected(request('status') === 'sedang berlangsung')>Sedang Berlangsung</option>
                     <option value="selesai"  @selected(request('status') === 'selesai')>Selesai</option>
                 </select>
             </div>
@@ -64,7 +64,10 @@
                 <select name="kategori" class="form-select">
                     <option value="">Semua Kategori</option>
                     @foreach($kategori as $kat)
-                        <option value="{{ $kat }}" @selected(request('kategori') === $kat)>{{ $kat }}</option>
+                        <option value="{{ $kat->id_kategori }}" 
+                            @selected(request('kategori') == $kat->id_kategori)>
+                            {{ $kat->nama_kategori }}
+                        </option>
                     @endforeach
                 </select>
             </div>
@@ -140,7 +143,7 @@
                             @php
                                 $statusClass = match($item->status) {
                                     'tersedia' => 'success',
-                                    'penuh'    => 'warning',
+                                    'sedang berlangsung' => 'warning',
                                     'selesai'  => 'secondary',
                                     default    => 'secondary',
                                 };
@@ -245,9 +248,9 @@
                             <select name="kategori_id" class="form-select rounded-3" required>
                                 <option value="">-- Pilih Kategori --</option>
                                 @foreach($kategori as $kat)
-                                    <option value="{{ $kat->id_kategori }}" 
-                                        {{ old('kategori_id', $pelatihan->kategori_id ?? '') == $kat->id_kategori ? 'selected' : '' }}>
-                                        [{{ $kat->kode_kategori }}] {{ $kat->nama_kategori }}
+                                    <option value="{{ $kat->id_kategori }}"
+                                        {{ old('kategori_id') == $kat->id_kategori ? 'selected' : '' }}>
+                                        {{ $kat->nama_kategori }}
                                     </option>
                                 @endforeach
                             </select>
@@ -286,7 +289,7 @@
                             <label class="form-label fw-semibold small">Status</label>
                             <select name="status" class="form-select rounded-3" required>
                                 <option value="tersedia" {{ old('status','tersedia') === 'tersedia' ? 'selected':'' }}>Tersedia</option>
-                                <option value="penuh"    {{ old('status') === 'penuh' ? 'selected':'' }}>Penuh</option>
+                                <option value="sedang berlangsung"    {{ old('status') === 'sedang berlangsung' ? 'selected':'' }}>Sedang Berlangsung</option>
                                 <option value="selesai"  {{ old('status') === 'selesai' ? 'selected':'' }}>Selesai</option>
                             </select>
                         </div>
@@ -376,7 +379,7 @@
                                 <option value="">-- Pilih Kategori --</option>
                                 @foreach($kategori as $kat)
                                     <option value="{{ $kat->id_kategori }}">
-                                        [{{ $kat->kode_kategori }}] {{ $kat->nama_kategori }}
+                                        {{ $kat->kode_kategori }} {{ $kat->nama_kategori }}
                                     </option>
                                 @endforeach
                             </select>  
@@ -409,7 +412,7 @@
                             <label class="form-label fw-semibold small">Status</label>
                             <select name="status" id="edit_status" class="form-select rounded-3" required>
                                 <option value="tersedia">Tersedia</option>
-                                <option value="penuh">Penuh</option>
+                                <option value="sedang berlangsung">Sedang Berlangsung</option>
                                 <option value="selesai">Selesai</option>
                             </select>
                         </div>
