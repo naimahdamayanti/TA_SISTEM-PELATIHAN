@@ -157,13 +157,7 @@
                 <a class="navbar-brand" href="{{ url('/') }}">
                   <img src="{{ asset('template/assets/img/logo/logo-expertindo.png') }}" alt="logo" />
                 </a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                  data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                  aria-expanded="false" aria-label="Toggle navigation">
-                  <span class="toggler-icon"></span>
-                  <span class="toggler-icon"></span>
-                  <span class="toggler-icon"></span>
-                </button>
+                
               </nav>
             </div>
           </div>
@@ -201,7 +195,7 @@
           </div>
 
           <!-- Tombol -->
-          <div class="col-6 order-3 mt-3">
+          <div class="col-12 order-3 mt-3">
             <a href="{{ route('login') }}" class="main-btn">
               Login
             </a>

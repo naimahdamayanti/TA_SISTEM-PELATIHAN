@@ -135,7 +135,8 @@
                         <th class="py-3">Perusahaan</th>
                         <th class="py-3">Pelatihan</th>
                         <th class="py-3">Tanggal Daftar</th>
-                        <th class="py-3 text-center" style="width:110px">Status</th>
+                        <th class="py-3 text-center" style="width:120px">Status</th>
+                        <th class="py-3 text-center" style="width:140px">Aksi</th>
                     </tr>
                 </thead>
                 <tbody>

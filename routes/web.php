@@ -104,6 +104,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/laporan',        [LaporanController::class, 'index'])->name('laporan.index');
         Route::get('/laporan/export', [LaporanController::class, 'export'])->name('laporan.export');
         Route::get('/laporan/exportPdf', [LaporanController::class, 'exportPdf'])->name('laporan.exportPdf');
+        Route::get('/laporan/export-excel', [LaporanController::class, 'exportExcel'])->name('laporan.exportExcel');
 
         // Kelola Akun
         Route::resource('akun', AkunController::class)->parameters(['akun' => 'user']);

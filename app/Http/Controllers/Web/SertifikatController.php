@@ -142,15 +142,16 @@ class SertifikatController extends Controller
 
         // Convert gambar ke base64 untuk DomPDF
         $templateBase64 = null;
+        $ttdBase64      = null;
         if ($templatePath && file_exists($templatePath)) {
             $templateBase64   = $pendaftaran->pelatihan->template_sertifikat
                 ? $this->toBase64($pendaftaran->pelatihan->template_sertifikat)
                 : null;
+                    }
 
-            $ttdBase64 = $pendaftaran->pelatihan->tanda_tangan
+        $ttdBase64 = $pendaftaran->pelatihan->tanda_tangan
                 ? $this->toBase64($pendaftaran->pelatihan->tanda_tangan)
                 : null;
-                    }
 
         $nomorSertifikat = $this->generateNomorSertifikat($pendaftaran->pelatihan, $tglTerbit);
 

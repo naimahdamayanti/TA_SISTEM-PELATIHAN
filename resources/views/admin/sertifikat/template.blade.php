@@ -94,6 +94,16 @@
 
         return $style;
     };
+
+    $ttdStyle = null;
+    if (isset($posisi['tanda_tangan'])) {
+        $p    = $posisi['tanda_tangan'];
+        $xMm  = $p['x'] / 100 * 297;
+        $yMm  = $p['y'] / 100 * 210;
+        $w    = 45; // lebar tanda tangan dalam mm, sesuaikan
+        $left = $xMm - $w / 2; // selalu center
+        $ttdStyle = "position:absolute; top:{$yMm}mm; left:{$left}mm; width:{$w}mm;";
+    }
 @endphp
 <div class="wrap">
 
@@ -117,6 +127,13 @@
         </div>
         <div class="diterbitkan" style="{{ $styleFor('diterbitkan_oleh') }}">{{ $diterbitkan_oleh }}</div>
         <div class="kode" style="{{ $styleFor('kode') }}">{{ $kode }}</div>
+        @if(!empty($ttdBase64) && $ttdStyle)
+        <div style="{{ $ttdStyle }}">
+            <img src="{{ $ttdBase64 }}"
+                alt="ttd"
+                style="width:100%; height:auto; max-height:20mm; display:block;">
+        </div>
+        @endif
     </div>
 
 </div>

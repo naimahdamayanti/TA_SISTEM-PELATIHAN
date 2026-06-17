@@ -19,6 +19,10 @@
         class="btn btn-primary fw-semibold px-4">
             <i class="bi bi-file-earmark-pdf me-2"></i>Export PDF
         </a>
+        <a href="{{ route('admin.laporan.exportExcel', ['tahun' => $tahun]) }}"
+        class="btn btn-success fw-semibold px-4">
+            <i class="bi bi-file-earmark-excel me-2"></i>Export Excel
+        </a>
     </div>
 </div>
 
@@ -90,6 +94,16 @@
                             </a>
                         </li>
                         @endforeach
+                    
+                        <li><hr class="dropdown-divider"></li>
+                        <li><h6 class="dropdown-header">Export Excel</h6></li>
+                        <li>
+                            <a class="dropdown-item small"
+                            href="{{ route('admin.laporan.exportExcel', ['tahun' => $tahun]) }}">
+                                <i class="bi bi-file-earmark-excel me-2 text-success"></i>Semua Data (4 Sheet)
+                            </a>
+                        </li>
+                    
                         <li><hr class="dropdown-divider"></li>
                         <li><h6 class="dropdown-header">Export PDF</h6></li>
                         <li>

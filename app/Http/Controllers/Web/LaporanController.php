@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers\Web;
 
+use App\Exports\LaporanExcelExport;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Controllers\Controller;
 use App\Models\PelatihanModel;
 use App\Models\PendaftaranModel;
@@ -281,5 +283,14 @@ class LaporanController extends Controller
         ])->setPaper('a4', 'landscape');
 
         return $pdf->download("laporan_pelatihan_{$tahun}.pdf");
+    }
+
+    public function exportExcel(Request $request)
+    {
+        $tahun = $request->input('tahun', Carbon::now()->year);
+ 
+        $namaFile = "laporan_expertindo_{$tahun}.xlsx";
+ 
+        return Excel::download(new LaporanExcelExport($tahun), $namaFile);
     }
 }

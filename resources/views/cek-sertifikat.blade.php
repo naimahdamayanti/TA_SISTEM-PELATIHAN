@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verifikasi Sertifikat — SIMPERTI</title>
+    <title>Verifikasi Sertifikat</title>
+    <link rel="shortcut icon" href="{{ asset('template/assets/img/logo/logo-expertindo.png') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -385,10 +386,9 @@
     <div class="card-header">
         <div class="header-icon">
             {{-- Ikon badge centang --}}
-            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12 2l2.09 4.26L18.5 7.27l-3.25 3.17.77 4.47L12 12.77l-4.02 2.14.77-4.47L5.5 7.27l4.41-1.01L12 2z"/>
-                <path d="M9 12l2 2 4-4" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-            </svg>
+            <img src="{{ asset('template/assets/img/logo/logo-expertindo.png') }}"
+                alt="Expertindo"
+                style="height:34px; width:auto; object-fit:contain;">
         </div>
         <h1>Verifikasi Keaslian Sertifikat</h1>
         <p>Masukkan kode sertifikat untuk memverifikasi keaslian dokumen</p>

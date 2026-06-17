@@ -135,12 +135,20 @@
 </head>
 <body>
 
+@php
+    $logoPath = public_path('template/assets/img/logo/logo-expertindo.png');
+    $logoSrc  = file_exists($logoPath)
+        ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
+        : null;
+@endphp
+
     {{-- ── HEADER ── --}}
     <div class="header">
         <div class="header-top">
             <div>
-                <div class="brand">Expertindo</div>
-                <div class="brand-sub">Training &amp; Consulting</div>
+                @if($logoSrc)
+                    <img src="{{ $logoSrc }}" style="height:60px; width:auto;" alt="Logo">
+                @endif
             </div>
             <div class="doc-title">
                 <h1>Laporan Data Pelatihan {{ $tahun }}</h1>
