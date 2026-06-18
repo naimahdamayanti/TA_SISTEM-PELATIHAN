@@ -93,6 +93,201 @@ class MailHelper
     }
 
     /**
+     * Kirim email kode penerimaan instruktur
+     */
+    public static function sendKodePenerimaanEmail(
+        string $email,
+        string $nama,
+        string $kode,
+        ?string $expiredAt,
+        string $namaPeruntukan = ''
+    ): array {
+        $appName = config('mail.from.name', 'Tim Support');
+
+        $altBody = "Halo {$nama},\n\n"
+                . "Selamat! Anda telah diterima sebagai instruktur di {$appName}.\n\n"
+                . "Kode Penerimaan Anda: {$kode}\n"
+                . ($expiredAt ? "Berlaku hingga: {$expiredAt}\n" : "")
+                . "\nGunakan kode ini saat melakukan registrasi akun instruktur di:\n"
+                . url('/register') . "\n\n"
+                . "Jangan bagikan kode ini kepada siapapun.";
+
+        return self::sendEmail(
+            $email,
+            'Kode Penerimaan Instruktur - ' . $appName,
+            self::buildKodePenerimaanBody($nama, $kode, $expiredAt, $appName),
+            $altBody
+        );
+    }
+
+    /**
+     * Build HTML body email kode penerimaan
+     */
+    private static function buildKodePenerimaanBody(
+        string $nama,
+        string $kode,
+        ?string $expiredAt,
+        string $appName
+    ): string {
+        $registerUrl   = url('/register');
+        $expiredNotice = $expiredAt
+            ? '<p style="color:#92400e;font-size:13px;margin:0;">
+                ⏳ Kode ini berlaku hingga <strong>' . htmlspecialchars($expiredAt) . '</strong>.
+            </p>'
+            : '<p style="color:#555;font-size:13px;margin:0;">
+                Kode ini tidak memiliki batas waktu penggunaan.
+            </p>';
+
+        return '
+        <html>
+        <body style="margin:0;padding:0;font-family:Segoe UI,Arial,sans-serif;background:#f4f6f9;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="padding:40px 20px;">
+                <tr><td align="center">
+                    <table width="560" cellpadding="0" cellspacing="0"
+                        style="background:#fff;border-radius:12px;overflow:hidden;
+                                box-shadow:0 4px 20px rgba(0,0,0,0.08);">
+                        <tr>
+                            <td style="background:linear-gradient(135deg,#0f766e,#0d9488);
+                                    padding:36px 40px;text-align:center;">
+                                <h1 style="color:#fff;margin:0 0 6px;font-size:22px;font-weight:700;">
+                                    🎓 Selamat, Anda Diterima!
+                                </h1>
+                                <p style="color:rgba(255,255,255,0.85);margin:0;font-size:13px;">
+                                    ' . htmlspecialchars($appName) . '
+                                </p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="padding:36px 40px;">
+                                <p style="color:#333;font-size:16px;font-weight:600;margin:0 0 8px;">
+                                    Halo, ' . htmlspecialchars($nama) . '!
+                                </p>
+                                <p style="color:#555;font-size:14px;line-height:1.7;margin:0 0 28px;">
+                                    Anda telah diterima sebagai <strong>Instruktur</strong> di
+                                    <strong>' . htmlspecialchars($appName) . '</strong>.
+                                    Gunakan kode berikut untuk menyelesaikan registrasi akun Anda.
+                                </p>
+
+                                <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:12px;">
+                                    <tr><td align="center">
+                                        <div style="display:inline-block;
+                                                    background:#f0fdfa;
+                                                    border:2px dashed #0d9488;
+                                                    border-radius:12px;
+                                                    padding:20px 40px;
+                                                    text-align:center;">
+                                            <p style="color:#888;font-size:12px;margin:0 0 8px;
+                                                    text-transform:uppercase;letter-spacing:1px;">
+                                                Kode Penerimaan Anda
+                                            </p>
+                                            <p style="color:#0f766e;
+                                                    font-family:Courier New,monospace;
+                                                    font-size:28px;
+                                                    font-weight:700;
+                                                    letter-spacing:4px;
+                                                    margin:0;">
+                                                ' . htmlspecialchars($kode) . '
+                                            </p>
+                                        </div>
+                                    </td></tr>
+                                </table>
+
+                                <table width="100%" cellpadding="0" cellspacing="0"
+                                    style="background:#fffbeb;border-left:4px solid #f59e0b;
+                                            border-radius:6px;margin-bottom:28px;">
+                                    <tr><td style="padding:12px 16px;">
+                                        ' . $expiredNotice . '
+                                    </td></tr>
+                                </table>
+
+                                <p style="color:#333;font-size:14px;font-weight:600;margin:0 0 12px;">
+                                    Langkah registrasi:
+                                </p>
+                                <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
+                                    <tr>
+                                        <td style="width:28px;vertical-align:top;padding-top:2px;">
+                                            <span style="background:#0d9488;color:#fff;border-radius:50%;
+                                                        width:20px;height:20px;display:inline-block;
+                                                        text-align:center;font-size:11px;line-height:20px;
+                                                        font-weight:700;">1</span>
+                                        </td>
+                                        <td style="color:#555;font-size:13px;line-height:1.6;padding-bottom:8px;">
+                                            Buka halaman registrasi instruktur
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width:28px;vertical-align:top;padding-top:2px;">
+                                            <span style="background:#0d9488;color:#fff;border-radius:50%;
+                                                        width:20px;height:20px;display:inline-block;
+                                                        text-align:center;font-size:11px;line-height:20px;
+                                                        font-weight:700;">2</span>
+                                        </td>
+                                        <td style="color:#555;font-size:13px;line-height:1.6;padding-bottom:8px;">
+                                            Isi data diri dan masukkan kode penerimaan di atas
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width:28px;vertical-align:top;padding-top:2px;">
+                                            <span style="background:#0d9488;color:#fff;border-radius:50%;
+                                                        width:20px;height:20px;display:inline-block;
+                                                        text-align:center;font-size:11px;line-height:20px;
+                                                        font-weight:700;">3</span>
+                                        </td>
+                                        <td style="color:#555;font-size:13px;line-height:1.6;padding-bottom:8px;">
+                                            Upload surat / bukti penerimaan dari ' . htmlspecialchars($appName) . '
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width:28px;vertical-align:top;padding-top:2px;">
+                                            <span style="background:#0d9488;color:#fff;border-radius:50%;
+                                                        width:20px;height:20px;display:inline-block;
+                                                        text-align:center;font-size:11px;line-height:20px;
+                                                        font-weight:700;">4</span>
+                                        </td>
+                                        <td style="color:#555;font-size:13px;line-height:1.6;">
+                                            Tunggu verifikasi dokumen oleh Admin
+                                        </td>
+                                    </tr>
+                                </table>
+
+                                <table width="100%" cellpadding="0" cellspacing="0">
+                                    <tr><td align="center" style="padding-bottom:28px;">
+                                        <a href="' . $registerUrl . '"
+                                        style="display:inline-block;padding:13px 36px;
+                                                background:linear-gradient(135deg,#0f766e,#0d9488);
+                                                color:#fff;text-decoration:none;border-radius:8px;
+                                                font-size:15px;font-weight:600;">
+                                            Daftar Sekarang →
+                                        </a>
+                                    </td></tr>
+                                </table>
+
+                                <hr style="border:none;border-top:1px solid #eee;margin:0 0 20px;">
+                                <p style="color:#aaa;font-size:12px;margin:0;">
+                                    🔒 Jangan bagikan kode ini kepada siapapun. Kode hanya dapat digunakan satu kali.
+                                </p>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td style="background:#f0fdfa;padding:20px 40px;
+                                    text-align:center;border-top:1px solid #ccfbf1;">
+                                <p style="color:#aaa;font-size:12px;margin:0;">
+                                    &copy; ' . date('Y') . ' ' . htmlspecialchars($appName) . '.
+                                    Dikirim otomatis, jangan balas email ini.
+                                </p>
+                            </td>
+                        </tr>
+
+                    </table>
+                </td></tr>
+            </table>
+        </body>
+        </html>';
+    }
+
+    /**
      * Kirim email notifikasi akun baru dibuat oleh admin
      */
     public static function sendAkunCreatedEmail(string $email, string $nama, string $username, string $password, string $role): array

@@ -5,7 +5,42 @@
 
 @section('content')
 
-{{-- ── Greeting ── --}}
+{{-- ══════════════════════════════════════════════════════════════════════════
+     NOTICE STATUS VERIFIKASI
+     Ditampilkan jika instruktur belum/tidak terverifikasi
+══════════════════════════════════════════════════════════════════════════ --}}
+@if(Auth::user()->status_verifikasi === 'menunggu')
+    <div class="alert d-flex align-items-start gap-3 rounded-3 mb-4 border-0"
+         style="background:#fffbeb;border-left:4px solid #f59e0b!important;border-left-width:4px;">
+        <i class="bi bi-hourglass-split fs-5 mt-1" style="color:#f59e0b"></i>
+        <div>
+            <div class="fw-semibold mb-1" style="color:#78350f">Akun Sedang Menunggu Verifikasi</div>
+            <div class="small" style="color:#92400e">
+                Dokumen penerimaan Anda sedang diperiksa oleh Admin.
+                Anda belum dapat ditugaskan ke sesi pelatihan sampai akun diverifikasi.
+                Hubungi Admin jika membutuhkan informasi lebih lanjut.
+            </div>
+        </div>
+    </div>
+
+@elseif(Auth::user()->status_verifikasi === 'ditolak')
+    <div class="alert d-flex align-items-start gap-3 rounded-3 mb-4 border-0"
+         style="background:#fef2f2;border-left:4px solid #dc2626!important;border-left-width:4px;">
+        <i class="bi bi-x-circle fs-5 mt-1 text-danger"></i>
+        <div>
+            <div class="fw-semibold mb-1 text-danger">Verifikasi Dokumen Ditolak</div>
+            <div class="small text-danger-emphasis">
+                @if(Auth::user()->catatan_verifikasi)
+                    <strong>Alasan:</strong> {{ Auth::user()->catatan_verifikasi }}<br>
+                @endif
+                Hubungi Admin PT. Expertindo Training untuk informasi lebih lanjut
+                atau ajukan kembali dokumen yang sesuai.
+            </div>
+        </div>
+    </div>
+@endif
+
+{{-- ── Greeting ─────────────────────────────────────────────────────────────── --}}
 <div class="d-flex align-items-center justify-content-between mb-4">
     <div>
         <h5 class="fw-bold mb-1">Dashboard Instruktur</h5>
@@ -15,7 +50,7 @@
     </div>
 </div>
 
-{{-- ── STAT CARDS ── --}}
+{{-- ── STAT CARDS ─────────────────────────────────────────────────────────────── --}}
 <div class="row g-3 mb-4">
 
     {{-- Pelatihan Berlangsung --}}
@@ -72,7 +107,7 @@
 
 </div>
 
-{{-- ── GRID: Tabel + Kolom Kanan ── --}}
+{{-- ── GRID: Tabel + Kolom Kanan ───────────────────────────────────────────── --}}
 <div class="row g-4">
 
     {{-- Tabel Pelatihan Saya --}}
@@ -127,15 +162,12 @@
 
         {{-- Aksi Cepat --}}
         <div class="panel">
-            <div class="panel-header">
-                <h6>Aksi Cepat</h6>
-            </div>
+            <div class="panel-header"><h6>Aksi Cepat</h6></div>
             <div style="padding:16px 16px 8px">
                 <a href="{{ route('instruktur.logbook.index') }}" class="quick-link">
                     <i class="bi bi-clipboard-plus"></i>
                     Input Logbook Kehadiran
                 </a>
-
                 <a href="{{ route('instruktur.kelayakan.index') }}" class="quick-link">
                     <i class="bi bi-shield-check"></i>
                     <span class="flex-fill">Nilai Kelayakan Peserta</span>
@@ -146,7 +178,6 @@
                         </span>
                     @endif
                 </a>
-
                 <a href="{{ route('instruktur.sertifikat.index') }}" class="quick-link">
                     <i class="bi bi-award"></i>
                     Riwayat Sertifikat
@@ -157,9 +188,7 @@
         {{-- Sesi Mendatang --}}
         @if($sesiMendatang->isNotEmpty())
         <div class="panel">
-            <div class="panel-header">
-                <h6>Sesi Mendatang</h6>
-            </div>
+            <div class="panel-header"><h6>Sesi Mendatang</h6></div>
             <div style="padding:16px">
                 @foreach($sesiMendatang as $sesi)
                 <div class="d-flex align-items-start gap-3 {{ !$loop->last ? 'mb-3' : '' }}">
@@ -186,6 +215,7 @@
             </div>
         </div>
         @endif
+
     </div>
 </div>
 

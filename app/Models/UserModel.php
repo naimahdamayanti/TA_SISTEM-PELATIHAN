@@ -5,7 +5,8 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\KodePenerimaanModel;
 class UserModel extends Authenticatable
 {
     use HasApiTokens, Notifiable;
@@ -21,6 +22,10 @@ class UserModel extends Authenticatable
         'no_hp',
         'foto_profil',
         'role',
+        'kode_penerimaan_id',
+        'bukti_penerimaan',
+        'status_verifikasi',
+        'catatan_verifikasi',
         'api_token',
         'token_reset',
         'token_exp',
@@ -91,5 +96,15 @@ class UserModel extends Authenticatable
     public function isPeserta(): bool
     {
         return $this->role === 'peserta';
+    }
+
+    public function kodePenerimaan(): BelongsTo
+    {
+        return $this->belongsTo(KodePenerimaanModel::class, 'kode_penerimaan_id');
+    }
+
+    public function isVerified(): bool
+    {
+        return $this->status_verifikasi === 'terverifikasi';
     }
 }

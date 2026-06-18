@@ -4,11 +4,13 @@ namespace App\Http\Controllers\Web;
 
 use App\Helpers\MailHelper;
 use App\Http\Controllers\Controller;
+use App\Models\KodePenerimaanModel;            
 use App\Models\UserModel;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;  
 use Illuminate\Support\Str;
 
 class AuthController extends Controller
@@ -44,7 +46,7 @@ class AuthController extends Controller
     }
 
     /* ═══════════════════════════════════════════════
-     |  REGISTER (Peserta)
+     |  REGISTER
      ═══════════════════════════════════════════════ */
 
     public function registerForm()
@@ -54,6 +56,7 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
+        // Validasi dasar (semua role)
         $validated = $request->validate([
             'nama'     => 'required|string|max:100',
             'email'    => 'required|email|max:100|unique:users,email',
@@ -63,17 +66,77 @@ class AuthController extends Controller
             'role'     => 'required|in:peserta,instruktur',
         ]);
 
+        // ── Validasi tambahan khusus instruktur ──────────────────────────────
+        if ($validated['role'] === 'instruktur') {
+
+            $request->validate([
+                'kode_penerimaan'  => 'required|string',
+                'bukti_penerimaan' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
+            ]);
+
+            // Cek kode ada di database
+            $kodePenerimaan = KodePenerimaanModel::where(
+                'kode', strtoupper($request->kode_penerimaan)
+            )->first();
+
+            if (!$kodePenerimaan) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['kode_penerimaan' => 'Kode penerimaan tidak ditemukan.']);
+            }
+
+            if ($kodePenerimaan->is_used) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['kode_penerimaan' => 'Kode penerimaan sudah pernah digunakan.']);
+            }
+
+            if ($kodePenerimaan->isExpired()) {
+                return back()
+                    ->withInput()
+                    ->withErrors(['kode_penerimaan' => 'Kode penerimaan sudah kedaluwarsa.']);
+            }
+
+            // Upload bukti penerimaan
+            $pathBukti = $request->file('bukti_penerimaan')
+                                  ->store('bukti_penerimaan', 'public');
+
+            // Buat akun instruktur (menunggu verifikasi)
+            $user = UserModel::create([
+                'nama'               => $validated['nama'],
+                'email'              => $validated['email'],
+                'username'           => $validated['username'],
+                'password'           => Hash::make($validated['password']),
+                'no_hp'              => $validated['no_hp'] ?? null,
+                'role'               => 'instruktur',
+                'kode_penerimaan_id' => $kodePenerimaan->id,
+                'bukti_penerimaan'   => $pathBukti,
+                'status_verifikasi'  => 'menunggu',
+            ]);
+
+            // Tandai kode sudah terpakai
+            $kodePenerimaan->update([
+                'is_used'  => true,
+                'used_by'  => $user->id_user,
+                'used_at'  => now(),
+            ]);
+
+            return redirect()->route('login')
+                ->with('info', 'Registrasi berhasil! Akun Anda sedang menunggu verifikasi dokumen oleh Admin. Anda akan dapat login setelah diverifikasi.');
+        }
+
+        // ── Registrasi peserta (alur biasa) ─────────────────────────────────
         UserModel::create([
             'nama'     => $validated['nama'],
             'email'    => $validated['email'],
             'username' => $validated['username'],
             'password' => Hash::make($validated['password']),
             'no_hp'    => $validated['no_hp'] ?? null,
-            'role'     => $validated['role'],
+            'role'     => 'peserta',
         ]);
 
         return redirect()->route('login')
-            ->with('success', 'Akun berhasil dibuat.');
+            ->with('success', 'Akun berhasil dibuat. Silakan login.');
     }
 
     /* ═══════════════════════════════════════════════
@@ -99,10 +162,6 @@ class AuthController extends Controller
         return view('lupa-password');
     }
 
-    /**
-     * [PUBLIC] Kirim link reset password ke email.
-     * Token disimpan ke kolom token_reset & token_exp di tabel users.
-     */
     public function forgotSend(Request $request)
     {
         $request->validate([
@@ -111,12 +170,10 @@ class AuthController extends Controller
 
         $user = UserModel::where('email', $request->email)->first();
 
-        // Respons sama meskipun email tidak ditemukan (hindari email enumeration)
         if (!$user) {
             return back()->with('success', 'Jika email terdaftar, link reset password telah dikirim.');
         }
 
-        // Generate token & simpan ke kolom users
         $token  = Str::random(64);
         $expiry = Carbon::now()->addMinutes(60);
 
@@ -126,18 +183,15 @@ class AuthController extends Controller
         ]);
 
         $resetLink = url('/reset-password/' . $token);
-
-        $result = MailHelper::sendResetPasswordEmail($user->email, $resetLink);
+        $result    = MailHelper::sendResetPasswordEmail($user->email, $resetLink);
 
         if (($result['status'] ?? 'error') !== 'success') {
             return back()->with('error', 'Gagal mengirim email. Silakan coba lagi atau hubungi admin.');
         }
+
         return back()->with('success', 'Link reset password telah dikirim ke email Anda.');
     }
 
-    /**
-     * [PUBLIC] Tampilkan form reset password (via token dari email).
-     */
     public function resetForm(string $token)
     {
         $user = UserModel::where('token_reset', $token)
@@ -152,9 +206,6 @@ class AuthController extends Controller
         return view('reset', compact('token'));
     }
 
-    /**
-     * [PUBLIC] Proses reset password.
-     */
     public function resetPassword(Request $request)
     {
         $request->validate([

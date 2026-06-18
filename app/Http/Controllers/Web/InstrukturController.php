@@ -17,7 +17,8 @@ class InstrukturController extends Controller
      ═══════════════════════════════════════════════ */
 
     /**
-     * [ADMIN] Daftar semua instruktur beserta jumlah pelatihan yang diampu.
+     * [ADMIN] Daftar semua instruktur.
+     * Instruktur dengan status 'menunggu' ditampilkan paling atas.
      */
     public function index(Request $request)
     {
@@ -25,34 +26,39 @@ class InstrukturController extends Controller
 
         $query = UserModel::where('role', 'instruktur')
             ->withCount('pelatihan')
-            ->with(['pelatihan.pendaftaran']);;
+            ->with(['pelatihan.pendaftaran'])
+            ->orderByRaw("CASE
+                WHEN status_verifikasi = 'menunggu' THEN 0
+                WHEN status_verifikasi IS NULL       THEN 1
+                WHEN status_verifikasi = 'terverifikasi' THEN 1
+                ELSE 2
+            END");
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
-                $q->where('nama', 'like', '%' . $request->search . '%')
-                  ->orWhere('email', 'like', '%' . $request->search . '%')
+                $q->where('nama',     'like', '%' . $request->search . '%')
+                  ->orWhere('email',    'like', '%' . $request->search . '%')
                   ->orWhere('username', 'like', '%' . $request->search . '%');
             });
         }
 
         $instruktur = $query->latest()->paginate(10)->withQueryString();
-        $pelatihan = PelatihanModel::orderBy('nama_pelatihan')->get();
+        $pelatihan  = PelatihanModel::orderBy('nama_pelatihan')->get();
 
         return view('admin.instruktur.index', compact('instruktur', 'pelatihan'));
     }
 
     /**
-     * [ADMIN] Form tambah instruktur baru.
+     * [ADMIN] Form tambah instruktur baru (langsung oleh admin, tanpa kode).
      */
     public function create()
     {
         $this->authorizeAdmin();
-
         return view('admin.instruktur.create');
     }
 
     /**
-     * [ADMIN] Simpan instruktur baru.
+     * [ADMIN] Simpan instruktur baru — dibuat admin langsung, status terverifikasi.
      */
     public function store(Request $request)
     {
@@ -67,12 +73,13 @@ class InstrukturController extends Controller
         ]);
 
         UserModel::create([
-            'nama'     => $validated['nama'],
-            'email'    => $validated['email'],
-            'username' => $validated['username'],
-            'password' => Hash::make($validated['password']),
-            'no_hp'    => $validated['no_hp'] ?? null,
-            'role'     => 'instruktur',
+            'nama'              => $validated['nama'],
+            'email'             => $validated['email'],
+            'username'          => $validated['username'],
+            'password'          => Hash::make($validated['password']),
+            'no_hp'             => $validated['no_hp'] ?? null,
+            'role'              => 'instruktur',
+            'status_verifikasi' => 'terverifikasi',
         ]);
 
         return redirect()->route('admin.instruktur.index')
@@ -130,14 +137,13 @@ class InstrukturController extends Controller
     }
 
     /**
-     * [ADMIN] Hapus instruktur. Data pelatihan yang diampu akan ikut terhapus (CASCADE).
+     * [ADMIN] Hapus instruktur.
      */
     public function destroy(UserModel $instruktur)
     {
         $this->authorizeAdmin();
         $this->pastikanRoleInstruktur($instruktur);
 
-        // Cegah instruktur menghapus dirinya sendiri
         if ($instruktur->id_user === Auth::user()->id_user) {
             return back()->with('error', 'Anda tidak dapat menghapus akun sendiri.');
         }
@@ -149,7 +155,33 @@ class InstrukturController extends Controller
     }
 
     /**
-     * [ADMIN] Tugaskan instruktur ke pelatihan (m-tugaskan di mockup).
+     * [ADMIN] Verifikasi atau tolak dokumen instruktur yang daftar mandiri.
+     */
+    public function verifikasi(Request $request, UserModel $user)
+    {
+        $this->authorizeAdmin();
+        $this->pastikanRoleInstruktur($user);
+
+        $request->validate([
+            'status_verifikasi'  => 'required|in:terverifikasi,ditolak',
+            'catatan_verifikasi' => 'nullable|string|max:500',
+        ]);
+
+        $user->update([
+            'status_verifikasi'  => $request->status_verifikasi,
+            'catatan_verifikasi' => $request->catatan_verifikasi,
+        ]);
+
+        $pesan = $request->status_verifikasi === 'terverifikasi'
+            ? "Instruktur {$user->nama} berhasil diverifikasi."
+            : "Instruktur {$user->nama} ditolak.";
+
+        return redirect()->route('admin.instruktur.index')->with('success', $pesan);
+    }
+
+    /**
+     * [ADMIN] Tugaskan instruktur ke pelatihan.
+     * Hanya instruktur yang sudah terverifikasi yang bisa ditugaskan.
      */
     public function tugaskan(Request $request)
     {
@@ -164,10 +196,19 @@ class InstrukturController extends Controller
             ->where('role', 'instruktur')
             ->firstOrFail();
 
+        // ── Guard: hanya instruktur terverifikasi yang bisa ditugaskan ───────
+        if ($instruktur->status_verifikasi !== 'terverifikasi') {
+            return back()->with('error',
+                "Instruktur {$instruktur->nama} belum terverifikasi dan tidak dapat ditugaskan."
+            );
+        }
+
         $pelatihan = PelatihanModel::findOrFail($validated['pelatihan_id']);
         $pelatihan->update(['instruktur_id' => $instruktur->id_user]);
 
-        return back()->with('success', "Instruktur {$instruktur->nama} berhasil ditugaskan ke pelatihan {$pelatihan->nama_pelatihan}.");
+        return back()->with('success',
+            "Instruktur {$instruktur->nama} berhasil ditugaskan ke pelatihan {$pelatihan->nama_pelatihan}."
+        );
     }
 
     /* ─── Helper ─── */

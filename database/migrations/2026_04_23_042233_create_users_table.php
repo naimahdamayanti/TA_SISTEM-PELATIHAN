@@ -17,6 +17,11 @@ return new class extends Migration
             $table->string('no_hp', 20)->nullable();
             $table->string('foto_profil')->nullable()->comment('Path file foto profil');
             $table->enum('role', ['admin', 'instruktur', 'peserta']);
+            $table->foreignId('kode_penerimaan_id')
+              ->nullable()->constrained('kode_penerimaan')->nullOnDelete();
+            $table->string('bukti_penerimaan')->nullable();
+            $table->enum('status_verifikasi', ['menunggu', 'terverifikasi', 'ditolak'])->nullable();
+            $table->text('catatan_verifikasi')->nullable();
             $table->string('api_token', 80)->nullable()->unique();
             $table->string('token_reset', 100)->nullable()->comment('Token untuk reset password');
             $table->dateTime('token_exp')->nullable()->comment('Waktu kedaluwarsa token reset');
