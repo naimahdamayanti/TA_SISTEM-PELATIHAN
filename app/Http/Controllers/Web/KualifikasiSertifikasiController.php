@@ -14,20 +14,12 @@ use Illuminate\Support\Facades\DB;
 
 class KualifikasiSertifikasiController extends Controller
 {
-    /* ═══════════════════════════════════════════════
-     |  INSTRUKTUR – Nilai Kelayakan Peserta
-     ═══════════════════════════════════════════════ */
-
-    /**
-     * [INSTRUKTUR] Daftar peserta yang siap dinilai kelayakannya (pelatihan selesai).
-     */
     public function index(Request $request)
     {
         $this->authorizeRole(['instruktur']);
 
         $instruktur = Auth::user();
 
-        // Pelatihan berstatus "selesai" yang diampu instruktur ini
         $pelatihan = PelatihanModel::where('instruktur_id', $instruktur->id_user)
             ->where('status', 'selesai')
             ->withCount(['pendaftaran' => fn($q) => $q->where('status', 'diterima')])
@@ -49,39 +41,32 @@ class KualifikasiSertifikasiController extends Controller
         return view('instruktur.kelayakan.index', compact('pelatihan', 'pesertaList', 'pelatihanDipilih'));
     }
 
-    /**
-     * [INSTRUKTUR] Simpan atau perbarui penilaian kelayakan satu peserta.
-     */
     public function simpan(Request $request, PendaftaranModel $pendaftaran)
     {
         $this->authorizeRole(['instruktur']);
 
-        // Pastikan pelatihan ini diampu instruktur login
         if ($pendaftaran->pelatihan->instruktur_id !== Auth::user()->id_user) {
             abort(403, 'Pendaftaran ini bukan pada pelatihan Anda.');
         }
 
         $validated = $request->validate([
-            'persen_hadir'   => 'required|numeric|min:0|max:100',
-            'memenuhi_syarat'=> 'required|boolean',
-            'catatan'        => 'nullable|string',
+            'persen_hadir' => 'required|numeric|min:0|max:100',
+            'catatan'      => 'nullable|string',
         ]);
-
-        $validated['instruktur_id']  = Auth::user()->id_user;
-        $validated['pendaftaran_id'] = $pendaftaran->id_pendaftaran;
 
         KualifikasiSertifikasiModel::updateOrCreate(
             ['pendaftaran_id' => $pendaftaran->id_pendaftaran],
-            $validated
+            [
+                'instruktur_id'   => Auth::user()->id_user,
+                'persen_hadir'    => $validated['persen_hadir'],
+                'memenuhi_syarat' => $validated['persen_hadir'] >= 80 ? 'lulus' : 'tidak lulus',
+                'catatan'         => $validated['catatan'] ?? null,
+            ]
         );
 
         return back()->with('success', 'Penilaian kelayakan berhasil disimpan.');
     }
 
-    /**
-     * [INSTRUKTUR] Simpan penilaian kelayakan massal (seluruh peserta satu pelatihan sekaligus).
-     * Persentase dihitung otomatis dari logbook.
-     */
     public function simpanMassal(Request $request, PelatihanModel $pelatihan)
     {
         $this->authorizeRole(['instruktur']);
@@ -93,7 +78,6 @@ class KualifikasiSertifikasiController extends Controller
         $request->validate([
             'kelayakan'                  => 'required|array',
             'kelayakan.*.pendaftaran_id' => 'required|exists:pendaftaran,id_pendaftaran',
-            'kelayakan.*.memenuhi_syarat'=> 'required|boolean',
             'kelayakan.*.catatan'        => 'nullable|string',
         ]);
 
@@ -105,8 +89,7 @@ class KualifikasiSertifikasiController extends Controller
             foreach ($request->input('kelayakan') as $row) {
                 $pendaftaran = PendaftaranModel::findOrFail($row['pendaftaran_id']);
 
-                // Hitung persen hadir dari logbook
-                $hadirCount  = LogbookModel::where('peserta_id', $pendaftaran->peserta_id)
+                $hadirCount = LogbookModel::where('peserta_id', $pendaftaran->peserta_id)
                     ->whereHas('sesiPelatihan', fn($q) => $q->where('pelatihan_id', $pelatihan->id_pelatihan))
                     ->where('status', 'hadir')
                     ->count();
@@ -116,10 +99,10 @@ class KualifikasiSertifikasiController extends Controller
                 KualifikasiSertifikasiModel::updateOrCreate(
                     ['pendaftaran_id' => $row['pendaftaran_id']],
                     [
-                        'instruktur_id'  => $instrukturId,
-                        'persen_hadir'   => $persen,
-                        'memenuhi_syarat'=> $row['memenuhi_syarat'],
-                        'catatan'        => $row['catatan'] ?? null,
+                        'instruktur_id'   => $instrukturId,
+                        'persen_hadir'    => $persen,
+                        'memenuhi_syarat' => $persen >= 80 ? 'lulus' : 'tidak lulus',
+                        'catatan'         => $row['catatan'] ?? null,
                     ]
                 );
             }
@@ -129,9 +112,6 @@ class KualifikasiSertifikasiController extends Controller
             ->with('success', 'Penilaian kelayakan semua peserta berhasil disimpan.');
     }
 
-    /**
-     * [INSTRUKTUR] Riwayat sertifikat – daftar peserta yang memenuhi syarat.
-     */
     public function riwayatSertifInstruktur(Request $request)
     {
         $this->authorizeRole(['instruktur']);
@@ -154,13 +134,6 @@ class KualifikasiSertifikasiController extends Controller
         return view('instruktur.kelayakan.riwayat', compact('kualifikasi', 'pelatihan'));
     }
 
-    /* ═══════════════════════════════════════════════
-     |  ADMIN – Lihat Semua Kualifikasi
-     ═══════════════════════════════════════════════ */
-
-    /**
-     * [ADMIN] Semua data kualifikasi sertifikasi (read-only).
-     */
     public function adminIndex(Request $request)
     {
         $this->authorizeRole(['admin']);
@@ -168,21 +141,14 @@ class KualifikasiSertifikasiController extends Controller
         $query = KualifikasiSertifikasiModel::with(['pendaftaran.peserta', 'pendaftaran.pelatihan', 'instruktur']);
 
         if ($request->filled('memenuhi_syarat')) {
-            $query->where('memenuhi_syarat', $request->boolean('memenuhi_syarat'));
+            $query->where('memenuhi_syarat', $request->memenuhi_syarat);
         }
-
+    
         $kualifikasi = $query->latest('tgl_penilaian')->paginate(20)->withQueryString();
 
         return view('admin.kualifikasi.index', compact('kualifikasi'));
     }
 
-    /* ═══════════════════════════════════════════════
-     |  PESERTA – Lihat Status Kelayakan Sendiri
-     ═══════════════════════════════════════════════ */
-
-    /**
-     * [PESERTA] Status kelayakan sertifikasi peserta yang sedang login.
-     */
     public function statusKelayakanPeserta()
     {
         $this->authorizeRole(['peserta']);
@@ -196,11 +162,6 @@ class KualifikasiSertifikasiController extends Controller
         return view('peserta.kelayakan.index', compact('kualifikasi'));
     }
 
-    /* ─── Private Helper ─── */
-
-    /**
-     * Ambil daftar peserta beserta data kehadiran & kelayakan untuk satu pelatihan.
-     */
     private function getPesertaDenganKelayakan(PelatihanModel $pelatihan, int $instrukturId): \Illuminate\Support\Collection
     {
         $pesertaList = PendaftaranModel::with(['peserta', 'kualifikasiSertifikasi'])

@@ -14,13 +14,6 @@ use Illuminate\Validation\Rule;
 
 class PelatihanController extends Controller
 {
-    /* ═══════════════════════════════════════════════
-     |  ADMIN – Kelola Pelatihan
-     ═══════════════════════════════════════════════ */
-
-    /**
-     * [ADMIN] Tampilkan daftar semua pelatihan beserta instruktur & jumlah peserta.
-     */
     public function index(Request $request)
     {
         $this->authorizeRole(['admin']);
@@ -28,7 +21,6 @@ class PelatihanController extends Controller
         $query = PelatihanModel::with('instruktur', 'kategori')
             ->withCount(['pendaftaran' => fn($q) => $q->where('status', 'diterima')]);
 
-        // Filter opsional
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
@@ -49,9 +41,6 @@ class PelatihanController extends Controller
         return view('admin.pelatihan.index', compact('pelatihan', 'instruktur', 'kategori'));
     }
 
-    /**
-     * [ADMIN] Form tambah pelatihan baru.
-     */
     public function create()
     {
         $this->authorizeRole(['admin']);
@@ -61,9 +50,6 @@ class PelatihanController extends Controller
         return view('admin.pelatihan.create', compact('instruktur', 'kategori'));
     }
 
-    /**
-     * [ADMIN] Simpan pelatihan baru ke database.
-     */
     public function store(Request $request)
     {
         $this->authorizeRole(['admin']);
@@ -86,9 +72,6 @@ class PelatihanController extends Controller
             ->with('success', 'Pelatihan berhasil ditambahkan.');
     }
 
-    /**
-     * [ADMIN] Form edit pelatihan.
-     */
     public function edit(PelatihanModel $pelatihan)
     {
         $this->authorizeRole(['admin']);
@@ -98,9 +81,6 @@ class PelatihanController extends Controller
         return view('admin.pelatihan.edit', compact('pelatihan', 'instruktur', 'kategori'));
     }
 
-    /**
-     * [ADMIN] Perbarui data pelatihan.
-     */
     public function update(Request $request, PelatihanModel $pelatihan)
     {
         $this->authorizeRole(['admin']);
@@ -125,9 +105,6 @@ class PelatihanController extends Controller
             ->with('success', 'Data pelatihan berhasil diperbarui.');
     }
 
-    /**
-     * [ADMIN] Hapus pelatihan (CASCADE ke sesi, pendaftaran, dst.).
-     */
     public function destroy(PelatihanModel $pelatihan)
     {
         $this->authorizeRole(['admin']);
@@ -138,13 +115,6 @@ class PelatihanController extends Controller
             ->with('success', 'Pelatihan berhasil dihapus.');
     }
 
-    /* ═══════════════════════════════════════════════
-     |  INSTRUKTUR – Pelatihan Saya
-     ═══════════════════════════════════════════════ */
-
-    /**
-     * [INSTRUKTUR] Daftar pelatihan yang diampu instruktur login.
-     */
     public function pelatihanSaya(Request $request)
     {
         $this->authorizeRole(['instruktur']);
@@ -164,9 +134,7 @@ class PelatihanController extends Controller
 
         return view('instruktur.pelatihan.index', compact('pelatihan'));
     }
-    /**
-     * [INSTRUKTUR] Detail pelatihan: daftar peserta diterima.
-     */
+
     public function detailPelatihanSaya(PelatihanModel $pelatihan)
     {
         $this->authorizeRole(['instruktur']);
@@ -184,13 +152,6 @@ class PelatihanController extends Controller
         return view('instruktur.pelatihan.detail', compact('pelatihan', 'peserta', 'sesi'));
     }
 
-    /* ═══════════════════════════════════════════════
-     |  PESERTA – Katalog Pelatihan
-     ═══════════════════════════════════════════════ */
-
-    /**
-     * [PESERTA] Katalog pelatihan tersedia beserta tombol daftar.
-     */
     public function katalog(Request $request)
     {
         $this->authorizeRole(['peserta']);
@@ -212,7 +173,6 @@ class PelatihanController extends Controller
             $query->where('kategori_id', $request->kategori);
         }
 
-        // Hanya tampilkan yang tersedia
         $query->where('status', 'tersedia');
 
         $pelatihan = $query->latest()->paginate(9)->withQueryString();
@@ -221,9 +181,6 @@ class PelatihanController extends Controller
         return view('peserta.pelatihan.index', compact('pelatihan', 'kategori', 'sudahDaftar'));
     }
 
-    /**
-     * [PESERTA] Detail pelatihan + form pendaftaran.
-     */
     public function detailKatalog(PelatihanModel $pelatihan)
     {
         $this->authorizeRole(['peserta']);
@@ -240,8 +197,6 @@ class PelatihanController extends Controller
 
         return view('peserta.pelatihan.detail', compact('pelatihan', 'sesi', 'sudahDaftar'));
     }
-
-    /* ─── Helper ─── */
 
     private function authorizeRole(array $roles): void
     {

@@ -7,23 +7,20 @@ use Illuminate\Http\Request;
 
 class KategoriController extends Controller
 {
-    // GET /admin/kategori
     public function index()
     {
         $kategoris = KategoriModel::withCount('pelatihan')
                               ->orderBy('nama_kategori')
                               ->paginate(20);
 
-        return view('admin.pelatihan.index', compact('kategoris'));
+        return redirect()->route('admin.pelatihan.index');
     }
 
-    // GET /admin/kategori/create
     public function create()
     {
-        return view('admin.pelatihan.index');
+        return redirect()->route('admin.pelatihan.index');
     }
 
-    // POST /admin/kategori
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -34,11 +31,10 @@ class KategoriController extends Controller
         $validated['aktif'] = $validated['aktif'] ?? true;
         KategoriModel::create($validated);
 
-        return redirect()->route('admin.kategori.index')
+        return redirect()->route('admin.pelatihan.index')
                          ->with('success', 'Kategori berhasil ditambahkan.');
     }
 
-    // GET /admin/kategori/{id}/edit
     public function edit($id)
     {
         $kategori = KategoriModel::findOrFail($id);
@@ -46,7 +42,6 @@ class KategoriController extends Controller
         return view('admin.kategori.edit', compact('kategori'));
     }
 
-    // PUT /admin/kategori/{id}
     public function update(Request $request, $id)
     {
         $kategori = KategoriModel::findOrFail($id);
@@ -59,11 +54,10 @@ class KategoriController extends Controller
         $validated['aktif'] = $validated['aktif'] ?? $kategori->aktif;
         $kategori->update($validated);
 
-        return redirect()->route('admin.kategori.index')
+        return redirect()->route('admin.pelatihan.index')
                          ->with('success', 'Kategori berhasil diperbarui.');
     }
 
-    // DELETE /admin/kategori/{id}
     public function destroy($id)
     {
         $kategori = KategoriModel::withCount('pelatihan')->findOrFail($id);
@@ -75,7 +69,7 @@ class KategoriController extends Controller
 
         $kategori->delete();
 
-        return redirect()->route('admin.kategori.index')
+        return redirect()->route('admin.pelatihan.index')
                          ->with('success', 'Kategori berhasil dihapus.');
     }
 }

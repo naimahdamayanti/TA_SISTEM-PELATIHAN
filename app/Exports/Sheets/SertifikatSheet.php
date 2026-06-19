@@ -95,7 +95,6 @@ class SertifikatSheet implements
                         ]);
                     }
 
-                    // Warna kolom File PDF
                     $filVal   = $sheet->getCell("H{$row}")->getValue();
                     $filColor = $filVal === 'Ada' ? 'FFE8F5E9' : 'FFFFEBEE';
                     $sheet->getStyle("H{$row}")->applyFromArray([

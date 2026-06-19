@@ -7,9 +7,7 @@ use PHPMailer\PHPMailer\Exception;
 
 class MailHelper
 {
-    /**
-     * Setup konfigurasi SMTP — dipakai bersama oleh semua method
-     */
+    
     private static function setupSMTP(PHPMailer $mail): void
     {
         $host       = config('mail.mailers.smtp.host', 'smtp.gmail.com');
@@ -45,9 +43,6 @@ class MailHelper
         );
     }
 
-    /**
-     * Kirim email reset password
-     */
     public static function sendResetPasswordEmail($email, $resetLink): array
     {
         $mail    = new PHPMailer(true);
@@ -92,9 +87,6 @@ class MailHelper
         }
     }
 
-    /**
-     * Kirim email kode penerimaan instruktur
-     */
     public static function sendKodePenerimaanEmail(
         string $email,
         string $nama,
@@ -120,9 +112,6 @@ class MailHelper
         );
     }
 
-    /**
-     * Build HTML body email kode penerimaan
-     */
     private static function buildKodePenerimaanBody(
         string $nama,
         string $kode,
@@ -287,9 +276,6 @@ class MailHelper
         </html>';
     }
 
-    /**
-     * Kirim email notifikasi akun baru dibuat oleh admin
-     */
     public static function sendAkunCreatedEmail(string $email, string $nama, string $username, string $password, string $role): array
     {
         $appName = config('mail.from.name', 'Tim Support');
@@ -311,9 +297,6 @@ class MailHelper
         );
     }
 
-    /**
-     * Kirim email umum
-     */
     public static function sendEmail($to, $subject, $body, $altBody = ''): array
     {
         
@@ -341,9 +324,6 @@ class MailHelper
         }
     }
 
-    /**
-     * Build HTML body email reset password
-     */
     private static function buildResetPasswordBody(string $resetLink, string $appName): string
     {
         return '
@@ -407,9 +387,6 @@ class MailHelper
         </html>';
     }
 
-    /**
-     * Build HTML body email akun baru
-     */
     private static function buildAkunCreatedBody(string $nama, string $email, string $username, string $password, string $role, string $appName): string
     {
         $roleColors = [

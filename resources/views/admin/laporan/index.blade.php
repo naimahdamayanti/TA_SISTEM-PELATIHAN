@@ -6,7 +6,7 @@
 
 <div class="d-flex align-items-center justify-content-between mb-4">
     <div>
-        <h4 class="fw-bold mb-1">Laporan Data Pendaftaran</h4>
+        <h4 class="fw-bold mb-1">Laporan</h4>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-0 small">
                 <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
@@ -132,7 +132,8 @@
                         <th class="py-3 text-center" style="width:85px">Menunggu</th>
                         <th class="py-3 text-center" style="width:75px">Ditolak</th>
                         <th class="py-3 text-center" style="width:85px">Sertifikat</th>
-                        <th class="py-3" style="width:190px">Periode</th>
+                        <th class="py-3 text-center" style="width:110px">Kelulusan</th>
+                        <th class="py-3 text-center" style="width:190px">Periode</th>
                         <th class="py-3 text-center" style="width:90px">Status</th>
                     </tr>
                 </thead>
@@ -150,6 +151,20 @@
                         $menunggu  = \App\Models\PendaftaranModel::where('pelatihan_id', $item->id_pelatihan)->where('status','menunggu')->count();
                         $ditolak   = \App\Models\PendaftaranModel::where('pelatihan_id', $item->id_pelatihan)->where('status','ditolak')->count();
                         $sertif    = \App\Models\SertifikatModel::whereHas('pendaftaran', fn($q) => $q->where('pelatihan_id', $item->id_pelatihan))->count();
+
+                        $totalLulus = \App\Models\KualifikasiSertifikasiModel::whereHas('pendaftaran', fn($q) =>
+                            $q->where('pelatihan_id', $item->id_pelatihan)
+                        )->where('memenuhi_syarat', true)->count();
+
+                        $persenKelulusan = $diterima > 0 ? round(($totalLulus / $diterima) * 100, 1) : null;
+
+                        $kelulusanClass = match(true) {
+                            is_null($persenKelulusan)    => 'text-muted',
+                            $persenKelulusan >= 80       => 'text-success',
+                            $persenKelulusan >= 50       => 'text-warning',
+                            default                      => 'text-danger',
+                        };
+
                         $statusClass = match($item->status) {
                             'tersedia' => 'success',
                             'penuh'    => 'warning',
@@ -186,6 +201,13 @@
                                 {{ $sertif }}
                             </span>
                         </td>
+                        <td class="text-center">
+                            @if(is_null($persenKelulusan))
+                                <span class="text-muted">—</span>
+                            @else
+                                <span class="fw-bold {{ $kelulusanClass }}">{{ $persenKelulusan }}%</span>
+                            @endif
+                        </td>
                         <td class="small text-bold text-nowrap">
                             @if($item->tgl_mulai)
                                 {{ \Carbon\Carbon::parse($item->tgl_mulai)->translatedFormat('j M Y') }}
@@ -204,7 +226,7 @@
                     </tr>
                     @empty
                     <tr>
-                        <td colspan="10" class="text-center py-5 text-muted">
+                        <td colspan="11" class="text-center py-5 text-muted">
                             <i class="bi bi-inbox fs-2 d-block mb-2"></i>
                             Tidak ada data pelatihan untuk filter ini.
                         </td>

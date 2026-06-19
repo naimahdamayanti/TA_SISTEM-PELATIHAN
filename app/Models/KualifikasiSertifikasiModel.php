@@ -8,8 +8,6 @@ class KualifikasiSertifikasiModel extends Model
 {
     protected $table      = 'kualifikasi_sertifikasi';
     protected $primaryKey = 'id_kualifikasi';
-
-    // Hanya ada tgl_penilaian sebagai created, tidak ada updated_at
     public $timestamps = false;
 
     protected $fillable = [
@@ -25,36 +23,24 @@ class KualifikasiSertifikasiModel extends Model
     {
         return [
             'persen_hadir'    => 'float',
-            'memenuhi_syarat' => 'boolean',
             'tgl_penilaian'   => 'datetime',
         ];
     }
 
-    // ----------------------------------------------------------------
-    // RELATIONS
-    // ----------------------------------------------------------------
-
-    /** Pendaftaran yang dinilai */
     public function pendaftaran()
     {
         return $this->belongsTo(PendaftaranModel::class, 'pendaftaran_id', 'id_pendaftaran');
     }
 
-    /** Instruktur yang memberikan penilaian */
     public function instruktur()
     {
         return $this->belongsTo(UserModel::class, 'instruktur_id', 'id_user');
     }
 
-    // ----------------------------------------------------------------
-    // HELPERS
-    // ----------------------------------------------------------------
-
-    /** Batas minimal kehadiran untuk memenuhi syarat sertifikasi */
     const BATAS_KEHADIRAN = 80.0;
 
     public function layakSertifikat(): bool
     {
-        return $this->memenuhi_syarat && $this->persen_hadir >= self::BATAS_KEHADIRAN;
+        return $this->memenuhi_syarat === 'lulus' && $this->persen_hadir >= self::BATAS_KEHADIRAN;
     }
 }

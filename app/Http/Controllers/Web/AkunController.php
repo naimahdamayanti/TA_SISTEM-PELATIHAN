@@ -15,10 +15,7 @@ use Illuminate\Validation\Rules\Password;
 
 class AkunController extends Controller
 {
-    /* ═══════════════════════════════════════════════
-     |  ADMIN – Kelola Akun Seluruh Pengguna
-     ═══════════════════════════════════════════════ */
-
+    
     public function index(Request $request)
     {
         $this->authorizeAdmin();
@@ -54,9 +51,6 @@ class AkunController extends Controller
         return view('admin.akun.create');
     }
 
-    /**
-     * [ADMIN] Simpan akun baru + kirim email notifikasi ke pengguna.
-     */
     public function store(Request $request)
     {
         $this->authorizeAdmin();
@@ -79,6 +73,7 @@ class AkunController extends Controller
             'password' => Hash::make($plainPassword),
             'no_hp'    => $validated['no_hp'] ?? null,
             'role'     => $validated['role'],
+            'status_verifikasi' => $validated['role'] === 'instruktur' ? 'terverifikasi' : null,
         ]);
 
         $result = MailHelper::sendAkunCreatedEmail(
@@ -130,8 +125,8 @@ class AkunController extends Controller
             'role'     => $validated['role'],
         ];
 
-        if (!empty($validated['password'])) {
-            $data['password'] = Hash::make($validated['password']);
+        if ($validated['role'] === 'instruktur' && $user->status_verifikasi !== 'terverifikasi') {
+            $data['status_verifikasi'] = 'terverifikasi';
         }
 
         $user->update($data);
@@ -157,10 +152,6 @@ class AkunController extends Controller
         return redirect()->route('admin.akun.index')
             ->with('success', 'Akun berhasil dihapus.');
     }
-
-    /* ═══════════════════════════════════════════════
-     |  SEMUA ROLE – Profil & Update Akun Sendiri
-     ═══════════════════════════════════════════════ */
 
     public function profil()
     {
@@ -223,8 +214,6 @@ class AkunController extends Controller
 
         return back()->with('success', 'Password berhasil diubah.');
     }
-
-    /* ─── Helper ─── */
 
     private function authorizeAdmin(): void
     {

@@ -15,13 +15,11 @@ class KategoriModel extends Model
         'aktif',
     ];
 
-    // Scope untuk hanya mengambil kategori yang aktif
     public function scopeAktif($query)
     {
         return $query->where('aktif', true);
     }
 
-    // ── Relasi ──────────────────────────────────────────────────────────
     public function pelatihan()
     {
         return $this->hasMany(PelatihanModel::class, 'kategori_id', 'id_kategori');

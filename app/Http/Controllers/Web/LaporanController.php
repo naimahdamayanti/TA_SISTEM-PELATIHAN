@@ -21,7 +21,6 @@ class LaporanController extends Controller
 {
     public function __construct()
     {
-        // Laporan hanya untuk admin
         $this->middleware(function ($request, $next) {
             if (Auth::user()->role !== 'admin') {
                 abort(403, 'Akses ditolak. Hanya admin yang dapat mengakses halaman laporan.');
@@ -30,25 +29,16 @@ class LaporanController extends Controller
         });
     }
 
-    /* ═══════════════════════════════════════════════
-     |  ADMIN – Laporan Utama
-     ═══════════════════════════════════════════════ */
-
-    /**
-     * [ADMIN] Halaman laporan dengan ringkasan statistik dan berbagai data.
-     */
     public function index(Request $request)
     {
         $tahun  = $request->input('tahun', Carbon::now()->year);
         $bulan  = $request->input('bulan'); // opsional, filter per bulan
 
-        /* ── Statistik Utama ── */
         $totalPelatihan  = PelatihanModel::count();
         $totalPeserta    = UserModel::where('role', 'peserta')->count();
         $totalInstruktur = UserModel::where('role', 'instruktur')->count();
         $totalSertifikat = SertifikatModel::count();
 
-        /* ── Grafik Pelatihan Bulanan ── */
         $grafikQuery = PelatihanModel::selectRaw('MONTH(tgl_mulai) as bulan, COUNT(*) as total')
             ->whereYear('tgl_mulai', $tahun)
             ->groupBy('bulan')
@@ -61,14 +51,12 @@ class LaporanController extends Controller
             $grafikBulanan[$i] = $grafikQuery[$i] ?? 0;
         }
 
-        /* ── Grafik Pendaftaran per Status ── */
         $pendaftaranPerStatus = PendaftaranModel::selectRaw('status, COUNT(*) as total')
             ->whereYear('tgl_daftar', $tahun)
             ->groupBy('status')
             ->pluck('total', 'status')
             ->toArray();
 
-        /* ── Pelatihan Paling Diminati ── */
         $topPelatihan = PelatihanModel::withCount(['pendaftaran' => fn($q) =>
             $q->where('status', 'diterima')
         ])
@@ -76,7 +64,6 @@ class LaporanController extends Controller
             ->limit(10)
             ->get();
 
-        /* ── Laporan Kehadiran per Pelatihan ── */
         $rekapKehadiran = PelatihanModel::with(['sesiPelatihan'])
             ->whereYear('tgl_mulai', $tahun)
             ->get()
@@ -102,7 +89,6 @@ class LaporanController extends Controller
                 ];
             });
 
-        /* ── Laporan Sertifikasi ── */
         $rekapSertifikasi = PelatihanModel::where('status', 'selesai')
             ->whereYear('tgl_selesai', $tahun)
             ->get()
@@ -112,7 +98,7 @@ class LaporanController extends Controller
 
                 $memenuhiSyarat = KualifikasiSertifikasiModel::whereHas('pendaftaran', fn($q) =>
                     $q->where('pelatihan_id', $pelatihan->id_pelatihan)
-                )->where('memenuhi_syarat', true)->count();
+                )->where('memenuhi_syarat', 'lulus')->count();
 
                 $sertifikatTerbit = SertifikatModel::whereHas('pendaftaran', fn($q) =>
                     $q->where('pelatihan_id', $pelatihan->id_pelatihan)
@@ -126,7 +112,6 @@ class LaporanController extends Controller
                 ];
             });
 
-        /* ── Performa Instruktur ── */
         $performaInstruktur = UserModel::where('role', 'instruktur')
             ->withCount('pelatihan')
             ->with(['pelatihan' => fn($q) => $q->where('status', 'selesai')])
@@ -171,10 +156,6 @@ class LaporanController extends Controller
         ));
     }
 
-    /**
-     * [ADMIN] Export laporan ke CSV / Excel (sederhana, tanpa package tambahan).
-     * Untuk export lengkap, integrasikan dengan maatwebsite/excel atau spatie/laravel-export.
-     */
     public function export(Request $request)
     {
         $request->validate([
@@ -247,10 +228,9 @@ class LaporanController extends Controller
                 break;
         }
 
-        // Generate CSV response
         $callback = function () use ($headers, $data) {
             $out = fopen('php://output', 'w');
-            fprintf($out, chr(0xEF) . chr(0xBB) . chr(0xBF)); // BOM UTF-8 agar Excel terbaca dengan benar
+            fprintf($out, chr(0xEF) . chr(0xBB) . chr(0xBF)); 
             fputcsv($out, $headers, ';');
             foreach ($data as $row) {
                 fputcsv($out, $row, ';');

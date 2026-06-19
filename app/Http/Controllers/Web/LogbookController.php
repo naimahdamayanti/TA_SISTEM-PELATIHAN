@@ -13,13 +13,6 @@ use Illuminate\Support\Facades\DB;
 
 class LogbookController extends Controller
 {
-    /* ═══════════════════════════════════════════════
-     |  INSTRUKTUR – Input Logbook Kehadiran
-     ═══════════════════════════════════════════════ */
-
-    /**
-     * [INSTRUKTUR] Pilih sesi untuk mengisi logbook.
-     */
     public function index(Request $request)
     {
         $this->authorizeRole(['instruktur']);
@@ -57,7 +50,6 @@ class LogbookController extends Controller
                 ->get()->keyBy('peserta_id');
         }
 
-        // Sesi mana yang sudah diisi logbook
         $sesiSudahDiisi = LogbookModel::where('instruktur_id', $instruktur->id_user)
             ->select('sesi_id', DB::raw('COUNT(*) as jumlah'))
             ->groupBy('sesi_id')
@@ -69,10 +61,6 @@ class LogbookController extends Controller
         ));
     }
 
-    /**
-     * [INSTRUKTUR] Form input kehadiran untuk satu sesi.
-     * Menampilkan seluruh peserta terdaftar beserta input status hadir/izin/tidak hadir.
-     */
     public function inputKehadiran(SesiPelatihanModel $sesi)
     {
         $this->authorizeRole(['instruktur']);
@@ -80,13 +68,11 @@ class LogbookController extends Controller
 
         $sesi->load('pelatihan');
 
-        // Peserta yang sudah diterima di pelatihan ini
         $peserta = PendaftaranModel::with('peserta')
             ->where('pelatihan_id', $sesi->pelatihan_id)
             ->where('status', 'diterima')
             ->get();
 
-        // Logbook yang sudah ada untuk sesi ini (jika sudah pernah diisi)
         $logbookAda = LogbookModel::where('sesi_id', $sesi->id_sesi)
             ->get()
             ->keyBy('peserta_id');
@@ -94,9 +80,6 @@ class LogbookController extends Controller
         return view('instruktur.logbook.input', compact('sesi', 'peserta', 'logbookAda'));
     }
 
-    /**
-     * [INSTRUKTUR] Simpan (atau perbarui) data kehadiran sesi.
-     */
     public function simpanKehadiran(Request $request, SesiPelatihanModel $sesi)
     {
         $this->authorizeRole(['instruktur']);
@@ -131,9 +114,6 @@ class LogbookController extends Controller
             ->with('success', 'Logbook kehadiran berhasil disimpan.');
     }
 
-    /**
-     * [INSTRUKTUR] Rekap logbook satu pelatihan: semua peserta x semua sesi.
-     */
     public function rekapKehadiran(PelatihanModel $pelatihan)
     {
         $this->authorizeRole(['instruktur']);
@@ -151,14 +131,12 @@ class LogbookController extends Controller
             ->where('status', 'diterima')
             ->get();
 
-        // Bangun matriks kehadiran [peserta_id][sesi_id] => status
         $logbookMatrix = LogbookModel::where('instruktur_id', Auth::user()->id_user)
             ->whereIn('sesi_id', $sesiList->pluck('id_sesi'))
             ->get()
             ->groupBy('peserta_id')
             ->map(fn($rows) => $rows->keyBy('sesi_id'));
 
-        // Hitung persentase kehadiran per peserta
         $totalSesi = $sesiList->count();
         $rekapPersen = [];
         foreach ($pesertaList as $daftar) {
@@ -178,13 +156,6 @@ class LogbookController extends Controller
         ));
     }
 
-    /* ═══════════════════════════════════════════════
-     |  ADMIN – Lihat Semua Logbook
-     ═══════════════════════════════════════════════ */
-
-    /**
-     * [ADMIN] Rekap logbook seluruh pelatihan (read-only).
-     */
     public function adminIndex(Request $request)
     {
         $this->authorizeRole(['admin']);
@@ -203,8 +174,6 @@ class LogbookController extends Controller
 
         return view('admin.logbook.index', compact('logbook', 'pelatihan'));
     }
-
-    /* ─── Helper ─── */
 
     private function authorizeRole(array $roles): void
     {

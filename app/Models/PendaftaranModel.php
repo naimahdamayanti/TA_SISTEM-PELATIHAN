@@ -9,7 +9,6 @@ class PendaftaranModel extends Model
     protected $table      = 'pendaftaran';
     protected $primaryKey = 'id_pendaftaran';
 
-    // Timestamps non-standar: tgl_daftar (created) + updated_at
     const CREATED_AT = 'tgl_daftar';
     const UPDATED_AT = 'updated_at';
 
@@ -35,37 +34,25 @@ class PendaftaranModel extends Model
         ];
     }
 
-    // ----------------------------------------------------------------
-    // RELATIONS
-    // ----------------------------------------------------------------
-
-    /** Peserta (user) yang mendaftar — nullable jika guest */
     public function peserta()
     {
         return $this->belongsTo(UserModel::class, 'peserta_id', 'id_user');
     }
 
-    /** Pelatihan yang didaftarkan */
     public function pelatihan()
     {
         return $this->belongsTo(PelatihanModel::class, 'pelatihan_id', 'id_pelatihan');
     }
 
-    /** Penilaian kualifikasi sertifikasi pendaftaran ini */
     public function kualifikasiSertifikasi()
     {
         return $this->hasOne(KualifikasiSertifikasiModel::class, 'pendaftaran_id', 'id_pendaftaran');
     }
 
-    /** Sertifikat yang diterbitkan untuk pendaftaran ini */
     public function sertifikat()
     {
         return $this->hasOne(SertifikatModel::class, 'pendaftaran_id', 'id_pendaftaran');
     }
-
-    // ----------------------------------------------------------------
-    // HELPERS
-    // ----------------------------------------------------------------
 
     public function namaLengkap(): string
     {

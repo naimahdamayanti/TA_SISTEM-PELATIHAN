@@ -12,19 +12,12 @@ use Illuminate\Support\Facades\Auth;
 
 class SesiPelatihanController extends Controller
 {
-    /* ═══════════════════════════════════════════════
-     |  ADMIN – Kelola Sesi Pelatihan
-     ═══════════════════════════════════════════════ */
-
-    /**
-     * [ADMIN] Daftar sesi dari satu pelatihan.
-     */
     public function index(PelatihanModel $pelatihan)
     {
         $this->authorizeRole(['admin']);
 
         $sesi = SesiPelatihanModel::where('pelatihan_id', $pelatihan->id_pelatihan)
-            ->withCount('logbook')  // agar $s->logbook_count tersedia di view
+            ->withCount('logbook')  
             ->orderBy('tanggal')
             ->orderBy('waktu_mulai')
             ->get();
@@ -36,9 +29,6 @@ class SesiPelatihanController extends Controller
         return view('admin.sesi.index', compact('pelatihan', 'sesi', 'pesertaDiterima'));
     }
 
-    /**
-     * [ADMIN] Form tambah sesi baru.
-     */
     public function create(PelatihanModel $pelatihan)
     {
         $this->authorizeRole(['admin']);
@@ -46,9 +36,6 @@ class SesiPelatihanController extends Controller
         return view('admin.sesi.create', compact('pelatihan'));
     }
 
-    /**
-     * [ADMIN] Simpan sesi baru.
-     */
     public function store(Request $request, PelatihanModel $pelatihan)
     {
         $this->authorizeRole(['admin']);
@@ -69,9 +56,6 @@ class SesiPelatihanController extends Controller
             ->with('success', 'Sesi pelatihan berhasil ditambahkan.');
     }
 
-    /**
-     * [ADMIN] Form edit sesi.
-     */
     public function edit(PelatihanModel $pelatihan, SesiPelatihanModel $sesi)
     {
         $this->authorizeRole(['admin']);
@@ -79,9 +63,6 @@ class SesiPelatihanController extends Controller
         return view('admin.sesi.edit', compact('pelatihan', 'sesi'));
     }
 
-    /**
-     * [ADMIN] Perbarui data sesi.
-     */
     public function update(Request $request, PelatihanModel $pelatihan, SesiPelatihanModel $sesi)
     {
         $this->authorizeRole(['admin']);
@@ -101,9 +82,6 @@ class SesiPelatihanController extends Controller
             ->with('success', 'Data sesi berhasil diperbarui.');
     }
 
-    /**
-     * [ADMIN] Hapus sesi.
-     */
     public function destroy(PelatihanModel $pelatihan, SesiPelatihanModel $sesi)
     {
         $this->authorizeRole(['admin']);
@@ -115,13 +93,6 @@ class SesiPelatihanController extends Controller
             ->with('success', 'Sesi berhasil dihapus.');
     }
 
-    /* ═══════════════════════════════════════════════
-     |  INSTRUKTUR – Jadwal Sesi
-     ═══════════════════════════════════════════════ */
-
-    /**
-     * [INSTRUKTUR] Jadwal sesi pelatihan yang diampu.
-     */
     public function jadwalSesi(Request $request)
     {
         $this->authorizeRole(['instruktur']);
@@ -132,40 +103,32 @@ class SesiPelatihanController extends Controller
             $q->where('instruktur_id', $instruktur->id_user)
         )->with('pelatihan')->orderBy('tanggal')->orderBy('waktu_mulai');
 
-        // Filter berdasarkan pelatihan tertentu
         if ($request->filled('pelatihan_id')) {
             $query->where('pelatihan_id', $request->pelatihan_id);
         }
 
         $sesi = $query->paginate(15)->withQueryString();
 
-        // Daftar pelatihan instruktur ini untuk filter dropdown
         $pelatihan = PelatihanModel::where('instruktur_id', $instruktur->id_user)->get();
 
         return view('instruktur.sesi.jadwal', compact('sesi', 'pelatihan'));
     }
 
-    /**
-     * [INSTRUKTUR] Detail satu sesi: daftar peserta + status logbook.
-     */
     public function detailSesi(SesiPelatihanModel $sesi)
     {
         $this->authorizeRole(['instruktur']);
 
-        // Pastikan sesi ini milik instruktur login
         if ($sesi->pelatihan->instruktur_id !== Auth::user()->id_user) {
             abort(403, 'Sesi ini bukan bagian dari pelatihan Anda.');
         }
 
         $sesi->load('pelatihan');
 
-        // Peserta yang terdaftar (diterima) di pelatihan ini
         $pesertaTerdaftar = PendaftaranModel::with('peserta')
             ->where('pelatihan_id', $sesi->pelatihan_id)
             ->where('status', 'diterima')
             ->get();
 
-        // Logbook yang sudah diisi untuk sesi ini
         $logbookTerisi = LogbookModel::where('sesi_id', $sesi->id_sesi)
             ->pluck('status', 'peserta_id')
             ->toArray();
@@ -173,31 +136,21 @@ class SesiPelatihanController extends Controller
         return view('instruktur.sesi.detail', compact('sesi', 'pesertaTerdaftar', 'logbookTerisi'));
     }
 
-    /* ═══════════════════════════════════════════════
-     |  PESERTA – Status Kehadiran
-     ═══════════════════════════════════════════════ */
-
-    /**
-     * [PESERTA] Status kehadiran peserta di seluruh sesi pelatihan yang diikuti.
-     */
     public function statusKehadiran(Request $request)
     {
         $this->authorizeRole(['peserta']);
 
         $peserta = Auth::user();
 
-        // Ambil pelatihan yang diikuti peserta (pendaftaran diterima)
         $pendaftaranDiterima = PendaftaranModel::where('peserta_id', $peserta->id_user)
             ->where('status', 'diterima')
             ->with(['pelatihan.sesiPelatihan'])
             ->get();
 
-        // Logbook peserta ini
         $logbook = LogbookModel::where('peserta_id', $peserta->id_user)
             ->get()
             ->keyBy('sesi_id');
 
-        // Susun data per pelatihan
         $dataKehadiran = $pendaftaranDiterima->map(function ($daftar) use ($logbook) {
             $sesiList = $daftar->pelatihan->sesiPelatihan->map(function ($sesi) use ($logbook) {
                 return [
@@ -221,8 +174,6 @@ class SesiPelatihanController extends Controller
 
         return view('peserta.kehadiran.index', compact('dataKehadiran'));
     }
-
-    /* ─── Helper ─── */
 
     private function authorizeRole(array $roles): void
     {

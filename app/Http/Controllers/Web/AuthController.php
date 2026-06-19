@@ -15,10 +15,6 @@ use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    /* ═══════════════════════════════════════════════
-     |  LOGIN
-     ═══════════════════════════════════════════════ */
-
     public function loginForm()
     {
         return view('login');
@@ -45,10 +41,6 @@ class AuthController extends Controller
         return $this->redirectByRole($user->role);
     }
 
-    /* ═══════════════════════════════════════════════
-     |  REGISTER
-     ═══════════════════════════════════════════════ */
-
     public function registerForm()
     {
         return view('register');
@@ -56,7 +48,6 @@ class AuthController extends Controller
 
     public function register(Request $request)
     {
-        // Validasi dasar (semua role)
         $validated = $request->validate([
             'nama'     => 'required|string|max:100',
             'email'    => 'required|email|max:100|unique:users,email',
@@ -66,7 +57,6 @@ class AuthController extends Controller
             'role'     => 'required|in:peserta,instruktur',
         ]);
 
-        // ── Validasi tambahan khusus instruktur ──────────────────────────────
         if ($validated['role'] === 'instruktur') {
 
             $request->validate([
@@ -74,7 +64,6 @@ class AuthController extends Controller
                 'bukti_penerimaan' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
             ]);
 
-            // Cek kode ada di database
             $kodePenerimaan = KodePenerimaanModel::where(
                 'kode', strtoupper($request->kode_penerimaan)
             )->first();
@@ -97,11 +86,9 @@ class AuthController extends Controller
                     ->withErrors(['kode_penerimaan' => 'Kode penerimaan sudah kedaluwarsa.']);
             }
 
-            // Upload bukti penerimaan
             $pathBukti = $request->file('bukti_penerimaan')
                                   ->store('bukti_penerimaan', 'public');
 
-            // Buat akun instruktur (menunggu verifikasi)
             $user = UserModel::create([
                 'nama'               => $validated['nama'],
                 'email'              => $validated['email'],
@@ -114,7 +101,6 @@ class AuthController extends Controller
                 'status_verifikasi'  => 'menunggu',
             ]);
 
-            // Tandai kode sudah terpakai
             $kodePenerimaan->update([
                 'is_used'  => true,
                 'used_by'  => $user->id_user,
@@ -125,7 +111,6 @@ class AuthController extends Controller
                 ->with('info', 'Registrasi berhasil! Akun Anda sedang menunggu verifikasi dokumen oleh Admin. Anda akan dapat login setelah diverifikasi.');
         }
 
-        // ── Registrasi peserta (alur biasa) ─────────────────────────────────
         UserModel::create([
             'nama'     => $validated['nama'],
             'email'    => $validated['email'],
@@ -139,10 +124,6 @@ class AuthController extends Controller
             ->with('success', 'Akun berhasil dibuat. Silakan login.');
     }
 
-    /* ═══════════════════════════════════════════════
-     |  LOGOUT
-     ═══════════════════════════════════════════════ */
-
     public function logout(Request $request)
     {
         Auth::logout();
@@ -152,10 +133,6 @@ class AuthController extends Controller
         return redirect()->route('welcome')
             ->with('success', 'Anda berhasil keluar dari sistem.');
     }
-
-    /* ═══════════════════════════════════════════════
-     |  FORGOT PASSWORD
-     ═══════════════════════════════════════════════ */
 
     public function forgotForm()
     {
@@ -232,10 +209,6 @@ class AuthController extends Controller
             ->with('success', 'Password berhasil direset. Silakan login dengan password baru Anda.');
     }
 
-    /* ═══════════════════════════════════════════════
-     |  LANDING PAGE
-     ═══════════════════════════════════════════════ */
-
     public function landing()
     {
         if (Auth::check()) {
@@ -244,8 +217,6 @@ class AuthController extends Controller
 
         return view('welcome');
     }
-
-    /* ─── Helper ─── */
 
     private function redirectByRole(string $role): \Illuminate\Http\RedirectResponse
     {

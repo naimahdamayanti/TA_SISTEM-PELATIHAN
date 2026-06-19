@@ -45,43 +45,30 @@ class UserModel extends Authenticatable
         ];
     }
 
-    // ----------------------------------------------------------------
-    // RELATIONS
-    // ----------------------------------------------------------------
-
-    /** Pelatihan yang diampu oleh instruktur ini */
     public function pelatihan()
     {
         return $this->hasMany(PelatihanModel::class, 'instruktur_id', 'id_user');
     }
 
-    /** Pendaftaran pelatihan milik peserta ini */
     public function pendaftaran()
     {
         return $this->hasMany(PendaftaranModel::class, 'peserta_id', 'id_user');
     }
 
-    /** Logbook absensi sebagai peserta */
     public function logbookSebagaiPeserta()
     {
         return $this->hasMany(LogbookModel::class, 'peserta_id', 'id_user');
     }
 
-    /** Logbook absensi yang dicatat sebagai instruktur */
     public function logbookSebagaiInstruktur()
     {
         return $this->hasMany(LogbookModel::class, 'instruktur_id', 'id_user');
     }
 
-    /** Penilaian kualifikasi yang diberikan sebagai instruktur */
     public function kualifikasiSertifikasi()
     {
         return $this->hasMany(KualifikasiSertifikasiModel::class, 'instruktur_id', 'id_user');
     }
-
-    // ----------------------------------------------------------------
-    // HELPERS
-    // ----------------------------------------------------------------
 
     public function isAdmin(): bool
     {

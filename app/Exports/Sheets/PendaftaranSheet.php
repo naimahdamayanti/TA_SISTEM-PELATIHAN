@@ -106,7 +106,6 @@ class PendaftaranSheet implements
                 $sheet->freezePane('A2');
                 $sheet->getRowDimension(1)->setRowHeight(22);
 
-                // Ringkasan status
                 $totalRow   = $lastRow + 2;
                 $diterima   = PendaftaranModel::whereYear('tgl_daftar', $this->tahun)->where('status', 'diterima')->count();
                 $menunggu   = PendaftaranModel::whereYear('tgl_daftar', $this->tahun)->where('status', 'menunggu')->count();

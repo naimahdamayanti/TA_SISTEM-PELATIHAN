@@ -190,6 +190,7 @@
                 <th class="center" style="width:55px">Menunggu</th>
                 <th class="center" style="width:50px">Ditolak</th>
                 <th class="center" style="width:55px">Sertifikat</th>
+                <th class="center" style="width:60px">Kelulusan</th>
                 <th style="width:150px">Periode</th>
                 <th class="center" style="width:65px">Status</th>
             </tr>
@@ -201,6 +202,19 @@
                 $menunggu = \App\Models\PendaftaranModel::where('pelatihan_id', $item->id_pelatihan)->where('status','menunggu')->count();
                 $ditolak  = \App\Models\PendaftaranModel::where('pelatihan_id', $item->id_pelatihan)->where('status','ditolak')->count();
                 $sertif   = \App\Models\SertifikatModel::whereHas('pendaftaran', fn($q) => $q->where('pelatihan_id', $item->id_pelatihan))->count();
+
+                $totalLulus = \App\Models\KualifikasiSertifikasiModel::whereHas('pendaftaran', fn($q) =>
+                    $q->where('pelatihan_id', $item->id_pelatihan)
+                )->where('memenuhi_syarat', true)->count();
+
+                $persenKelulusan = $diterima > 0 ? round(($totalLulus / $diterima) * 100, 1) : null;
+
+                $kelulusanClass = match(true) {
+                    is_null($persenKelulusan) => 'text-muted',
+                    $persenKelulusan >= 80    => 'text-success',
+                    $persenKelulusan >= 50    => 'text-warning',
+                    default                   => 'text-danger',
+                };
             @endphp
             <tr>
                 <td><span class="kode">{{ $item->kode_pelatihan }}</span></td>
@@ -211,6 +225,9 @@
                 <td class="center {{ $menunggu > 0 ? 'text-warning' : 'text-muted' }}">{{ $menunggu }}</td>
                 <td class="center {{ $ditolak > 0 ? 'text-danger' : 'text-muted' }}">{{ $ditolak }}</td>
                 <td class="center {{ $sertif > 0 ? 'text-primary' : 'text-muted' }}">{{ $sertif }}</td>
+                <td class="center {{ $kelulusanClass }}">
+                    {{ is_null($persenKelulusan) ? '—' : $persenKelulusan . '%' }}
+                </td>
                 <td class="text-muted">
                     @if($item->tgl_mulai)
                         {{ \Carbon\Carbon::parse($item->tgl_mulai)->format('d M Y') }}
@@ -227,7 +244,7 @@
             </tr>
             @empty
             <tr>
-                <td colspan="10" class="center text-muted">Tidak ada data.</td>
+                <td colspan="11" class="center text-muted">Tidak ada data.</td>
             </tr>
             @endforelse
         </tbody>

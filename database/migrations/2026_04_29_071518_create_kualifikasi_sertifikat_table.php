@@ -26,7 +26,7 @@ return new class extends Migration
 
             // true  = memenuhi syarat (persen_hadir >= 80%)
             // false = tidak memenuhi syarat
-            $table->boolean('memenuhi_syarat')->default(false);
+            $table->enum('memenuhi_syarat', ['lulus', 'tidak lulus'])->nullable();
 
             $table->text('catatan')->nullable()->comment('Catatan penilaian dari instruktur');
             $table->dateTime('tgl_penilaian')->useCurrent();

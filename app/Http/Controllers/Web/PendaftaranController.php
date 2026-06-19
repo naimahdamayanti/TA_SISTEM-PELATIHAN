@@ -13,10 +13,6 @@ use Carbon\Carbon;
 
 class PendaftaranController extends Controller
 {
-    /* ═══════════════════════════════════════════════
-     |  ADMIN – Kelola Pendaftaran
-     ═══════════════════════════════════════════════ */
-
     public function index(Request $request)
     {
         $this->authorizeRole(['admin']);
@@ -102,10 +98,6 @@ class PendaftaranController extends Controller
         return redirect()->route('admin.pendaftaran.index')
             ->with('success', 'Data pendaftaran berhasil dihapus.');
     }
-
-    /* ═══════════════════════════════════════════════
-     |  PESERTA – Form & Riwayat Pendaftaran
-     ═══════════════════════════════════════════════ */
 
     public function formPendaftaran(PelatihanModel $pelatihan)
     {
@@ -212,10 +204,6 @@ class PendaftaranController extends Controller
         ]);
     }
 
-    /**
-     * [PESERTA] Ambil data satu pendaftaran sebagai JSON untuk ditampilkan di modal.
-     * Dipanggil via AJAX saat peserta klik tombol "Unduh PDF" di tabel riwayat.
-     */
     public function detailPendaftaran(PendaftaranModel $pendaftaran)
     {
         $this->authorizeRole(['peserta']);
@@ -262,10 +250,6 @@ class PendaftaranController extends Controller
         ]);
     }
 
-    /**
-     * [PESERTA] Generate & download PDF formulir satu pendaftaran.
-     * Dipanggil saat peserta klik "Unduh sebagai PDF" di dalam modal.
-     */
     public function exportPDF(PendaftaranModel $pendaftaran)
     {
         $this->authorizeRole(['peserta']);
@@ -291,7 +275,6 @@ class PendaftaranController extends Controller
         return $pdf->download($namaFile);
     }
 
-    /* ─── Helper ─── */
     private function authorizeRole(array $roles): void
     {
         if (!in_array(Auth::user()->role, $roles)) {

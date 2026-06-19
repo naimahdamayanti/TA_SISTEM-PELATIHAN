@@ -5,6 +5,7 @@ namespace App\Exports\Sheets;
 use App\Models\PelatihanModel;
 use App\Models\PendaftaranModel;
 use App\Models\SertifikatModel;
+use App\Models\KualifikasiSertifikasiModel;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
@@ -33,7 +34,6 @@ class PelatihanSheet implements
             ->orderBy('tgl_mulai')
             ->get();
 
-        // Pre-load counts per pelatihan untuk menghindari N+1
         $pelIds = $rows->pluck('id_pelatihan');
 
         $countDiterima = PendaftaranModel::whereIn('pelatihan_id', $pelIds)
@@ -62,9 +62,23 @@ class PelatihanSheet implements
         ->groupBy('pendaftaran.pelatihan_id')
         ->pluck('total', 'pendaftaran.pelatihan_id');
 
+        // Hitung peserta lulus (memenuhi_syarat) per pelatihan via relasi, bukan raw join
+        $countLulus = KualifikasiSertifikasiModel::whereHas('pendaftaran', fn($q) =>
+                $q->whereIn('pelatihan_id', $pelIds)
+            )
+            ->where('memenuhi_syarat', true)
+            ->with('pendaftaran:id_pendaftaran,pelatihan_id')
+            ->get()
+            ->groupBy(fn($k) => $k->pendaftaran->pelatihan_id)
+            ->map->count();
+
         $this->rowCount = $rows->count();
 
-        return $rows->map(function ($p, $i) use ($countDiterima, $countMenunggu, $countDitolak, $countSertif) {
+        return $rows->map(function ($p, $i) use ($countDiterima, $countMenunggu, $countDitolak, $countSertif, $countLulus) {
+            $diterima = (int) ($countDiterima[$p->id_pelatihan] ?? 0);
+            $lulus    = (int) ($countLulus[$p->id_pelatihan] ?? 0);
+            $persenKelulusan = $diterima > 0 ? round(($lulus / $diterima) * 100, 1) : '-';
+
             return [
                 $i + 1,
                 $p->kode_pelatihan,
@@ -72,10 +86,11 @@ class PelatihanSheet implements
                 $p->kategori ?? '-',
                 $p->instruktur?->nama ?? '-',
                 (int) $p->kuota,
-                (int) ($countDiterima[$p->id_pelatihan] ?? 0),
+                $diterima,
                 (int) ($countMenunggu[$p->id_pelatihan] ?? 0),
                 (int) ($countDitolak[$p->id_pelatihan] ?? 0),
                 (int) ($countSertif[$p->id_pelatihan] ?? 0),
+                $persenKelulusan,
                 $p->tgl_mulai   ? Carbon::parse($p->tgl_mulai)->format('d/m/Y')   : '-',
                 $p->tgl_selesai ? Carbon::parse($p->tgl_selesai)->format('d/m/Y') : '-',
                 ucfirst($p->status),
@@ -87,7 +102,7 @@ class PelatihanSheet implements
     {
         return [
             'No', 'Kode', 'Nama Pelatihan', 'Kategori', 'Instruktur',
-            'Kuota', 'Diterima', 'Menunggu', 'Ditolak', 'Sertifikat',
+            'Kuota', 'Diterima', 'Menunggu', 'Ditolak', 'Sertifikat', 'Kelulusan (%)',
             'Tgl Mulai', 'Tgl Selesai', 'Status',
         ];
     }
@@ -108,10 +123,9 @@ class PelatihanSheet implements
         return [
             AfterSheet::class => function (AfterSheet $event) {
                 $sheet = $event->sheet->getDelegate();
-                $lastRow = $this->rowCount + 1; // +1 for heading
+                $lastRow = $this->rowCount + 1;
 
-                // Border seluruh tabel
-                $sheet->getStyle("A1:M{$lastRow}")->applyFromArray([
+                $sheet->getStyle("A1:N{$lastRow}")->applyFromArray([
                     'borders' => [
                         'allBorders' => [
                             'borderStyle' => Border::BORDER_THIN,
@@ -120,27 +134,26 @@ class PelatihanSheet implements
                     ],
                 ]);
 
-                // Row baris genap – zebra striping
                 for ($row = 2; $row <= $lastRow; $row++) {
                     if ($row % 2 === 0) {
-                        $sheet->getStyle("A{$row}:M{$row}")->applyFromArray([
+                        $sheet->getStyle("A{$row}:N{$row}")->applyFromArray([
                             'fill' => ['fillType' => 'solid', 'startColor' => ['argb' => 'FFF0F4FF']],
                         ]);
                     }
                 }
 
-                // Freeze baris pertama
                 $sheet->freezePane('A2');
 
-                // Row heading tinggi 22px
                 $sheet->getRowDimension(1)->setRowHeight(22);
 
-                // Alignment angka ke tengah
-                $sheet->getStyle("F2:J{$lastRow}")->applyFromArray([
+                $sheet->getStyle("F2:K{$lastRow}")->applyFromArray([
                     'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
                 ]);
 
-                // Baris total di bawah
+                // Format kolom Kelulusan sebagai "xx.x%" (nilai numerik biasa, bukan format persen Excel /100)
+                $sheet->getStyle("K2:K{$lastRow}")
+                    ->getNumberFormat()->setFormatCode('0.0"%"');
+
                 $totalRow = $lastRow + 1;
                 $sheet->setCellValue("E{$totalRow}", 'TOTAL');
                 $sheet->setCellValue("F{$totalRow}", "=SUM(F2:F{$lastRow})");
@@ -148,8 +161,12 @@ class PelatihanSheet implements
                 $sheet->setCellValue("H{$totalRow}", "=SUM(H2:H{$lastRow})");
                 $sheet->setCellValue("I{$totalRow}", "=SUM(I2:I{$lastRow})");
                 $sheet->setCellValue("J{$totalRow}", "=SUM(J2:J{$lastRow})");
+                $sheet->setCellValue("K{$totalRow}", "=AVERAGE(K2:K{$lastRow})");
 
-                $sheet->getStyle("E{$totalRow}:J{$totalRow}")->applyFromArray([
+                $sheet->getStyle("K{$totalRow}")
+                    ->getNumberFormat()->setFormatCode('0.0"%"');
+
+                $sheet->getStyle("E{$totalRow}:K{$totalRow}")->applyFromArray([
                     'font'      => ['bold' => true, 'color' => ['argb' => 'FFFFFFFF']],
                     'fill'      => ['fillType' => 'solid', 'startColor' => ['argb' => 'FF1565C0']],
                     'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],

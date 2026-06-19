@@ -29,7 +29,6 @@ class KodePenerimaanController extends Controller
             'jumlah'          => 'required|integer|min:1|max:20',
         ]);
 
-        // Kirim email hanya bisa untuk 1 kode sekaligus
         if ($request->filled('email_tujuan') && $request->jumlah > 1) {
             return back()->withErrors([
                 'email_tujuan' => 'Pengiriman email hanya bisa dilakukan untuk 1 kode sekaligus.',

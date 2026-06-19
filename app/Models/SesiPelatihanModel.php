@@ -25,17 +25,11 @@ class SesiPelatihanModel extends Model
         ];
     }
 
-    // ----------------------------------------------------------------
-    // RELATIONS
-    // ----------------------------------------------------------------
-
-    /** Pelatihan induk sesi ini */
     public function pelatihan()
     {
         return $this->belongsTo(PelatihanModel::class, 'pelatihan_id', 'id_pelatihan');
     }
 
-    /** Semua data logbook / absensi pada sesi ini */
     public function logbook()
     {
         return $this->hasMany(LogbookModel::class, 'sesi_id', 'id_sesi');

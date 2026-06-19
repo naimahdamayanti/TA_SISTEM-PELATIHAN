@@ -17,51 +17,34 @@ class LogbookModel extends Model
         'catatan',
     ];
 
-    // ----------------------------------------------------------------
-    // RELATIONS
-    // ----------------------------------------------------------------
-
-    /** Instruktur yang mencatat absensi ini */
     public function instruktur()
     {
         return $this->belongsTo(UserModel::class, 'instruktur_id', 'id_user');
     }
 
-    /** Sesi pelatihan tempat absensi ini dicatat */
     public function sesiPelatihan()
     {
         return $this->belongsTo(SesiPelatihanModel::class, 'sesi_id', 'id_sesi');
     }
 
-    /** Peserta yang diabsen */
     public function peserta()
     {
         return $this->belongsTo(UserModel::class, 'peserta_id', 'id_user');
     }
-
-    // ----------------------------------------------------------------
-    // HELPERS
-    // ----------------------------------------------------------------
 
     public function hadir(): bool
     {
         return $this->status === 'hadir';
     }
 
-    /**
-     * Hitung persentase kehadiran peserta pada satu pelatihan.
-     * Digunakan sebagai input kualifikasi sertifikasi.
-     */
     public static function persentaseKehadiran(int $pesertaId, int $pelatihanId): float
     {
-        // Total sesi pada pelatihan
         $totalSesi = SesiPelatihanModel::where('pelatihan_id', $pelatihanId)->count();
 
         if ($totalSesi === 0) {
             return 0.0;
         }
 
-        // Jumlah sesi yang dihadiri peserta
         $totalHadir = self::whereHas('sesiPelatihan', function ($q) use ($pelatihanId) {
                             $q->where('pelatihan_id', $pelatihanId);
                         })

@@ -12,14 +12,6 @@ use Illuminate\Validation\Rule;
 
 class InstrukturController extends Controller
 {
-    /* ═══════════════════════════════════════════════
-     |  ADMIN – Kelola Instruktur
-     ═══════════════════════════════════════════════ */
-
-    /**
-     * [ADMIN] Daftar semua instruktur.
-     * Instruktur dengan status 'menunggu' ditampilkan paling atas.
-     */
     public function index(Request $request)
     {
         $this->authorizeAdmin();
@@ -48,18 +40,12 @@ class InstrukturController extends Controller
         return view('admin.instruktur.index', compact('instruktur', 'pelatihan'));
     }
 
-    /**
-     * [ADMIN] Form tambah instruktur baru (langsung oleh admin, tanpa kode).
-     */
     public function create()
     {
         $this->authorizeAdmin();
         return view('admin.instruktur.create');
     }
 
-    /**
-     * [ADMIN] Simpan instruktur baru — dibuat admin langsung, status terverifikasi.
-     */
     public function store(Request $request)
     {
         $this->authorizeAdmin();
@@ -81,14 +67,11 @@ class InstrukturController extends Controller
             'role'              => 'instruktur',
             'status_verifikasi' => 'terverifikasi',
         ]);
-
+        
         return redirect()->route('admin.instruktur.index')
             ->with('success', 'Instruktur baru berhasil ditambahkan.');
     }
 
-    /**
-     * [ADMIN] Form edit instruktur.
-     */
     public function edit(UserModel $instruktur)
     {
         $this->authorizeAdmin();
@@ -99,9 +82,6 @@ class InstrukturController extends Controller
         return view('admin.instruktur.edit', compact('instruktur', 'pelatihan'));
     }
 
-    /**
-     * [ADMIN] Perbarui data instruktur.
-     */
     public function update(Request $request, UserModel $instruktur)
     {
         $this->authorizeAdmin();
@@ -136,9 +116,6 @@ class InstrukturController extends Controller
             ->with('success', 'Data instruktur berhasil diperbarui.');
     }
 
-    /**
-     * [ADMIN] Hapus instruktur.
-     */
     public function destroy(UserModel $instruktur)
     {
         $this->authorizeAdmin();
@@ -154,9 +131,6 @@ class InstrukturController extends Controller
             ->with('success', 'Instruktur berhasil dihapus.');
     }
 
-    /**
-     * [ADMIN] Verifikasi atau tolak dokumen instruktur yang daftar mandiri.
-     */
     public function verifikasi(Request $request, UserModel $user)
     {
         $this->authorizeAdmin();
@@ -179,10 +153,6 @@ class InstrukturController extends Controller
         return redirect()->route('admin.instruktur.index')->with('success', $pesan);
     }
 
-    /**
-     * [ADMIN] Tugaskan instruktur ke pelatihan.
-     * Hanya instruktur yang sudah terverifikasi yang bisa ditugaskan.
-     */
     public function tugaskan(Request $request)
     {
         $this->authorizeAdmin();
@@ -196,7 +166,6 @@ class InstrukturController extends Controller
             ->where('role', 'instruktur')
             ->firstOrFail();
 
-        // ── Guard: hanya instruktur terverifikasi yang bisa ditugaskan ───────
         if ($instruktur->status_verifikasi !== 'terverifikasi') {
             return back()->with('error',
                 "Instruktur {$instruktur->nama} belum terverifikasi dan tidak dapat ditugaskan."
@@ -210,8 +179,6 @@ class InstrukturController extends Controller
             "Instruktur {$instruktur->nama} berhasil ditugaskan ke pelatihan {$pelatihan->nama_pelatihan}."
         );
     }
-
-    /* ─── Helper ─── */
 
     private function authorizeAdmin(): void
     {

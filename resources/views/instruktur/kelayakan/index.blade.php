@@ -100,56 +100,27 @@
         text-align: right;
     }
 
-    /* ─── RADIO YA / TIDAK ─── */
-    .radio-yn {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    .radio-wrap-yn {
+    /* ─── BADGE STATUS KELULUSAN ─── */
+    .badge-status {
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        cursor: pointer;
-        user-select: none;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
     }
-    .radio-wrap-yn input[type="radio"] { display: none; }
-    .radio-dot-yn {
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-        border: 1.5px solid #ccc;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-        transition: border-color .15s;
+    .badge-lulus {
+        background: #f0fdf4;
+        color: #15803d;
+        border: 1px solid #bbf7d0;
     }
-    .radio-dot-yn::after {
-        content: '';
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: transparent;
-        transition: background .15s;
+    .badge-tidak-lulus {
+        background: #fef2f2;
+        color: #b91c1c;
+        border: 1px solid #fecaca;
     }
-    .radio-label-yn {
-        font-size: 13px;
-        font-weight: 500;
-        transition: color .15s;
-    }
-
-    /* Ya — aktif */
-    .wrap-ya.selected .radio-dot-yn   { border-color: #16a34a; }
-    .wrap-ya.selected .radio-dot-yn::after { background: #16a34a; }
-    .wrap-ya.selected .radio-label-yn { color: #15803d; }
-    .wrap-ya:not(.selected) .radio-label-yn { color: #aaa; }
-
-    /* Tidak — aktif */
-    .wrap-tidak.selected .radio-dot-yn   { border-color: #dc2626; }
-    .wrap-tidak.selected .radio-dot-yn::after { background: #dc2626; }
-    .wrap-tidak.selected .radio-label-yn { color: #b91c1c; }
-    .wrap-tidak:not(.selected) .radio-label-yn { color: #aaa; }
 
     /* ─── INPUT CATATAN ─── */
     .input-catatan {
@@ -298,7 +269,7 @@
             <tr>
                 <th style="width:220px">Peserta</th>
                 <th style="width:220px">Persen Hadir</th>
-                <th style="width:180px">Memenuhi Syarat</th>
+                <th style="width:160px">Status Kelulusan</th>
                 <th>Catatan Instruktur</th>
                 <th style="width:100px;text-align:center">Simpan</th>
             </tr>
@@ -306,18 +277,11 @@
         <tbody>
             @foreach($pesertaList as $i => $item)
             @php
-                $kualifikasi  = $item['kualifikasi'];
-                $persen       = $item['persen_hadir'];
-                $memenuhi     = $kualifikasi?->memenuhi_syarat;
-
-                // Auto-suggest: >= 80% → memenuhi syarat, tapi bisa di-override manual
-                if (is_null($memenuhi)) {
-                    $memenuhi = $persen >= 80 ? 1 : 0;
-                }
-                $catatanAda = $kualifikasi?->catatan ?? '';
-
-                // Warna progress bar
-                $fillClass = $persen >= 80 ? 'fill-green' : 'fill-red';
+                $kualifikasi = $item['kualifikasi'];
+                $persen      = $item['persen_hadir'];
+                $lulus       = $persen >= 80;
+                $catatanAda  = $kualifikasi?->catatan ?? '';
+                $fillClass   = $lulus ? 'fill-green' : 'fill-red';
             @endphp
             <tr>
                 {{-- Nama Peserta --}}
@@ -340,35 +304,12 @@
                     </div>
                 </td>
 
-                {{-- Memenuhi Syarat: Radio Ya / Tidak --}}
+                {{-- Status Kelulusan: otomatis dari persen hadir --}}
                 <td>
-                    <div class="radio-yn" id="ryn-{{ $i }}">
-
-                        {{-- Ya --}}
-                        <label class="radio-wrap-yn wrap-ya {{ $memenuhi ? 'selected' : '' }}"
-                               onclick="pilihYaTidak({{ $i }}, 1, this)">
-                            <input type="radio"
-                                   name="_memenuhi_{{ $i }}"
-                                   value="1"
-                                   {{ $memenuhi ? 'checked' : '' }}
-                                   data-row="{{ $i }}">
-                            <span class="radio-dot-yn"></span>
-                            <span class="radio-label-yn">Ya</span>
-                        </label>
-
-                        {{-- Tidak --}}
-                        <label class="radio-wrap-yn wrap-tidak {{ !$memenuhi ? 'selected' : '' }}"
-                               onclick="pilihYaTidak({{ $i }}, 0, this)">
-                            <input type="radio"
-                                   name="_memenuhi_{{ $i }}"
-                                   value="0"
-                                   {{ !$memenuhi ? 'checked' : '' }}
-                                   data-row="{{ $i }}">
-                            <span class="radio-dot-yn"></span>
-                            <span class="radio-label-yn">Tidak</span>
-                        </label>
-
-                    </div>
+                    <span class="badge-status {{ $lulus ? 'badge-lulus' : 'badge-tidak-lulus' }}">
+                        <i class="bi {{ $lulus ? 'bi-check-circle-fill' : 'bi-x-circle-fill' }}"></i>
+                        {{ $lulus ? 'Lulus' : 'Tidak Lulus' }}
+                    </span>
                 </td>
 
                 {{-- Catatan --}}
@@ -383,19 +324,13 @@
                 {{-- Tombol Simpan (form individual POST) --}}
                 <td style="text-align:center">
                     <form method="POST"
-                          action="{{ route('instruktur.kelayakan.simpan', $item['pendaftaran']->id_pendaftaran) }}"
-                          id="form-simpan-{{ $i }}">
+                        action="{{ route('instruktur.kelayakan.simpan', $item['pendaftaran']->id_pendaftaran) }}"
+                        id="form-simpan-{{ $i }}">
                         @csrf
-                        {{-- Hidden fields yang diisi via JS sebelum submit --}}
-                        <input type="hidden" name="persen_hadir"    value="{{ $persen }}">
-                        <input type="hidden" name="memenuhi_syarat" id="hidden-memenuhi-{{ $i }}"
-                               value="{{ $memenuhi ? 1 : 0 }}">
-                        <input type="hidden" name="catatan"         id="hidden-catatan-{{ $i }}"
-                               value="{{ $catatanAda }}">
+                        <input type="hidden" name="persen_hadir" value="{{ $persen }}">
+                        <input type="hidden" name="catatan" id="hidden-catatan-{{ $i }}" value="{{ $catatanAda }}">
 
-                        <button type="button"
-                                class="btn-simpan-row"
-                                onclick="submitBaris({{ $i }})">
+                        <button type="button" class="btn-simpan-row" onclick="submitBaris({{ $i }})">
                             <i class="bi bi-check-lg"></i> Simpan
                         </button>
                     </form>
@@ -412,23 +347,6 @@
 
 @push('scripts')
 <script>
-    // ── Pilih Ya / Tidak ────────────────────────────────────────────
-    function pilihYaTidak(rowIdx, nilai, clickedLabel) {
-        const group = document.getElementById('ryn-' + rowIdx);
-
-        // Reset semua di baris ini
-        group.querySelectorAll('.radio-wrap-yn').forEach(el => el.classList.remove('selected'));
-
-        // Tandai yang dipilih
-        clickedLabel.classList.add('selected');
-
-        // Check radio-nya
-        clickedLabel.querySelector('input[type="radio"]').checked = true;
-
-        // Update hidden input
-        document.getElementById('hidden-memenuhi-' + rowIdx).value = nilai;
-    }
-
     // ── Submit form per baris ────────────────────────────────────────
     function submitBaris(rowIdx) {
         // Sinkronkan catatan dari input teks ke hidden field
@@ -439,12 +357,5 @@
         document.getElementById('form-simpan-' + rowIdx).submit();
     }
 
-    // ── Init: pastikan visual radio sinkron dengan checked saat load ──
-    document.querySelectorAll('.radio-yn').forEach(group => {
-        const checked = group.querySelector('input[type="radio"]:checked');
-        if (checked) {
-            checked.closest('.radio-wrap-yn')?.classList.add('selected');
-        }
-    });
 </script>
 @endpush

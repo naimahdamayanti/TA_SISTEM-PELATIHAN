@@ -518,6 +518,25 @@
         sidebar.classList.remove('open');
         overlay.style.display = 'none';
     }
+
+    const modalProfil = new bootstrap.Modal(document.getElementById('modalProfil'));
+
+    document.querySelectorAll('[data-open-profil]').forEach(el => {
+        el.addEventListener('click', e => {
+            e.preventDefault();
+            modalProfil.show();
+        });
+    });
+
+    // Auto-buka jika ada error validasi profil
+    @if($errors->any())
+        modalProfil.show();
+    @endif
+
+    // Auto-buka jika ada pesan sukses profil
+    @if(session('profil_success'))
+        modalProfil.show();
+    @endif
 </script>
 
 @stack('scripts')

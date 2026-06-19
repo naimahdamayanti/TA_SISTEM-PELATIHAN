@@ -34,11 +34,6 @@ class PelatihanModel extends Model
         ];
     }
 
-    // ----------------------------------------------------------------
-    // RELATIONS
-    // ----------------------------------------------------------------
-
-    /** Instruktur yang mengampu pelatihan ini */
     public function instruktur()
     {
         return $this->belongsTo(UserModel::class, 'instruktur_id', 'id_user');
@@ -49,36 +44,27 @@ class PelatihanModel extends Model
         return $this->belongsTo(KategoriModel::class, 'kategori_id', 'id_kategori');
     }
 
-    /** Semua sesi jadwal pelatihan ini */
     public function sesiPelatihan()
     {
         return $this->hasMany(SesiPelatihanModel::class, 'pelatihan_id', 'id_pelatihan');
     }
 
-    /** Semua pendaftaran ke pelatihan ini */
     public function pendaftaran()
     {
         return $this->hasMany(PendaftaranModel::class, 'pelatihan_id', 'id_pelatihan');
     }
 
-    /** Pendaftaran yang sudah diterima */
     public function pendaftaranDiterima()
     {
         return $this->hasMany(PendaftaranModel::class, 'pelatihan_id', 'id_pelatihan')
                     ->where('status', 'diterima');
     }
 
-    // ----------------------------------------------------------------
-    // HELPERS
-    // ----------------------------------------------------------------
-
-    /** Jumlah peserta yang sudah diterima */
     public function jumlahPeserta(): int
     {
         return $this->pendaftaranDiterima()->count();
     }
 
-    /** Apakah kuota masih tersisa */
     public function masihTersedia(): bool
     {
         return $this->status === 'tersedia' && $this->jumlahPeserta() < $this->kuota;

@@ -7,7 +7,7 @@ use App\Models\SertifikatModel;
 use App\Models\PendaftaranModel;
 use App\Models\KualifikasiSertifikasiModel;
 use App\Models\PelatihanModel;
-use Barryvdh\DomPDF\Facade\Pdf;          // <-- import facade DomPDF
+use Barryvdh\DomPDF\Facade\Pdf;          
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -16,10 +16,6 @@ use Carbon\Carbon;
 
 class SertifikatController extends Controller
 {
-    /* ═══════════════════════════════════════════════
-     |  PUBLIC – Cek Sertifikat (tanpa login)
-     ═══════════════════════════════════════════════ */
-
     public function cekForm()
     {
         return view('cek-sertifikat');
@@ -43,10 +39,6 @@ class SertifikatController extends Controller
 
         return view('cek-sertifikat', compact('sertifikat'));
     }
-
-    /* ═══════════════════════════════════════════════
-     |  ADMIN – Daftar Sertifikat
-     ══════════════════════════════════════════════ */
 
     public function index(Request $request)
     {
@@ -97,10 +89,6 @@ class SertifikatController extends Controller
         return back()->with('success', 'Template sertifikat berhasil diupload.');
     }   
 
-    /* ═══════════════════════════════════════════════
-     |  ADMIN – Preview & Generate Sertifikat
-     ═══════════════════════════════════════════════ */
-
     public function preview(PendaftaranModel $pendaftaran)
     {
         $this->authorizeRole(['admin']);
@@ -135,12 +123,10 @@ class SertifikatController extends Controller
 
         $tglTerbit = Carbon::now();
 
-        // Ambil path template gambar
         $templatePath = $pendaftaran->pelatihan->template_sertifikat
             ? storage_path('app/public/' . $pendaftaran->pelatihan->template_sertifikat)
             : null;
 
-        // Convert gambar ke base64 untuk DomPDF
         $templateBase64 = null;
         $ttdBase64      = null;
         if ($templatePath && file_exists($templatePath)) {
@@ -207,7 +193,6 @@ class SertifikatController extends Controller
         return back()->with('success', 'Tanda tangan berhasil diupload.');
     }
 
-    /* ═══ Default posisi (dalam %, berdasarkan layout mm lama: 297x210mm) ═══ */
     private function defaultPosisi(): array
     {
         return [
@@ -233,7 +218,6 @@ class SertifikatController extends Controller
         return $resolved;
     }
 
-    /* ═══ Ambil data posisi + template untuk editor ═══ */
     public function getPosisi(PelatihanModel $pelatihan)
     {
         $this->authorizeRole(['admin']);
@@ -246,7 +230,6 @@ class SertifikatController extends Controller
         ]);
     }
 
-    /* ═══ Simpan posisi dari editor ═══ */
     public function savePosisi(Request $request, PelatihanModel $pelatihan)
     {
         $this->authorizeRole(['admin']);
@@ -262,10 +245,6 @@ class SertifikatController extends Controller
 
         return response()->json(['success' => true]);
     }
-
-    /* ═══════════════════════════════════════════════
-     |  ADMIN – Generate Massal
-     ═══════════════════════════════════════════════ */
 
     public function generateMassal(Request $request)
     {
@@ -374,10 +353,6 @@ class SertifikatController extends Controller
         ]);
     }
 
-    /* ═══════════════════════════════════════════════
-     |  ADMIN – Hapus Sertifikat
-     ═══════════════════════════════════════════════ */
-
     public function destroy(SertifikatModel $sertifikat)
     {
         $this->authorizeRole(['admin']);
@@ -391,10 +366,6 @@ class SertifikatController extends Controller
         return redirect()->route('admin.sertifikat.index')
             ->with('success', 'Sertifikat berhasil dihapus.');
     }
-
-    /* ═══════════════════════════════════════════════
-     |  INSTRUKTUR – Riwayat Sertifikat
-     ═══════════════════════════════════════════════ */
 
     public function riwayatInstruktur(Request $request)
     {
@@ -413,10 +384,6 @@ class SertifikatController extends Controller
         return view('instruktur.sertifikat.index', compact('sertifikat'));
     }
 
-    /* ═══════════════════════════════════════════════
-     |  PESERTA – Sertifikat Saya + Download
-     ═══════════════════════════════════════════════ */
-
     public function sertifSaya()
     {
         $this->authorizeRole(['peserta']);
@@ -433,9 +400,6 @@ class SertifikatController extends Controller
         return view('peserta.sertifikat.index', compact('sertifikat'));
     }
 
-    /**
-     * [PESERTA] Download PDF sertifikat milik sendiri.
-     */
     public function download(SertifikatModel $sertifikat)
     {
         $this->authorizeRole(['peserta']);
@@ -459,8 +423,6 @@ class SertifikatController extends Controller
         );
     }
 
-    /* ─── Helper ─── */
-
     private const KODE_INSTITUSI = 'EXP';
 
     private function toRoman(int $month): string
@@ -470,7 +432,6 @@ class SertifikatController extends Controller
 
     private function generateNomorSertifikat(PelatihanModel $pelatihan, Carbon $tglTerbit, int $offset = 0): string
     {
-        // Hitung sertifikat yang sudah ada untuk pelatihan ini di bulan & tahun yang sama
         $existing = SertifikatModel::whereHas('pendaftaran', fn($q) =>
             $q->where('pelatihan_id', $pelatihan->id_pelatihan)
         )
@@ -479,7 +440,7 @@ class SertifikatController extends Controller
         ->count();
 
         $nomor     = str_pad($existing + 1 + $offset, 3, '0', STR_PAD_LEFT);
-        $kodePel   = strtoupper(explode('-', $pelatihan->kode_pelatihan)[0]); // STR-001 → STR
+        $kodePel   = strtoupper(explode('-', $pelatihan->kode_pelatihan)[0]); 
         $roman     = $this->toRoman($tglTerbit->month);
 
         return "{$nomor}/" . self::KODE_INSTITUSI . "/{$kodePel}/{$roman}/{$tglTerbit->year}";

@@ -15,9 +15,6 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    /**
-     * Redirect ke dashboard sesuai role pengguna yang sedang login.
-     */
     public function index()
     {
         $user = Auth::user();
@@ -68,7 +65,6 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        // Pendaftaran menunggu konfirmasi
         $pendaftaranMenunggu = PendaftaranModel::with(['peserta', 'pelatihan'])
             ->where('status', 'menunggu')
             ->latest('tgl_daftar')
@@ -111,12 +107,10 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
-        // Jumlah peserta yang sudah diisi logbook-nya (kehadiran hari ini)
         $logbookHariIni = LogbookModel::where('instruktur_id', $instruktur->id_user)
             ->whereHas('sesiPelatihan', fn($q) => $q->whereDate('tanggal', Carbon::today()))
             ->count();
 
-        // Peserta menunggu penilaian kelayakan
         $menungguKelayakan = PendaftaranModel::whereHas('pelatihan', fn($q) =>
             $q->where('instruktur_id', $instruktur->id_user)->where('status', 'selesai')
         )
@@ -152,12 +146,10 @@ class DashboardController extends Controller
             $q->where('peserta_id', $peserta->id_user)
         )->count();
 
-        // Pelatihan yang sedang diikuti (status tersedia, pendaftaran diterima)
         $pelatihanAktif = $pendaftaran->filter(fn($p) =>
             $p->status === 'diterima' && $p->pelatihan?->status === 'tersedia'
         );
 
-        // Sesi mendatang untuk peserta ini
         $sesiMendatang = SesiPelatihanModel::whereHas('pelatihan.pendaftaran', fn($q) =>
             $q->where('peserta_id', $peserta->id_user)->where('status', 'diterima')
         )
