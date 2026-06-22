@@ -275,7 +275,7 @@
                     <input type="text" id="first_name" name="first_name"
                            class="form-control-custom @error('first_name') is-invalid @enderror"
                            placeholder="Nama depan"
-                           value="{{ old('first_name', explode(' ', $peserta->nama_lengkap ?? $peserta->name ?? '')[0]) }}"
+                           value="{{ old('first_name', explode(' ', $peserta->nama ?? '')[0]) }}"
                            required>
                     @error('first_name')
                         <div class="invalid-feedback-custom">{{ $message }}</div>
@@ -287,7 +287,7 @@
                     <input type="text" id="last_name" name="last_name"
                            class="form-control-custom @error('last_name') is-invalid @enderror"
                            placeholder="Nama belakang"
-                           value="{{ old('last_name', implode(' ', array_slice(explode(' ', $peserta->nama_lengkap ?? $peserta->name ?? ''), 1))) }}">
+                           value="{{ old('last_name', implode(' ', array_slice(explode(' ', $peserta->nama ?? ''), 1))) }}" required>
                     @error('last_name')
                         <div class="invalid-feedback-custom">{{ $message }}</div>
                     @enderror

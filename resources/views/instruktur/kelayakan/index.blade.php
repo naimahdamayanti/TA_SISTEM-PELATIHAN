@@ -143,25 +143,29 @@
         box-shadow: 0 0 0 3px rgba(232,78,58,.08);
     }
 
-    /* ─── BTN SIMPAN PER BARIS ─── */
-    .btn-simpan-row {
-        display: inline-flex;
+    .btn-simpan {
+        display: flex;
         align-items: center;
-        gap: 5px;
-        padding: 7px 16px;
-        border: 1.5px solid var(--brand);
+        gap: 8px;
+        padding: 0 22px;
+        height: 40px;
+        background: var(--brand);
+        color: #fff;
+        border: none;
         border-radius: 8px;
-        background: #fff;
-        color: var(--brand);
         font-family: 'Outfit', sans-serif;
-        font-size: 12px;
+        font-size: 13px;
         font-weight: 600;
         cursor: pointer;
-        transition: background .15s, color .15s;
+        transition: background .15s;
         white-space: nowrap;
     }
-    .btn-simpan-row:hover { background: var(--brand); color: #fff; }
-    .btn-simpan-row i { font-size: 13px; }
+    .btn-simpan:hover { background: var(--brand-dark); }
+    .btn-simpan:disabled {
+        background: #e5e5e5;
+        color: #aaa;
+        cursor: not-allowed;
+    }
 
     /* ─── EMPTY STATE ─── */
     .empty-box {
@@ -222,140 +226,127 @@
 </div>
 @endif
 
-{{-- ── Dropdown Pilih Pelatihan ── --}}
-<div class="filter-bar">
-    <i class="bi bi-journal-bookmark text-muted" style="font-size:16px;flex-shrink:0"></i>
-    <select id="sel-pelatihan" class="form-select"
-            onchange="window.location.href='{{ route('instruktur.kelayakan.index') }}?pelatihan_id='+this.value">
-        <option value="">— Pilih Pelatihan —</option>
-        @foreach($pelatihan as $p)
-        <option value="{{ $p->id_pelatihan }}"
-                {{ $pelatihanDipilih?->id_pelatihan == $p->id_pelatihan ? 'selected' : '' }}>
-            {{ $p->nama_pelatihan }} ({{ $p->kode_pelatihan }})
-        </option>
-        @endforeach
-    </select>
+{{-- ══ FORM tunggal — filter + tabel ══ --}}
+<form method="POST"
+      action="{{ $pelatihanDipilih ? route('instruktur.kelayakan.simpanmassal', $pelatihanDipilih->id_pelatihan) : '#' }}"
+      id="form-kelayakan">
+@csrf
 
-    @if($pelatihanDipilih)
-    <span class="text-muted small ms-2">
-        <i class="bi bi-people me-1"></i>
-        {{ $pesertaList->count() }} peserta terdaftar
-    </span>
-    @endif
-</div>
+    {{-- ── Filter Bar + Tombol Simpan ── --}}
+    <div class="card p-4 mb-3">
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+            <i class="bi bi-journal-bookmark text-muted" style="font-size:16px;flex-shrink:0"></i>
 
-{{-- ══════════════════════════════════════════════════
-     TABEL KELAYAKAN
-══════════════════════════════════════════════════ --}}
-@if(!$pelatihanDipilih)
+            <select id="sel-pelatihan" class="form-select"
+                    onchange="window.location.href='{{ route('instruktur.kelayakan.index') }}?pelatihan_id='+this.value">
+                <option value="">— Pilih Pelatihan —</option>
+                @foreach($pelatihan as $p)
+                <option value="{{ $p->id_pelatihan }}"
+                        {{ $pelatihanDipilih?->id_pelatihan == $p->id_pelatihan ? 'selected' : '' }}>
+                    {{ $p->nama_pelatihan }} ({{ $p->kode_pelatihan }})
+                </option>
+                @endforeach
+            </select>
 
-    <div class="empty-box">
-        <i class="bi bi-shield-check"></i>
-        <p>Pilih pelatihan untuk melihat dan menilai kelayakan peserta.</p>
+            @if($pelatihanDipilih)
+            <span class="text-muted small">
+                <i class="bi bi-people me-1"></i>
+                {{ $pesertaList->count() }} peserta terdaftar
+            </span>
+
+            <button type="submit" class="btn-simpan ms-auto">
+                <i class="bi bi-floppy2-fill"></i> Simpan Kelayakan
+            </button>
+            @endif
+        </div>
     </div>
 
-@elseif($pesertaList->isEmpty())
+    {{-- ══ Tabel atau Empty State ══ --}}
+    @if(!$pelatihanDipilih)
 
-    <div class="empty-box">
-        <i class="bi bi-people"></i>
-        <p>Belum ada peserta yang diterima di pelatihan ini.</p>
-    </div>
+        <div class="empty-box">
+            <i class="bi bi-shield-check"></i>
+            <p>Pilih pelatihan untuk melihat dan menilai kelayakan peserta.</p>
+        </div>
 
-@else
+    @elseif($pesertaList->isEmpty())
 
-<div class="tabel-kelayakan">
-    <table>
-        <thead>
-            <tr>
-                <th style="width:220px">Peserta</th>
-                <th style="width:220px">Persen Hadir</th>
-                <th style="width:160px">Status Kelulusan</th>
-                <th>Catatan Instruktur</th>
-                <th style="width:100px;text-align:center">Simpan</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($pesertaList as $i => $item)
-            @php
-                $kualifikasi = $item['kualifikasi'];
-                $persen      = $item['persen_hadir'];
-                $lulus       = $persen >= 80;
-                $catatanAda  = $kualifikasi?->catatan ?? '';
-                $fillClass   = $lulus ? 'fill-green' : 'fill-red';
-            @endphp
-            <tr>
-                {{-- Nama Peserta --}}
-                <td>
-                    <div class="peserta-name">{{ $item['peserta']->nama }}</div>
-                    <div style="font-size:11px;color:#aaa">{{ $item['peserta']->email }}</div>
-                </td>
+        <div class="empty-box">
+            <i class="bi bi-people"></i>
+            <p>Belum ada peserta yang diterima di pelatihan ini.</p>
+        </div>
 
-                {{-- Persen Hadir + Progress Bar --}}
-                <td>
-                    <div class="persen-wrap">
-                        <div class="progress-track">
-                            <div class="progress-fill {{ $fillClass }}"
-                                 style="width:{{ $persen }}%"></div>
+    @else
+
+    <div class="tabel-kelayakan">
+        <table>
+            <thead>
+                <tr>
+                    <th style="width:220px">Peserta</th>
+                    <th style="width:220px">Persen Hadir</th>
+                    <th style="width:160px">Status Kelulusan</th>
+                    <th>Catatan Instruktur</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($pesertaList as $i => $item)
+                @php
+                    $kualifikasi = $item['kualifikasi'];
+                    $persen      = $item['persen_hadir'];
+                    $lulus       = $persen >= 80;
+                    $catatanAda  = $kualifikasi?->catatan ?? '';
+                    $fillClass   = $lulus ? 'fill-green' : 'fill-red';
+                @endphp
+                <tr>
+                    {{-- Hidden: pendaftaran_id per baris --}}
+                    <input type="hidden"
+                           name="kelayakan[{{ $i }}][pendaftaran_id]"
+                           value="{{ $item['pendaftaran']->id_pendaftaran }}">
+
+                    {{-- Nama Peserta --}}
+                    <td>
+                        <div class="peserta-name">{{ $item['peserta']->nama }}</div>
+                        <div style="font-size:11px;color:#aaa">{{ $item['peserta']->email }}</div>
+                    </td>
+
+                    {{-- Persen Hadir + Progress Bar --}}
+                    <td>
+                        <div class="persen-wrap">
+                            <div class="progress-track">
+                                <div class="progress-fill {{ $fillClass }}"
+                                     style="width:{{ $persen }}%"></div>
+                            </div>
+                            <span class="persen-text">{{ $persen }}%</span>
                         </div>
-                        <span class="persen-text">{{ $persen }}%</span>
-                    </div>
-                    <div style="font-size:10px;color:#bbb;margin-top:3px">
-                        {{ $item['hadir'] }}/{{ $item['total_sesi'] }} sesi hadir
-                    </div>
-                </td>
+                        <div style="font-size:10px;color:#bbb;margin-top:3px">
+                            {{ $item['hadir'] }}/{{ $item['total_sesi'] }} sesi hadir
+                        </div>
+                    </td>
 
-                {{-- Status Kelulusan: otomatis dari persen hadir --}}
-                <td>
-                    <span class="badge-status {{ $lulus ? 'badge-lulus' : 'badge-tidak-lulus' }}">
-                        <i class="bi {{ $lulus ? 'bi-check-circle-fill' : 'bi-x-circle-fill' }}"></i>
-                        {{ $lulus ? 'Lulus' : 'Tidak Lulus' }}
-                    </span>
-                </td>
+                    {{-- Status Kelulusan --}}
+                    <td>
+                        <span class="badge-status {{ $lulus ? 'badge-lulus' : 'badge-tidak-lulus' }}">
+                            <i class="bi {{ $lulus ? 'bi-check-circle-fill' : 'bi-x-circle-fill' }}"></i>
+                            {{ $lulus ? 'Lulus' : 'Tidak Lulus' }}
+                        </span>
+                    </td>
 
-                {{-- Catatan --}}
-                <td>
-                    <input type="text"
-                           id="catatan-{{ $i }}"
-                           class="input-catatan"
-                           placeholder="catatan penilaian..."
-                           value="{{ $catatanAda }}">
-                </td>
+                    {{-- Catatan --}}
+                    <td>
+                        <input type="text"
+                               name="kelayakan[{{ $i }}][catatan]"
+                               class="input-catatan"
+                               placeholder="catatan penilaian..."
+                               value="{{ $catatanAda }}">
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
 
-                {{-- Tombol Simpan (form individual POST) --}}
-                <td style="text-align:center">
-                    <form method="POST"
-                        action="{{ route('instruktur.kelayakan.simpan', $item['pendaftaran']->id_pendaftaran) }}"
-                        id="form-simpan-{{ $i }}">
-                        @csrf
-                        <input type="hidden" name="persen_hadir" value="{{ $persen }}">
-                        <input type="hidden" name="catatan" id="hidden-catatan-{{ $i }}" value="{{ $catatanAda }}">
+    @endif
 
-                        <button type="button" class="btn-simpan-row" onclick="submitBaris({{ $i }})">
-                            <i class="bi bi-check-lg"></i> Simpan
-                        </button>
-                    </form>
-                </td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
-</div>
-
-@endif
+</form>
 
 @endsection
-
-@push('scripts')
-<script>
-    // ── Submit form per baris ────────────────────────────────────────
-    function submitBaris(rowIdx) {
-        // Sinkronkan catatan dari input teks ke hidden field
-        const catatan = document.getElementById('catatan-' + rowIdx).value;
-        document.getElementById('hidden-catatan-' + rowIdx).value = catatan;
-
-        // Submit form baris ini
-        document.getElementById('form-simpan-' + rowIdx).submit();
-    }
-
-</script>
-@endpush

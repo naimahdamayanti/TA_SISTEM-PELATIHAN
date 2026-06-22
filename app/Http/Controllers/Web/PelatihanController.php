@@ -158,7 +158,6 @@ class PelatihanController extends Controller
 
         $peserta = Auth::user();
 
-        // ID pelatihan yang sudah didaftarkan peserta ini
         $sudahDaftar = PendaftaranModel::where('peserta_id', $peserta->id_user)
             ->pluck('pelatihan_id')
             ->toArray();
@@ -174,6 +173,12 @@ class PelatihanController extends Controller
         }
 
         $query->where('status', 'tersedia');
+
+        // Sembunyikan pelatihan yang tanggal mulainya sudah lewat
+        $query->where(function ($q) {
+            $q->whereNull('tgl_mulai')
+            ->orWhere('tgl_mulai', '>=', today());
+        });
 
         $pelatihan = $query->latest()->paginate(9)->withQueryString();
         $kategori  = KategoriModel::aktif()->get();

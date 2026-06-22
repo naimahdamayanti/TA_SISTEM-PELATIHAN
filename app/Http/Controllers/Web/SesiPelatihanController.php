@@ -42,7 +42,12 @@ class SesiPelatihanController extends Controller
 
         $validated = $request->validate([
             'judul_sesi'    => 'nullable|string|max:100',
-            'tanggal'       => 'required|date',
+            'tanggal' => [
+                'required',
+                'date',
+                'after_or_equal:' . $pelatihan->tgl_mulai->format('Y-m-d'),
+                'before_or_equal:' . $pelatihan->tgl_selesai->format('Y-m-d'),
+            ],
             'waktu_mulai'   => 'required|date_format:H:i',
             'waktu_selesai' => 'required|date_format:H:i|after:waktu_mulai',
             'lokasi'        => 'required|string|max:255',
@@ -70,7 +75,12 @@ class SesiPelatihanController extends Controller
 
         $validated = $request->validate([
             'judul_sesi'    => 'nullable|string|max:100',
-            'tanggal'       => 'required|date',
+            'tanggal' => [
+                'required',
+                'date',
+                'after_or_equal:' . $pelatihan->tgl_mulai->format('Y-m-d'),
+                'before_or_equal:' . $pelatihan->tgl_selesai->format('Y-m-d'),
+            ],
             'waktu_mulai'   => 'required|date_format:H:i',
             'waktu_selesai' => 'required|date_format:H:i|after:waktu_mulai',
             'lokasi'        => 'required|string|max:255',

@@ -165,16 +165,31 @@ class AkunController extends Controller
         $user = Auth::user();
 
         $validated = $request->validate([
-            'nama'  => 'required|string|max:100',
-            'email' => ['required', 'email', 'max:100',
+            'nama'     => 'required|string|max:100',
+            'email'    => ['required', 'email', 'max:100',
                 Rule::unique('users', 'email')->ignore($user->id_user, 'id_user'),
             ],
-            'no_hp' => 'nullable|string|max:20',
+            'username' => ['required', 'string', 'max:50',
+                Rule::unique('users', 'username')->ignore($user->id_user, 'id_user'),
+            ],
+            'no_hp'    => 'nullable|string|max:20',
+            'password' => ['nullable', Password::min(8)->mixedCase()->numbers(), 'confirmed'],
         ]);
 
-        $user->update($validated);
+        $data = [
+            'nama'     => $validated['nama'],
+            'email'    => $validated['email'],
+            'username' => $validated['username'],
+            'no_hp'    => $validated['no_hp'] ?? null,
+        ];
 
-        return back()->with('success', 'Profil berhasil diperbarui.');
+        if (!empty($validated['password'])) {
+            $data['password'] = Hash::make($validated['password']);
+        }
+
+        $user->update($data);
+
+        return back()->with('profil_success', 'Profil berhasil diperbarui.');
     }
 
     public function updateFoto(Request $request)

@@ -209,6 +209,8 @@
                             <label class="form-label fw-semibold small">Tanggal</label>
                             <input type="date" name="tanggal"
                                 class="form-control rounded-3"
+                                min="{{ $pelatihan->tgl_mulai->format('Y-m-d') }}"
+                                max="{{ $pelatihan->tgl_selesai->format('Y-m-d') }}"
                                 value="{{ old('tanggal') }}" required>
                         </div>
                         <div class="col-md-6">
@@ -267,7 +269,10 @@
                         <div class="col-12">
                             <label class="form-label fw-semibold small">Tanggal</label>
                             <input type="date" name="tanggal" id="edit_tanggal"
-                                class="form-control rounded-3" required>
+                                class="form-control rounded-3"
+                                min="{{ $pelatihan->tgl_mulai->format('Y-m-d') }}"
+                                max="{{ $pelatihan->tgl_selesai->format('Y-m-d') }}"
+                                required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-semibold small">Waktu Mulai</label>

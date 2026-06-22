@@ -147,7 +147,7 @@ Route::middleware('auth')->group(function () {
 
         Route::get('/kelayakan',                       [KualifikasiSertifikasiController::class, 'index'])->name('kelayakan.index');
         Route::post('/kelayakan/{pendaftaran}',        [KualifikasiSertifikasiController::class, 'simpan'])->name('kelayakan.simpan');
-        Route::post('/kelayakan/massal/{pelatihan}',   [KualifikasiSertifikasiController::class, 'simpanMassal'])->name('kelayakan.massal');
+        Route::post('/kelayakan/massal/{pelatihan}',   [KualifikasiSertifikasiController::class, 'simpanMassal'])->name('kelayakan.simpanmassal');
         Route::get('/kelayakan/riwayat',               [KualifikasiSertifikasiController::class, 'riwayatSertifInstruktur'])->name('kelayakan.riwayat');
 
         Route::get('/sertifikat', [SertifikatController::class, 'riwayatInstruktur'])->name('sertifikat.index');

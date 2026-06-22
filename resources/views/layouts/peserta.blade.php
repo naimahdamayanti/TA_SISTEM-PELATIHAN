@@ -406,10 +406,10 @@
     {{-- Footer sidebar → buka modal profil --}}
     <div class="sidebar-footer" data-open-profil title="Edit Profil">
         <div class="sf-avatar">
-            {{ strtoupper(substr(Auth::user()->nama_lengkap ?? Auth::user()->nama ?? 'U', 0, 1)) }}
+            {{ strtoupper(substr(Auth::user()->nama ?? 'U', 0, 1)) }}
         </div>
         <div class="flex-fill" style="min-width:0">
-            <div class="sf-name text-truncate">{{ Auth::user()->nama_lengkap ?? Auth::user()->nama }}</div>
+            <div class="sf-name text-truncate">{{ Auth::user()->nama }}</div>
             <div class="sf-role">{{ ucfirst(Auth::user()->role) }}</div>
         </div>
         <i class="bi bi-three-dots-vertical text-muted" style="font-size:14px;flex-shrink:0"></i>
@@ -429,9 +429,9 @@
         {{-- Profil --}}
         <button type="button" class="topbar-profile" data-open-profil title="Edit Profil">
             <div class="tp-avatar">
-                {{ strtoupper(substr(Auth::user()->nama_lengkap ?? Auth::user()->nama ?? 'U', 0, 1)) }}
+                {{ strtoupper(substr(Auth::user()->nama ?? 'U', 0, 1)) }}
             </div>
-            <span class="tp-name d-none d-md-inline">{{ Auth::user()->nama_lengkap ?? Auth::user()->nama }}</span>
+            <span class="tp-name d-none d-md-inline">{{ Auth::user()->nama }}</span>
             <i class="bi bi-chevron-down tp-caret"></i>
         </button>
 
@@ -491,17 +491,12 @@
                 <div class="text-center mb-4">
                     <div class="position-relative d-inline-block">
                         <div class="d-flex align-items-center justify-content-center rounded-circle text-white fw-bold mx-auto"
-                             style="width:80px;height:80px;font-size:2rem;
+                            style="width:80px;height:80px;font-size:2rem;
                                     background:linear-gradient(135deg,#ff6b3d,#e84e3a)">
-                            {{ strtoupper(substr(Auth::user()->nama_lengkap ?? Auth::user()->nama ?? 'U', 0, 1)) }}
+                            {{ strtoupper(substr(Auth::user()->nama ?? 'U', 0, 1)) }}
                         </div>
-                        <span class="position-absolute bottom-0 end-0 bg-white rounded-circle border border-2
-                                     border-white d-flex align-items-center justify-content-center"
-                              style="width:24px;height:24px;cursor:pointer">
-                            <i class="bi bi-camera-fill text-secondary" style="font-size:11px"></i>
-                        </span>
                     </div>
-                    <div class="fw-bold mt-2">{{ Auth::user()->nama_lengkap ?? Auth::user()->name }}</div>
+                    <div class="fw-bold mt-2">{{ Auth::user()->nama }}</div>
                     <div class="text-muted small">{{ ucfirst(Auth::user()->role) }}</div>
                 </div>
 
@@ -513,37 +508,36 @@
 
                 <form action="{{ route('profil.update') }}" method="POST">
                     @csrf
-                    @method('PUT')
-
+                    
                     <div class="mb-3">
                         <label class="form-label small fw-semibold">Nama Lengkap</label>
-                        <input type="text" name="nama_lengkap"
-                               class="form-control rounded-3 @error('nama_lengkap') is-invalid @enderror"
-                               value="{{ old('nama_lengkap', Auth::user()->nama_lengkap ?? Auth::user()->name) }}">
-                        @error('nama_lengkap')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                        <input type="text" name="nama"
+                            class="form-control rounded-3 @error('nama') is-invalid @enderror"
+                            value="{{ old('nama', Auth::user()->nama) }}">
+                        @error('nama')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label small fw-semibold">Username</label>
                         <input type="text" name="username"
-                               class="form-control rounded-3 @error('username') is-invalid @enderror"
-                               value="{{ old('username', Auth::user()->username) }}">
+                            class="form-control rounded-3 @error('username') is-invalid @enderror"
+                            value="{{ old('username', Auth::user()->username) }}">
                         @error('username')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label small fw-semibold">Email</label>
                         <input type="email" name="email"
-                               class="form-control rounded-3 @error('email') is-invalid @enderror"
-                               value="{{ old('email', Auth::user()->email) }}">
+                            class="form-control rounded-3 @error('email') is-invalid @enderror"
+                            value="{{ old('email', Auth::user()->email) }}">
                         @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label small fw-semibold">No. HP</label>
                         <input type="text" name="no_hp"
-                               class="form-control rounded-3 @error('no_hp') is-invalid @enderror"
-                               value="{{ old('no_hp', Auth::user()->no_hp ?? '') }}">
+                            class="form-control rounded-3 @error('no_hp') is-invalid @enderror"
+                            value="{{ old('no_hp', Auth::user()->no_hp ?? '') }}">
                         @error('no_hp')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
@@ -554,16 +548,16 @@
                             Password Baru <span class="text-muted fw-normal">(opsional)</span>
                         </label>
                         <input type="password" name="password"
-                               class="form-control rounded-3 @error('password') is-invalid @enderror"
-                               placeholder="Biarkan kosong jika tidak diubah">
+                            class="form-control rounded-3 @error('password') is-invalid @enderror"
+                            placeholder="Biarkan kosong jika tidak diubah">
                         @error('password')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
 
                     <div class="mb-4">
                         <label class="form-label small fw-semibold">Konfirmasi Password</label>
                         <input type="password" name="password_confirmation"
-                               class="form-control rounded-3"
-                               placeholder="Ulangi password baru">
+                            class="form-control rounded-3"
+                            placeholder="Ulangi password baru">
                     </div>
 
                     <div class="d-flex gap-2 pb-4">

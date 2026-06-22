@@ -108,7 +108,7 @@ class KualifikasiSertifikasiController extends Controller
             }
         });
 
-        return redirect()->route('instruktur.kelayakan.index', ['pelatihan_id' => $pelatihan->id_pelatihan])
+        return redirect(route('instruktur.kelayakan.index') . '?pelatihan_id=' . $pelatihan->id_pelatihan)
             ->with('success', 'Penilaian kelayakan semua peserta berhasil disimpan.');
     }
 
