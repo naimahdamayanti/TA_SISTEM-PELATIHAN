@@ -64,7 +64,7 @@ class SertifikatController extends Controller
         $sertifikat = $query->paginate(15)->withQueryString();
         $pelatihan  = PelatihanModel::orderBy('nama_pelatihan')->get();
 
-        $menungguSertifikat = KualifikasiSertifikasiModel::where('memenuhi_syarat', true)
+        $menungguSertifikat = KualifikasiSertifikasiModel::where('memenuhi_syarat', 'lulus')
             ->whereDoesntHave('pendaftaran.sertifikat')
             ->count();
 
@@ -94,9 +94,9 @@ class SertifikatController extends Controller
         $this->authorizeRole(['admin']);
         $pendaftaran->load(['peserta', 'pelatihan.instruktur', 'kualifikasiSertifikasi']);
 
-        if (!$pendaftaran->kualifikasiSertifikasi?->memenuhi_syarat) {
-            return back()->with('error', 'Peserta ini belum memenuhi syarat sertifikasi.');
-        }
+        if (!$pendaftaran->kualifikasiSertifikasi?->layakSertifikat()) {
+                return back()->with('error', 'Peserta belum memenuhi syarat sertifikasi.');
+            }
 
         $sudahAda = SertifikatModel::where('pendaftaran_id', $pendaftaran->id_pendaftaran)->exists();
 
@@ -108,8 +108,9 @@ class SertifikatController extends Controller
         $this->authorizeRole(['admin']);
         $pendaftaran->load(['peserta', 'pelatihan.instruktur', 'kualifikasiSertifikasi']);
 
-        if (!$pendaftaran->kualifikasiSertifikasi?->memenuhi_syarat)
+        if (!$pendaftaran->kualifikasiSertifikasi?->layakSertifikat()) {
             return back()->with('error', 'Peserta belum memenuhi syarat sertifikasi.');
+        }
 
         if (SertifikatModel::where('pendaftaran_id', $pendaftaran->id_pendaftaran)->exists())
             return back()->with('info', 'Sertifikat sudah pernah diterbitkan.');
@@ -256,7 +257,7 @@ class SertifikatController extends Controller
             'pendaftaran_ids.*'   => 'integer',
         ]);
 
-        $kandidat = KualifikasiSertifikasiModel::where('memenuhi_syarat', true)
+        $kandidat = KualifikasiSertifikasiModel::where('memenuhi_syarat', 'lulus')
             ->whereIn('pendaftaran_id', $request->pendaftaran_ids)
             ->whereDoesntHave('pendaftaran.sertifikat')
             ->with(['pendaftaran.peserta', 'pendaftaran.pelatihan.instruktur'])

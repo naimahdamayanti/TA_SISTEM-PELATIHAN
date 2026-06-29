@@ -36,6 +36,24 @@
         </div>
     </div>
 
+    {{-- Total Instruktur --}}
+    <div class="col-6 col-xl-auto flex-xl-fill">
+        <div class="stat-card card border-0 shadow-sm rounded-3 h-100">
+            <div class="card-body d-flex align-items-center gap-3 py-3 px-4">
+                <div class="stat-icon rounded-3 d-flex align-items-center justify-content-center"
+                     style="width:52px;height:52px;background:linear-gradient(135deg,#9b59b6,#d2b4de);flex-shrink:0">
+                    <i class="bi bi-person-badge-fill text-white fs-5"></i>
+                </div>
+                <div>
+                    <div class="stat-number fw-bold lh-1 mb-1" style="font-size:1.8rem">
+                        {{ $totalInstruktur }}
+                    </div>
+                    <div class="fw-semibold small">Total Instruktur</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     {{-- Pelatihan Berlangsung --}}
     <div class="col-6 col-xl-auto flex-xl-fill">
         <div class="stat-card card border-0 shadow-sm rounded-3 h-100">
@@ -72,37 +90,19 @@
         </div>
     </div>
 
-    {{-- Sertifikat Terkirim --}}
+    {{-- Pendaftar Baru --}}
     <div class="col-6 col-xl-auto flex-xl-fill">
         <div class="stat-card card border-0 shadow-sm rounded-3 h-100">
             <div class="card-body d-flex align-items-center gap-3 py-3 px-4">
                 <div class="stat-icon rounded-3 d-flex align-items-center justify-content-center"
-                     style="width:52px;height:52px;background:linear-gradient(135deg,#f1c40f,#f9e49d);flex-shrink:0">
-                    <i class="bi bi-award-fill text-white fs-5"></i>
+                    style="width:52px;height:52px;background:linear-gradient(135deg,#f1c40f,#f9e49d);flex-shrink:0">
+                    <i class="bi bi-person-plus-fill text-white fs-5"></i>
                 </div>
                 <div>
                     <div class="stat-number fw-bold lh-1 mb-1" style="font-size:1.8rem">
-                        {{ $totalSertifikat }}
+                        {{ $pendaftarBaru }}
                     </div>
-                    <div class="fw-semibold small">Sertifikat Terkirim</div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    {{-- Total Instruktur --}}
-    <div class="col-6 col-xl-auto flex-xl-fill">
-        <div class="stat-card card border-0 shadow-sm rounded-3 h-100">
-            <div class="card-body d-flex align-items-center gap-3 py-3 px-4">
-                <div class="stat-icon rounded-3 d-flex align-items-center justify-content-center"
-                     style="width:52px;height:52px;background:linear-gradient(135deg,#9b59b6,#d2b4de);flex-shrink:0">
-                    <i class="bi bi-person-badge-fill text-white fs-5"></i>
-                </div>
-                <div>
-                    <div class="stat-number fw-bold lh-1 mb-1" style="font-size:1.8rem">
-                        {{ $totalInstruktur }}
-                    </div>
-                    <div class="fw-semibold small">Total Instruktur</div>
+                    <div class="fw-semibold small">Pendaftar Baru</div>
                 </div>
             </div>
         </div>

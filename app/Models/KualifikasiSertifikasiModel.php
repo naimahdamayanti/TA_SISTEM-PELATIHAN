@@ -37,7 +37,7 @@ class KualifikasiSertifikasiModel extends Model
         return $this->belongsTo(UserModel::class, 'instruktur_id', 'id_user');
     }
 
-    const BATAS_KEHADIRAN = 80.0;
+    const BATAS_KEHADIRAN = 60.0;
 
     public function layakSertifikat(): bool
     {

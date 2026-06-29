@@ -136,7 +136,7 @@ class MailHelper
                         style="background:#fff;border-radius:12px;overflow:hidden;
                                 box-shadow:0 4px 20px rgba(0,0,0,0.08);">
                         <tr>
-                            <td style="background:linear-gradient(135deg,#0f766e,#0d9488);
+                            <td style="background:linear-gradient(135deg,,#e73c3c,#c92a2a);
                                     padding:36px 40px;text-align:center;">
                                 <h1 style="color:#fff;margin:0 0 6px;font-size:22px;font-weight:700;">
                                     🎓 Selamat, Anda Diterima!
@@ -162,7 +162,7 @@ class MailHelper
                                     <tr><td align="center">
                                         <div style="display:inline-block;
                                                     background:#f0fdfa;
-                                                    border:2px dashed #0d9488;
+                                                    border:2px dashed #e73c3c;
                                                     border-radius:12px;
                                                     padding:20px 40px;
                                                     text-align:center;">
@@ -170,7 +170,7 @@ class MailHelper
                                                     text-transform:uppercase;letter-spacing:1px;">
                                                 Kode Penerimaan Anda
                                             </p>
-                                            <p style="color:#0f766e;
+                                            <p style="color:#e73c3c;
                                                     font-family:Courier New,monospace;
                                                     font-size:28px;
                                                     font-weight:700;
@@ -196,7 +196,7 @@ class MailHelper
                                 <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:28px;">
                                     <tr>
                                         <td style="width:28px;vertical-align:top;padding-top:2px;">
-                                            <span style="background:#0d9488;color:#fff;border-radius:50%;
+                                            <span style="background:#e73c3c;color:#fff;border-radius:50%;
                                                         width:20px;height:20px;display:inline-block;
                                                         text-align:center;font-size:11px;line-height:20px;
                                                         font-weight:700;">1</span>
@@ -207,7 +207,7 @@ class MailHelper
                                     </tr>
                                     <tr>
                                         <td style="width:28px;vertical-align:top;padding-top:2px;">
-                                            <span style="background:#0d9488;color:#fff;border-radius:50%;
+                                            <span style="background:#e73c3c;color:#fff;border-radius:50%;
                                                         width:20px;height:20px;display:inline-block;
                                                         text-align:center;font-size:11px;line-height:20px;
                                                         font-weight:700;">2</span>
@@ -218,7 +218,7 @@ class MailHelper
                                     </tr>
                                     <tr>
                                         <td style="width:28px;vertical-align:top;padding-top:2px;">
-                                            <span style="background:#0d9488;color:#fff;border-radius:50%;
+                                            <span style="background:#e73c3c;color:#fff;border-radius:50%;
                                                         width:20px;height:20px;display:inline-block;
                                                         text-align:center;font-size:11px;line-height:20px;
                                                         font-weight:700;">3</span>
@@ -229,7 +229,7 @@ class MailHelper
                                     </tr>
                                     <tr>
                                         <td style="width:28px;vertical-align:top;padding-top:2px;">
-                                            <span style="background:#0d9488;color:#fff;border-radius:50%;
+                                            <span style="background:#e73c3c;color:#fff;border-radius:50%;
                                                         width:20px;height:20px;display:inline-block;
                                                         text-align:center;font-size:11px;line-height:20px;
                                                         font-weight:700;">4</span>
@@ -244,7 +244,7 @@ class MailHelper
                                     <tr><td align="center" style="padding-bottom:28px;">
                                         <a href="' . $registerUrl . '"
                                         style="display:inline-block;padding:13px 36px;
-                                                background:linear-gradient(135deg,#0f766e,#0d9488);
+                                                background:linear-gradient(135deg,#e73c3c,#c92a2a);
                                                 color:#fff;text-decoration:none;border-radius:8px;
                                                 font-size:15px;font-weight:600;">
                                             Daftar Sekarang →

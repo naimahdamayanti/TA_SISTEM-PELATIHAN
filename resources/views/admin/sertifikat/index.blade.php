@@ -77,7 +77,7 @@
                         {{ \App\Models\KualifikasiSertifikasiModel::where('memenuhi_syarat', false)->count() }}
                     </div>
                     <div class="fw-semibold small">Tidak Memenuhi</div>
-                    <div class="text-muted" style="font-size:11px">Kehadiran &lt; 80%</div>
+                    <div class="text-muted" style="font-size:11px">Kehadiran &lt; 60%</div>
                 </div>
             </div>
         </div>
@@ -267,7 +267,7 @@
             </div>
             <div class="modal-body px-4 pt-2 pb-0">
                 <p class="text-muted small mb-3">
-                    Peserta berikut memenuhi syarat kehadiran &ge; 80%. Pilih untuk diterbitkan sertifikat.
+                    Peserta berikut memenuhi syarat kehadiran &ge; 60%. Pilih untuk diterbitkan sertifikat.
                 </p>
 
                 {{-- Filter dalam modal --}}
@@ -317,7 +317,7 @@
                             @php
                                 $pd      = $k->pendaftaran;
                                 $sudah   = $pd?->sertifikat !== null;
-                                $layak   = $k->memenuhi_syarat;
+                                $layak   = $k->layakSertifikat();
                                 $nama    = trim(($pd->first_name ?? '') . ' ' . ($pd->last_name ?? ''));
                                 $pelNama = $pd?->pelatihan?->nama_pelatihan ?? '-';
                                 $pelId   = $pd?->pelatihan_id ?? '';

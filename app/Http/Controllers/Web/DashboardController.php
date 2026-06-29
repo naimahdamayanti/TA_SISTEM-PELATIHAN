@@ -37,7 +37,7 @@ class DashboardController extends Controller
         $totalInstruktur  = UserModel::where('role', 'instruktur')->count();
         $pelatihanAktif   = PelatihanModel::where('status', 'sedang berlangsung')->count();
         $pelatihanSelesai = PelatihanModel::where('status', 'selesai')->count();
-        $totalSertifikat  = SertifikatModel::count();
+        $pendaftarBaru = PendaftaranModel::where('status', 'menunggu')->count();
 
         // Grafik: jumlah pelatihan yang mulai per bulan di tahun berjalan
         $tahun = request('tahun', Carbon::now()->year);
@@ -76,7 +76,7 @@ class DashboardController extends Controller
             'totalInstruktur',
             'pelatihanAktif',
             'pelatihanSelesai',
-            'totalSertifikat',
+            'pendaftarBaru',
             'grafikData',
             'tahun',
             'topPelatihan',

@@ -293,7 +293,7 @@
                 @php
                     $kualifikasi = $item['kualifikasi'];
                     $persen      = $item['persen_hadir'];
-                    $lulus       = $persen >= 80;
+                    $lulus       = $persen >= 60;
                     $catatanAda  = $kualifikasi?->catatan ?? '';
                     $fillClass   = $lulus ? 'fill-green' : 'fill-red';
                 @endphp

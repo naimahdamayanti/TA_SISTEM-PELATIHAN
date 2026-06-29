@@ -59,7 +59,7 @@ class KualifikasiSertifikasiController extends Controller
             [
                 'instruktur_id'   => Auth::user()->id_user,
                 'persen_hadir'    => $validated['persen_hadir'],
-                'memenuhi_syarat' => $validated['persen_hadir'] >= 80 ? 'lulus' : 'tidak lulus',
+                'memenuhi_syarat' => $validated['persen_hadir'] >= KualifikasiSertifikasiModel::BATAS_KEHADIRAN ? 'lulus' : 'tidak lulus',
                 'catatan'         => $validated['catatan'] ?? null,
             ]
         );
@@ -101,7 +101,7 @@ class KualifikasiSertifikasiController extends Controller
                     [
                         'instruktur_id'   => $instrukturId,
                         'persen_hadir'    => $persen,
-                        'memenuhi_syarat' => $persen >= 80 ? 'lulus' : 'tidak lulus',
+                        'memenuhi_syarat' => $persen >= KualifikasiSertifikasiModel::BATAS_KEHADIRAN ? 'lulus' : 'tidak lulus',
                         'catatan'         => $row['catatan'] ?? null,
                     ]
                 );
@@ -122,7 +122,8 @@ class KualifikasiSertifikasiController extends Controller
             ->where('instruktur_id', $instruktur->id_user);
 
         if ($request->filled('memenuhi_syarat')) {
-            $query->where('memenuhi_syarat', $request->boolean('memenuhi_syarat'));
+            $nilai = $request->input('memenuhi_syarat') === '1' ? 'lulus' : 'tidak lulus';
+            $query->where('memenuhi_syarat', $nilai);
         }
         if ($request->filled('pelatihan_id')) {
             $query->whereHas('pendaftaran', fn($q) => $q->where('pelatihan_id', $request->pelatihan_id));
@@ -134,6 +135,7 @@ class KualifikasiSertifikasiController extends Controller
         return view('instruktur.kelayakan.riwayat', compact('kualifikasi', 'pelatihan'));
     }
 
+
     public function adminIndex(Request $request)
     {
         $this->authorizeRole(['admin']);
@@ -141,7 +143,8 @@ class KualifikasiSertifikasiController extends Controller
         $query = KualifikasiSertifikasiModel::with(['pendaftaran.peserta', 'pendaftaran.pelatihan', 'instruktur']);
 
         if ($request->filled('memenuhi_syarat')) {
-            $query->where('memenuhi_syarat', $request->memenuhi_syarat);
+            $nilai = $request->input('memenuhi_syarat') === '1' ? 'lulus' : 'tidak lulus';
+            $query->where('memenuhi_syarat', $nilai);
         }
     
         $kualifikasi = $query->latest('tgl_penilaian')->paginate(20)->withQueryString();
