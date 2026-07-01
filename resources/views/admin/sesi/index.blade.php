@@ -39,7 +39,6 @@
     </div>
 </div>
 
-{{-- Alert --}}
 @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
         <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
@@ -53,7 +52,6 @@
     </div>
 @endif
 
-{{-- Stat Cards --}}
 <div class="row g-3 mb-4">
     <div class="col-6 col-md-3">
         <div class="card border-0 shadow-sm rounded-3 h-100">
@@ -121,18 +119,15 @@
     </div>
 </div>
 
-{{-- Daftar Sesi --}}
 <div class="d-flex flex-column gap-3">
     @forelse($sesi as $idx => $s)
     <div class="card border-0 shadow-sm rounded-3">
         <div class="card-body d-flex align-items-center gap-4 py-3 px-4">
-            {{-- Nomor --}}
             <div class="rounded-3 d-flex align-items-center justify-content-center text-white fw-bold flex-shrink-0"
                  style="width:42px;height:42px;font-size:14px;background:linear-gradient(135deg,#e84e3a,#c0392b)">
                 S{{ $idx + 1 }}
             </div>
 
-            {{-- Info --}}
             <div class="flex-fill min-w-0">
                 <div class="fw-semibold text-dark mb-1">{{ $s->judul_sesi }}</div>
                 <div class="d-flex align-items-center gap-3 text-muted small flex-wrap">
@@ -154,7 +149,6 @@
                 </div>
             </div>
 
-            {{-- Aksi --}}
             <div class="d-flex gap-2 flex-shrink-0">
                 <button type="button"
                     class="btn btn-sm btn-outline-primary rounded-3"
@@ -184,9 +178,6 @@
     @endforelse
 </div>
 
-{{-- ══════════════════════════════════════
-     MODAL TAMBAH SESI
-══════════════════════════════════════ --}}
 <div class="modal fade" id="modalTambahSesi" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow rounded-4">
@@ -246,9 +237,6 @@
     </div>
 </div>
 
-{{-- ══════════════════════════════════════
-     MODAL EDIT SESI
-══════════════════════════════════════ --}}
 <div class="modal fade" id="modalEditSesi" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow rounded-4">

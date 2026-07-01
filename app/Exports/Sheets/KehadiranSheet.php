@@ -89,7 +89,6 @@ class KehadiranSheet implements
                         ]);
                     }
 
-                    // Warna status kehadiran
                     $status = strtolower($sheet->getCell("F{$row}")->getValue());
                     $color  = match ($status) {
                         'hadir'  => 'FFE8F5E9',

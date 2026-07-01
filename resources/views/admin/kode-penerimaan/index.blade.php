@@ -4,7 +4,6 @@
 
 @section('content')
 
-{{-- ── Header ──────────────────────────────────────────────────────────────── --}}
 <div class="d-flex align-items-center justify-content-between mb-4">
     <div>
         <h4 class="fw-bold mb-1">Kode Penerimaan Instruktur</h4>
@@ -21,7 +20,6 @@
     </button>
 </div>
 
-{{-- ── Alert ───────────────────────────────────────────────────────────────── --}}
 @foreach(['success','error','warning','info'] as $type)
     @if(session($type))
         <div class="alert alert-{{ $type === 'error' ? 'danger' : $type }} alert-dismissible fade show rounded-3 mb-4">
@@ -32,7 +30,6 @@
     @endif
 @endforeach
 
-{{-- ── Tabel Kode ──────────────────────────────────────────────────────────── --}}
 <div class="card border-0 shadow-sm rounded-3">
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -51,7 +48,6 @@
                 <tbody>
                     @forelse($kodes as $k)
                     <tr>
-                        {{-- Kode --}}
                         <td class="ps-4">
                             <div class="d-flex align-items-center gap-2">
                                 <code class="fs-6 fw-bold" style="color:#374151;letter-spacing:1px">
@@ -66,14 +62,12 @@
                             </div>
                         </td>
 
-                        {{-- Peruntukan --}}
                         <td>
                             <span class="text-truncate d-inline-block" style="max-width:160px">
                                 {{ $k->nama_peruntukan ?? '-' }}
                             </span>
                         </td>
 
-                        {{-- Expired --}}
                         <td style="font-size:13px">
                             @if($k->expired_at)
                                 <span class="{{ $k->isExpired() ? 'text-danger' : 'text-muted' }}">
@@ -87,7 +81,6 @@
                             @endif
                         </td>
 
-                        {{-- Status --}}
                         <td>
                             @if($k->is_used)
                                 <span class="badge rounded-pill px-3 py-1"
@@ -107,7 +100,6 @@
                             @endif
                         </td>
 
-                        {{-- Digunakan oleh --}}
                         <td style="font-size:13px">
                             @if($k->pemakainya)
                                 <div class="fw-semibold" style="color:#333">{{ $k->pemakainya->nama }}</div>
@@ -117,16 +109,13 @@
                             @endif
                         </td>
 
-                        {{-- Dibuat --}}
                         <td class="text-muted" style="font-size:12px">
                             {{ $k->created_at->format('d/m/Y H:i') }}
                         </td>
 
-                        {{-- Aksi --}}
                         <td class="pe-4 text-end">
                             <div class="d-flex justify-content-end gap-2">
 
-                                {{-- Kirim Email — hanya jika belum terpakai & belum expired --}}
                                 @if(!$k->is_used && !$k->isExpired())
                                 <button type="button"
                                         class="btn btn-sm btn-outline-primary rounded-3 px-3"
@@ -139,7 +128,6 @@
                                 </button>
                                 @endif
 
-                                {{-- Hapus — hanya jika belum terpakai --}}
                                 @if(!$k->is_used)
                                 <form action="{{ route('admin.kode-penerimaan.destroy', ['kodePenerimaan' => $k->id_kode_penerimaan]) }}'
                                       method="POST"
@@ -172,7 +160,6 @@
     </div>
 </div>
 
-{{-- Pagination --}}
 @if($kodes->hasPages())
 <div class="d-flex justify-content-between align-items-center mt-3">
     <small class="text-muted">
@@ -183,10 +170,6 @@
 </div>
 @endif
 
-
-{{-- ══════════════════════════════════════════════════════════════════════════
-     MODAL BUAT KODE
-══════════════════════════════════════════════════════════════════════════ --}}
 <div class="modal fade" id="modalBuatKode" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow rounded-4">
@@ -202,7 +185,6 @@
                 <form action="{{ route('admin.kode-penerimaan.store') }}" method="POST" id="formBuatKode">
                     @csrf
 
-                    {{-- Jumlah --}}
                     <div class="mb-3">
                         <label class="form-label fw-semibold small">
                             Jumlah Kode <span class="text-danger">*</span>
@@ -212,7 +194,6 @@
                         <div class="form-text">Maksimal 20 kode sekaligus. Isi email hanya bisa untuk 1 kode.</div>
                     </div>
 
-                    {{-- Peruntukan --}}
                     <div class="mb-3">
                         <label class="form-label fw-semibold small">Peruntukan <span class="text-muted fw-normal">(opsional)</span></label>
                         <input type="text" name="nama_peruntukan" class="form-control rounded-3"
@@ -220,7 +201,6 @@
                         <div class="form-text">Catatan internal Admin untuk memudahkan pengelolaan.</div>
                     </div>
 
-                    {{-- Berlaku Hingga --}}
                     <div class="mb-3">
                         <label class="form-label fw-semibold small">Berlaku Hingga <span class="text-muted fw-normal">(opsional)</span></label>
                         <input type="date" name="expired_at" class="form-control rounded-3"
@@ -230,7 +210,6 @@
 
                     <hr class="my-3">
 
-                    {{-- Kirim Langsung via Email (hanya muncul jika jumlah = 1) --}}
                     <div id="sectionEmail">
                         <p class="small fw-semibold text-muted mb-2">
                             <i class="bi bi-envelope me-1"></i>
@@ -268,10 +247,6 @@
     </div>
 </div>
 
-
-{{-- ══════════════════════════════════════════════════════════════════════════
-     MODAL KIRIM ULANG EMAIL
-══════════════════════════════════════════════════════════════════════════ --}}
 <div class="modal fade" id="modalKirimEmail" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow rounded-4">
@@ -320,8 +295,6 @@
     </div>
 </div>
 
-
-{{-- ── Toast notifikasi salin ──────────────────────────────────────────────── --}}
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index:9999">
     <div id="toastSalin" class="toast align-items-center text-white border-0 rounded-3"
          style="background:#374151" role="alert" aria-atomic="true">
@@ -337,7 +310,6 @@
 
 @push('scripts')
 <script>
-    // ── Sembunyikan section email jika jumlah > 1 ──────────────────────────
     document.getElementById('inputJumlah').addEventListener('input', function () {
         const section = document.getElementById('sectionEmail');
         const emailInput = section.querySelector('input[name="email_tujuan"]');
@@ -354,7 +326,6 @@
         }
     });
 
-    // ── Salin kode ke clipboard ────────────────────────────────────────────
     function salinKode(kode, btn) {
         navigator.clipboard.writeText(kode).then(() => {
             btn.innerHTML = '<i class="bi bi-check-lg text-success"></i>';
@@ -365,7 +336,6 @@
         });
     }
 
-    // ── Buka modal kirim email ─────────────────────────────────────────────
     function openModalKirim(kode, actionUrl) {
         document.getElementById('labelKodeKirim').value     = kode;
         document.getElementById('formKirimEmail').action    = actionUrl;
@@ -375,7 +345,6 @@
         new bootstrap.Modal(document.getElementById('modalKirimEmail')).show();
     }
 
-    // ── Buka modal buat kode jika ada error validasi ───────────────────────
     @if($errors->any())
         new bootstrap.Modal(document.getElementById('modalBuatKode')).show();
     @endif

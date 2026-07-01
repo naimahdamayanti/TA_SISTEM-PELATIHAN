@@ -88,7 +88,6 @@ class PendaftaranSheet implements
                     }
                 }
 
-                // Warna badge status
                 for ($row = 2; $row <= $lastRow; $row++) {
                     $status = strtolower($sheet->getCell("G{$row}")->getValue());
                     $color  = match ($status) {

@@ -106,7 +106,6 @@ class SertifikatSheet implements
                 $sheet->freezePane('A2');
                 $sheet->getRowDimension(1)->setRowHeight(22);
 
-                // Total
                 $totalRow = $lastRow + 2;
                 $sheet->setCellValue("A{$totalRow}", "Total Sertifikat Terbit: {$this->rowCount}");
                 $sheet->getStyle("A{$totalRow}")->applyFromArray([

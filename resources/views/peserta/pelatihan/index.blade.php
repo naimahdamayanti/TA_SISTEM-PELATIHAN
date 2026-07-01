@@ -5,7 +5,6 @@
 
 @push('styles')
 <style>
-    /* ─── FILTER BAR ─── */
     .filter-bar {
         background: #fff;
         border: 1px solid #eee;
@@ -89,7 +88,6 @@
     }
     .btn-reset:hover { background: #e5e7eb; color: #333; }
 
-    /* ─── CARD GRID ─── */
     .katalog-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -97,7 +95,6 @@
     }
     @media (max-width: 768px) { .katalog-grid { grid-template-columns: 1fr; } }
 
-    /* ─── TRAINING CARD ─── */
     .training-card {
         background: #fff;
         border: 1px solid #eee;
@@ -110,7 +107,6 @@
     }
     .training-card:hover { box-shadow: 0 8px 28px rgba(0,0,0,.09); transform: translateY(-2px); }
 
-    /* Card Header */
     .card-top {
         display: flex;
         align-items: flex-start;
@@ -127,7 +123,6 @@
         flex-shrink: 0;
     }
 
-    /* Badge Status */
     .status-badge {
         font-size: 11px;
         font-weight: 600;
@@ -140,7 +135,6 @@
     .status-selesai  { background: #f3f4f6; color: #374151; }
     .status-penuh    { background: #fee2e2; color: #991b1b; }
 
-    /* Card Body */
     .card-nama {
         font-size: 17px;
         font-weight: 700;
@@ -167,7 +161,6 @@
         overflow: hidden;
     }
 
-    /* Meta row */
     .card-meta {
         display: flex;
         align-items: center;
@@ -183,7 +176,6 @@
     }
     .meta-item i { font-size: 13px; }
 
-    /* Progress bar */
     .progress-wrap { display: flex; flex-direction: column; gap: 4px; }
     .progress-bar-track {
         height: 5px;
@@ -204,7 +196,6 @@
         text-align: right;
     }
 
-    /* Card Footer — Tombol */
     .card-footer-btn { margin-top: auto; }
 
     .btn-daftar {
@@ -261,7 +252,6 @@
         cursor: default;
     }
 
-    /* ─── EMPTY STATE ─── */
     .empty-katalog {
         grid-column: 1 / -1;
         text-align: center;
@@ -271,20 +261,17 @@
     .empty-katalog i { font-size: 48px; display: block; margin-bottom: 12px; opacity: .4; }
     .empty-katalog p { font-size: 14px; }
 
-    /* ─── PAGINATION ─── */
     .paginasi { margin-top: 28px; }
 </style>
 @endpush
 
 @section('content')
 
-{{-- ── Heading ── --}}
 <div class="mb-4">
     <h5 class="fw-bold mb-1">Katalog Pelatihan</h5>
     <p class="text-muted small mb-0">Temukan pelatihan yang sesuai dengan kebutuhanmu dan daftar sekarang.</p>
 </div>
 
-{{-- ── Filter Bar ── --}}
 <form method="GET" action="{{ route('peserta.pelatihan.index') }}">
     <div class="filter-bar">
         <div class="input-search">
@@ -316,7 +303,6 @@
     </div>
 </form>
 
-{{-- ── Grid Katalog ── --}}
 <div class="katalog-grid">
 
     @forelse($pelatihan as $p)
@@ -333,13 +319,11 @@
 
         <div class="training-card">
 
-            {{-- Baris atas: kode + badge status --}}
             <div class="card-top">
                 <span class="card-kode">{{ $p->kode_pelatihan }}</span>
                 <span class="status-badge status-{{ $p->status }}">{{ $p->status }}</span>
             </div>
 
-            {{-- Nama & instruktur --}}
             <div>
                 <h6 class="card-nama">{{ $p->nama_pelatihan }}</h6>
                 <div class="card-instruktur">
@@ -348,10 +332,8 @@
                 </div>
             </div>
 
-            {{-- Deskripsi --}}
             <p class="card-deskripsi">{{ $p->deskripsi }}</p>
 
-            {{-- Meta: tanggal & sisa kursi --}}
             <div class="card-meta">
                 @if($p->tgl_mulai && $p->tgl_selesai)
                 <div class="meta-item">
@@ -367,7 +349,6 @@
                 </div>
             </div>
 
-            {{-- Progress bar --}}
             <div class="progress-wrap">
                 <div class="progress-bar-track">
                     <div class="progress-bar-fill {{ $persen >= 100 ? 'full' : '' }}"
@@ -376,7 +357,6 @@
                 <div class="progress-label">{{ $terisi }}/{{ $kuota }} terdaftar</div>
             </div>
 
-            {{-- Tombol --}}
             <div class="card-footer-btn">
                 @if($sudah)
                     <div class="btn-terdaftar">
@@ -408,7 +388,6 @@
 
 </div>
 
-{{-- ── Pagination ── --}}
 @if($pelatihan->hasPages())
 <div class="paginasi d-flex justify-content-center">
     {{ $pelatihan->links('pagination::bootstrap-5') }}

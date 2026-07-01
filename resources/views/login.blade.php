@@ -315,7 +315,6 @@
         </div>
     @endif
 
-    {{-- Alert --}}
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}

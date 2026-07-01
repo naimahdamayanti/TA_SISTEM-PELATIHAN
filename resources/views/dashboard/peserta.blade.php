@@ -5,7 +5,6 @@
 
 @section('content')
 
-{{-- ── Greeting ── --}}
 <div class="d-flex align-items-center justify-content-between mb-4">
     <div>
         <h5 class="fw-bold mb-1">Dashboard Peserta</h5>
@@ -15,10 +14,8 @@
     </div>
 </div>
 
-{{-- ── STAT CARDS ── --}}
 <div class="row g-3 mb-4">
 
-    {{-- Pelatihan Terdaftar --}}
     <div class="col-6 col-lg-3">
         <div class="stat-card">
             <div class="stat-icon" style="background:#fff4f0">
@@ -32,7 +29,6 @@
         </div>
     </div>
 
-    {{-- Sedang Berlangsung --}}
     <div class="col-6 col-lg-3">
         <div class="stat-card">
             <div class="stat-icon" style="background:#f0fdf4">
@@ -46,7 +42,6 @@
         </div>
     </div>
 
-    {{-- Pelatihan Selesai --}}
     <div class="col-6 col-lg-3">
         <div class="stat-card">
             <div class="stat-icon" style="background:#eff6ff">
@@ -65,7 +60,6 @@
         </div>
     </div>
 
-    {{-- Sertifikat Terkumpul --}}
     <div class="col-6 col-lg-3">
         <div class="stat-card">
             <div class="stat-icon" style="background:#fefce8">
@@ -81,10 +75,8 @@
 
 </div>
 
-{{-- ── GRID: Tabel + Kolom Kanan ── --}}
 <div class="row g-4">
 
-    {{-- Tabel Pelatihan Saya --}}
     <div class="col-lg-8">
         <div class="panel">
             <div class="panel-header">
@@ -145,10 +137,8 @@
         </div>
     </div>
 
-    {{-- Kolom Kanan --}}
     <div class="col-lg-4 d-flex flex-column gap-3">
 
-        {{-- Sertifikat Terbaru --}}
         <div class="panel">
             <div class="panel-header">
                 <h6>Sertifikat Terbaru</h6>
@@ -172,7 +162,6 @@
             @if($sertifikatTerbaru)
                 <div style="padding:16px 16px 8px">
 
-                    {{-- Preview --}}
                     @if($templateUrl)
                         <div style="position:relative; width:100%; aspect-ratio:297/210;
                                     border-radius:10px; overflow:hidden; margin-bottom:12px;">
@@ -192,7 +181,6 @@
                             </div>
                         </div>
                     @else
-                        {{-- Fallback --}}
                         <div class="sertifikat-preview mb-3">
                             <div style="font-size:28px;margin-bottom:6px">🏆</div>
                             <div style="font-size:10px;font-weight:700;letter-spacing:.1em;
@@ -208,7 +196,6 @@
                         </div>
                     @endif
 
-                    {{-- Nomor & Kode --}}
                     <div style="text-align:center;margin-bottom:10px;">
                         <div style="font-size:11px;color:#555;font-weight:600;">
                             {{ $sertifikatTerbaru->nomor_sertifikat ?? '-' }}
@@ -232,7 +219,6 @@
             @endif
         </div>
 
-        {{-- Sesi Mendatang --}}
         @if($sesiMendatang->isNotEmpty())
         <div class="panel">
             <div class="panel-header">
@@ -265,8 +251,8 @@
         </div>
         @endif
 
-    </div>{{-- /kolom kanan --}}
+    </div>
 
-</div>{{-- /row --}}
+</div>
 
 @endsection

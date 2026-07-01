@@ -24,7 +24,6 @@
     </div>
 </div>
 
-{{-- Alert --}}
 @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
         <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
@@ -38,7 +37,6 @@
     </div>
 @endif
 
-{{-- Filter Bar --}}
 <div class="card border-0 shadow-sm rounded-3 mb-4">
     <div class="card-body py-3">
         <form method="GET" action="{{ route('admin.pelatihan.index') }}" class="row g-2 align-items-center">
@@ -81,7 +79,6 @@
     </div>
 </div>
 
-{{-- Tabel --}}
 <div class="card border-0 shadow-sm rounded-3">
     <div class="card-body p-0">
         <div class="table-responsive">
@@ -154,13 +151,11 @@
                         </td>
                         <td class="text-center pe-4">
                             <div class="d-flex justify-content-center gap-1">
-                                {{-- Detail / Sesi --}}
                                 <a href="{{ route('admin.sesi.index', $item->id_pelatihan) }}"
                                    class="btn btn-sm btn-outline-secondary"
                                    title="Jadwal Sesi">
                                     <i class="bi bi-calendar3"></i>
                                 </a>
-                                {{-- Edit --}}
                                 <button type="button"
                                     class="btn btn-sm btn-outline-primary"
                                     title="Edit"
@@ -178,7 +173,6 @@
                                     )">
                                     <i class="bi bi-pencil"></i>
                                 </button>
-                                {{-- Hapus --}}
                                 <form action="{{ route('admin.pelatihan.destroy', $item->id_pelatihan) }}"
                                       method="POST"
                                       onsubmit="return konfirmasiHapus(event, '{{ $item->nama_pelatihan }}')">
@@ -215,9 +209,6 @@
     @endif
 </div>
 
-{{-- ══════════════════════════════════════
-     MODAL TAMBAH PELATIHAN
-══════════════════════════════════════ --}}
 <div class="modal fade" id="modalTambah" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
         <div class="modal-content border-0 shadow rounded-4">
@@ -313,9 +304,6 @@
     </div>
 </div>
 
-{{-- ══════════════════════════════════════
-     MODAL TAMBAH KATEGORI
-══════════════════════════════════════ --}}
 <div class="modal fade" id="modalTambahKategori" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
         <div class="modal-content border-0 shadow rounded-4">
@@ -348,9 +336,6 @@
     </div>
 </div>
 
-{{-- ══════════════════════════════════════
-     MODAL EDIT PELATIHAN
-══════════════════════════════════════ --}}
 <div class="modal fade" id="modalEdit" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
         <div class="modal-content border-0 shadow rounded-4">

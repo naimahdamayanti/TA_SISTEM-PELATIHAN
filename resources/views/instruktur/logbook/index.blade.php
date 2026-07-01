@@ -5,7 +5,6 @@
 
 @push('styles')
 <style>
-    /* ─── FILTER BAR ─── */
     .filter-bar {
         background: #fff;
         border: 1px solid #eee;
@@ -31,7 +30,6 @@
         box-shadow: 0 0 0 3px rgba(232,78,58,.1);
     }
 
-    /* ─── BTN SIMPAN ─── */
     .btn-simpan {
         display: flex;
         align-items: center;
@@ -52,7 +50,6 @@
     .btn-simpan:hover { background: var(--brand-dark); }
     .btn-simpan i { font-size: 15px; }
 
-    /* ─── SESI INFO BAR ─── */
     .sesi-info {
         background: #fff;
         border: 1px solid #eee;
@@ -81,7 +78,6 @@
     }
     .sesi-meta i { font-size: 13px; }
 
-    /* ─── TABEL KEHADIRAN ─── */
     .tabel-kehadiran {
         background: #fff;
         border: 1px solid #eee;
@@ -116,14 +112,11 @@
         vertical-align: middle;
     }
 
-    /* nomor urut */
     td.td-no { width: 40px; color: #bbb; font-size: 13px; }
 
-    /* nama peserta */
     .peserta-name { font-weight: 600; color: #222; font-size: 13px; }
     .peserta-email { font-size: 11px; color: #aaa; margin-top: 1px; }
 
-    /* ─── RADIO STATUS ─── */
     .radio-group {
         display: flex;
         align-items: center;
@@ -134,10 +127,8 @@
         align-items: center;
         gap: 0;
     }
-    /* sembunyikan radio asli */
     .radio-item input[type="radio"] { display: none; }
 
-    /* label sebagai pill --*/
     .radio-item label {
         padding: 5px 13px;
         border-radius: 999px;
@@ -149,7 +140,6 @@
         white-space: nowrap;
     }
 
-    /* radio dengan lingkaran sebelum label */
     .radio-item .radio-circle {
         width: 16px;
         height: 16px;
@@ -172,21 +162,17 @@
         transition: background .15s;
     }
 
-    /* hadir */
     .radio-hadir label  { color: #16a34a; }
     .radio-hadir input:checked ~ label { background: #dcfce7; color: #15803d; border-color: #86efac; }
     .radio-hadir input:checked ~ .radio-circle,
     .radio-hadir .radio-circle:has(~ input:checked) { border-color: #16a34a; }
 
-    /* izin */
     .radio-izin label { color: #2563eb; }
     .radio-izin input:checked ~ label { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
 
-    /* tidak hadir */
     .radio-tidak label { color: #dc2626; }
     .radio-tidak input:checked ~ label { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
 
-    /* Pendekatan alternatif: styling via JS class aktif */
     .radio-wrap {
         display: inline-flex;
         align-items: center;
@@ -225,7 +211,6 @@
         line-height: 1;
     }
 
-    /* hadir aktif */
     .radio-wrap.hadir input:checked + .radio-dot { border-color: #16a34a; }
     .radio-wrap.hadir input:checked + .radio-dot::after { background: #16a34a; }
     .radio-wrap.hadir.selected .radio-dot { border-color: #16a34a; }
@@ -233,19 +218,16 @@
     .radio-wrap.hadir.selected .radio-pill { background: #dcfce7; color: #15803d; border-color: #86efac; }
     .radio-wrap.hadir .radio-pill { color: #16a34a; }
 
-    /* izin aktif */
     .radio-wrap.izin.selected .radio-dot { border-color: #2563eb; }
     .radio-wrap.izin.selected .radio-dot::after { background: #2563eb; }
     .radio-wrap.izin.selected .radio-pill { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
     .radio-wrap.izin .radio-pill { color: #2563eb; }
 
-    /* tidak hadir aktif */
     .radio-wrap.tidak.selected .radio-dot { border-color: #dc2626; }
     .radio-wrap.tidak.selected .radio-dot::after { background: #dc2626; }
     .radio-wrap.tidak.selected .radio-pill { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
     .radio-wrap.tidak .radio-pill { color: #dc2626; }
 
-    /* ─── INPUT CATATAN ─── */
     .input-catatan {
         width: 100%;
         max-width: 220px;
@@ -266,7 +248,6 @@
         box-shadow: 0 0 0 3px rgba(232,78,58,.08);
     }
 
-    /* ─── BADGE SUDAH DIISI ─── */
     .badge-diisi {
         background: #dcfce7;
         color: #15803d;
@@ -284,7 +265,6 @@
         border-radius: 999px;
     }
 
-    /* ─── EMPTY / PLACEHOLDER ─── */
     .empty-box {
         background: #fff;
         border: 1px solid #eee;
@@ -300,7 +280,6 @@
 
 @section('content')
 
-{{-- ── Header ── --}}
 <div class="d-flex align-items-center justify-content-between mb-4">
     <div>
         <h5 class="fw-bold mb-1">Logbook Kehadiran</h5>
@@ -316,19 +295,14 @@
 </div>
 @endif
 
-{{-- ══════════════════════════════════════════════════════
-     FORM — filter pelatihan & sesi + tabel kehadiran
-══════════════════════════════════════════════════════ --}}
 <form method="POST"
       action="{{ $sesiDipilih ? route('instruktur.logbook.simpan', $sesiDipilih->id_sesi) : '#' }}"
       id="form-logbook">
 @csrf
 @if($sesiDipilih) @method('POST') @endif
 
-    {{-- ── Filter Bar: Dropdown Pelatihan + Sesi + Tombol Simpan ── --}}
     <div class="card p-4 mb-3">
         <div class="d-flex gap-3 flex wrap">
-        {{-- Dropdown Pelatihan --}}
         <select name="_pelatihan_id" id="sel-pelatihan" class="form-select"
                 onchange="gantiPelatihan(this.value)">
             <option value="">— Pilih Pelatihan —</option>
@@ -340,7 +314,6 @@
             @endforeach
         </select>
 
-        {{-- Dropdown Sesi (diisi via JS atau langsung dari $sesiList) --}}
         <select name="sesi_id" id="sel-sesi" class="form-select"
                 onchange="gantiSesi(this.value)"
                 {{ !$pelatihanDipilih ? 'disabled' : '' }}>
@@ -355,7 +328,6 @@
             @endif
         </select>
 
-        {{-- Tombol Simpan (hanya aktif jika sesi sudah dipilih) --}}
         @if($sesiDipilih)
         <button type="submit" class="btn-simpan ms-auto">
             <i class="bi bi-floppy2-fill"></i> Simpan Kehadiran
@@ -364,7 +336,6 @@
         </div>
     </div>
 
-    {{-- ── Info Sesi yang Dipilih ── --}}
     @if($sesiDipilih)
     <div class="sesi-info mb-3">
         <h6>{{ $sesiDipilih->judul_sesi ?? 'Sesi Pelatihan' }}</h6>
@@ -402,7 +373,6 @@
         </div>
     </div>
 
-    {{-- ── Tabel Kehadiran ── --}}
     @if($peserta->isEmpty())
     <div class="empty-box">
         <i class="bi bi-people"></i>
@@ -429,19 +399,15 @@
                     $catatan  = $existing?->catatan ?? '';
                 @endphp
                 <tr>
-                    {{-- Nomor --}}
                     <td class="td-no">{{ $i + 1 }}</td>
 
-                    {{-- Nama + Email --}}
                     <td>
                         <div class="peserta-name">{{ $p->nama }}</div>
                         <div class="peserta-email">{{ $p->email }}</div>
                     </td>
 
-                    {{-- Email kolom tersendiri --}}
                     <td style="color:#aaa;font-size:12px">{{ $p->email }}</td>
 
-                    {{-- Status Kehadiran: radio pills --}}
                     <td>
                         <input type="hidden"
                                name="kehadiran[{{ $i }}][peserta_id]"
@@ -449,7 +415,6 @@
 
                         <div class="radio-group" id="rg-{{ $i }}">
 
-                            {{-- Hadir --}}
                             <label class="radio-wrap hadir {{ $status === 'hadir' ? 'selected' : '' }}"
                                    onclick="pilihStatus({{ $i }}, 'hadir', this)">
                                 <input type="radio"
@@ -460,7 +425,6 @@
                                 <span class="radio-pill">hadir</span>
                             </label>
 
-                            {{-- Izin --}}
                             <label class="radio-wrap izin {{ $status === 'izin' ? 'selected' : '' }}"
                                    onclick="pilihStatus({{ $i }}, 'izin', this)">
                                 <input type="radio"
@@ -471,7 +435,6 @@
                                 <span class="radio-pill">izin</span>
                             </label>
 
-                            {{-- Tidak Hadir --}}
                             <label class="radio-wrap tidak {{ $status === 'tidak hadir' ? 'selected' : '' }}"
                                    onclick="pilihStatus({{ $i }}, 'tidak hadir', this)">
                                 <input type="radio"
@@ -485,7 +448,6 @@
                         </div>
                     </td>
 
-                    {{-- Catatan --}}
                     <td>
                         <input type="text"
                                name="kehadiran[{{ $i }}][catatan]"
@@ -498,15 +460,14 @@
             </tbody>
         </table>
     </div>
-    @endif {{-- end peserta not empty --}}
+    @endif 
 
     @else
-    {{-- Belum ada sesi yang dipilih --}}
     <div class="empty-box">
         <i class="bi bi-clipboard-check"></i>
         <p>Pilih pelatihan dan sesi untuk mengisi logbook kehadiran.</p>
     </div>
-    @endif {{-- end sesiDipilih --}}
+    @endif 
 
 </form>
 
@@ -514,13 +475,11 @@
 
 @push('scripts')
 <script>
-    // ── Ganti pelatihan → redirect dengan query param ────────────────
     function gantiPelatihan(pelatihanId) {
         if (!pelatihanId) return;
         window.location.href = '{{ route('instruktur.logbook.index') }}?pelatihan_id=' + pelatihanId;
     }
 
-    // ── Ganti sesi → redirect dengan query param ─────────────────────
     function gantiSesi(sesiId) {
         const pelatihanId = document.getElementById('sel-pelatihan').value;
         if (!sesiId) return;
@@ -529,22 +488,17 @@
             + '&sesi_id=' + sesiId;
     }
 
-    // ── Pilih status kehadiran (visual radio pill) ────────────────────
     function pilihStatus(rowIdx, status, clickedLabel) {
         const group = document.getElementById('rg-' + rowIdx);
 
-        // Hapus 'selected' dari semua radio-wrap di baris ini
         group.querySelectorAll('.radio-wrap').forEach(el => el.classList.remove('selected'));
 
-        // Tandai yang diklik
         clickedLabel.classList.add('selected');
 
-        // Check radio input di dalamnya
         const radio = clickedLabel.querySelector('input[type="radio"]');
         if (radio) radio.checked = true;
     }
 
-    // ── Init: pastikan state visual sinkron dengan checked saat load ──
     document.querySelectorAll('.radio-group').forEach(group => {
         const checked = group.querySelector('input[type="radio"]:checked');
         if (checked) {

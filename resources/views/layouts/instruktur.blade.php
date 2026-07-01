@@ -578,20 +578,16 @@
     </div>
 </div>
 
-{{-- Bootstrap JS --}}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // ── Sidebar toggle (mobile) ──────────────────────────
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
 
     document.getElementById('sidebarToggle').addEventListener('click', () => {
         if (window.innerWidth >= 992) {
-            // Desktop: toggle collapsed (icon only ↔ icon + teks)
             sidebar.classList.toggle('collapsed');
         } else {
-            // Mobile: toggle open (overlay)
             const isOpen = sidebar.classList.toggle('open');
             overlay.style.display = isOpen ? 'block' : 'none';
         }
@@ -602,7 +598,6 @@
         overlay.style.display = 'none';
     }
 
-    // ── Modal Profil ─────────────────────────────────────
     const modalProfil = new bootstrap.Modal(document.getElementById('modalProfil'));
 
     document.querySelectorAll('[data-open-profil]').forEach(el => {
@@ -612,12 +607,10 @@
         });
     });
 
-    // Auto-buka jika ada error validasi profil
     @if($errors->any())
         modalProfil.show();
     @endif
 
-    // Auto-buka jika ada pesan sukses profil
     @if(session('profil_success'))
         modalProfil.show();
     @endif

@@ -174,7 +174,6 @@ class PelatihanController extends Controller
 
         $query->where('status', 'tersedia');
 
-        // Sembunyikan pelatihan yang tanggal mulainya sudah lewat
         $query->where(function ($q) {
             $q->whereNull('tgl_mulai')
             ->orWhere('tgl_mulai', '>=', today());

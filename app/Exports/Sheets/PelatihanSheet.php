@@ -62,7 +62,6 @@ class PelatihanSheet implements
         ->groupBy('pendaftaran.pelatihan_id')
         ->pluck('total', 'pendaftaran.pelatihan_id');
 
-        // Hitung peserta lulus (memenuhi_syarat) per pelatihan via relasi, bukan raw join
         $countLulus = KualifikasiSertifikasiModel::whereHas('pendaftaran', fn($q) =>
                 $q->whereIn('pelatihan_id', $pelIds)
             )
@@ -150,7 +149,6 @@ class PelatihanSheet implements
                     'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
                 ]);
 
-                // Format kolom Kelulusan sebagai "xx.x%" (nilai numerik biasa, bukan format persen Excel /100)
                 $sheet->getStyle("K2:K{$lastRow}")
                     ->getNumberFormat()->setFormatCode('0.0"%"');
 
@@ -172,7 +170,6 @@ class PelatihanSheet implements
                     'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
                 ]);
 
-                // Footer info
                 $infoRow = $totalRow + 2;
                 $sheet->setCellValue("A{$infoRow}", 'Dicetak pada: ' . now()->translatedFormat('j F Y, H:i'));
                 $sheet->getStyle("A{$infoRow}")->applyFromArray([

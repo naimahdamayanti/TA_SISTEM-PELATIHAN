@@ -16,7 +16,6 @@
     </div>
 </div>
 
-{{-- Alert --}}
 @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
         <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
@@ -30,7 +29,6 @@
     </div>
 @endif
 
-{{-- Stat Cards --}}
 <div class="row g-3 mb-4">
     <div class="col-6 col-md-4">
         <div class="card border-0 shadow-sm rounded-3 h-100">
@@ -79,10 +77,8 @@
     </div>
 </div>
 
-{{-- Filter + Tabel --}}
 <div class="card border-0 shadow-sm rounded-3">
 
-    {{-- Filter Bar --}}
     <div class="card-body border-bottom py-3 px-4">
         <form method="GET" action="{{ route('admin.pendaftaran.index') }}" class="row g-2 align-items-center">
             <div class="col-12 col-md-4">
@@ -123,7 +119,6 @@
         </form>
     </div>
 
-    {{-- Tabel --}}
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
@@ -142,14 +137,12 @@
                 <tbody>
                     @forelse($pendaftaran as $item)
                     <tr>
-                        {{-- Nomor --}}
                         <td class="ps-4">
                             <span class="badge bg-secondary-subtle text-secondary-emphasis fw-semibold font-monospace">
                                 PD-{{ str_pad($item->id_pendaftaran, 3, '0', STR_PAD_LEFT) }}
                             </span>
                         </td>
 
-                        {{-- Nama --}}
                         <td>
                             <div class="d-flex align-items-center gap-2">
                                 <div class="rounded-circle bg-primary-subtle text-primary fw-bold
@@ -168,13 +161,10 @@
                             </div>
                         </td>
 
-                        {{-- Email --}}
                         <td class="small text-muted">{{ $item->email ?? '-' }}</td>
 
-                        {{-- Perusahaan --}}
                         <td class="small">{{ $item->perusahaan ?? '-' }}</td>
 
-                        {{-- Pelatihan --}}
                         <td>
                             <div class="fw-semibold small">{{ $item->pelatihan->nama_pelatihan ?? '-' }}</div>
                             <div class="text-muted font-monospace" style="font-size:11px">
@@ -182,12 +172,10 @@
                             </div>
                         </td>
 
-                        {{-- Tanggal --}}
                         <td class="small text-nowrap text-muted">
                             {{ $item->tgl_daftar ? \Carbon\Carbon::parse($item->tgl_daftar)->translatedFormat('j M Y') : '-' }}
                         </td>
 
-                        {{-- Status --}}
                         <td class="text-center">
                             @php
                                 $sc = match($item->status) {
@@ -202,11 +190,9 @@
                             </span>
                         </td>
 
-                        {{-- Aksi --}}
                         <td class="text-center pe-4">
                             <div class="d-flex justify-content-center align-items-center gap-1">
 
-                                {{-- Terima & Tolak (hanya jika menunggu) --}}
                                 @if($item->status === 'menunggu')
                                     <form action="{{ route('admin.pendaftaran.terima', $item->id_pendaftaran) }}"
                                           method="POST"
@@ -245,7 +231,6 @@
         </div>
     </div>
 
-    {{-- Pagination --}}
     @if($pendaftaran->hasPages())
     <div class="card-footer bg-white border-top py-3 px-4 d-flex justify-content-between align-items-center">
         <small class="text-muted">

@@ -5,7 +5,6 @@
 
 @push('styles')
 <style>
-    /* ─── PANEL ─── */
     .panel {
         background: #fff;
         border: 1px solid #eee;
@@ -13,7 +12,6 @@
         overflow: hidden;
     }
 
-    /* ─── TABEL ─── */
     .tabel-sertif { width: 100%; border-collapse: collapse; font-size: 13px; }
     .tabel-sertif thead th {
         padding: 11px 20px;
@@ -31,7 +29,6 @@
     .tabel-sertif tbody tr:hover { background: #fafafa; }
     .tabel-sertif tbody td { padding: 13px 20px; color: #444; vertical-align: middle; }
 
-    /* kode sertifikat */
     .kode-sertif {
         font-family: monospace;
         font-size: 12px;
@@ -43,16 +40,12 @@
         white-space: nowrap;
     }
 
-    /* nama peserta */
     .nama-peserta { font-weight: 600; color: #1a1a1a; }
 
-    /* tanggal */
     .tgl-terbit { font-size: 12px; color: #888; white-space: nowrap; }
 
-    /* diterbitkan oleh */
     .diterbitkan { font-size: 12px; color: #aaa; }
 
-    /* ─── BTN LIHAT ─── */
     .btn-lihat {
         display: inline-flex;
         align-items: center;
@@ -73,7 +66,6 @@
     .btn-lihat:hover { background: var(--brand); color: #fff; }
     .btn-lihat i { font-size: 13px; }
 
-    /* ─── EMPTY STATE ─── */
     .empty-box {
         padding: 60px 20px;
         text-align: center;
@@ -82,7 +74,6 @@
     .empty-box i { font-size: 40px; display: block; margin-bottom: 12px; }
     .empty-box p { font-size: 14px; margin: 0; }
 
-    /* ─── MODAL PREVIEW ─── */
     .modal-preview .modal-content {
         border: 0;
         border-radius: 16px;
@@ -106,7 +97,6 @@
         gap: 10px;
     }
 
-    /* keterangan di atas preview */
     .preview-hint {
         font-size: 12px;
         color: #aaa;
@@ -114,7 +104,6 @@
         line-height: 1.5;
     }
 
-    /* ─── SERTIFIKAT PREVIEW CARD ─── */
     .sertif-card {
         border: 1.5px solid #e5e5e5;
         border-radius: 10px;
@@ -124,7 +113,6 @@
         position: relative;
         overflow: hidden;
     }
-    /* Dekorasi garis atas */
     .sertif-card::before {
         content: '';
         position: absolute;
@@ -133,7 +121,6 @@
         background: linear-gradient(90deg, var(--brand), #f5a623);
     }
 
-    /* Trophy icon */
     .trophy-icon {
         font-size: 36px;
         margin-bottom: 8px;
@@ -141,7 +128,6 @@
         color: #f5a623;
     }
 
-    /* Judul sertifikat */
     .sertif-judul {
         font-size: 15px;
         font-weight: 800;
@@ -158,7 +144,6 @@
         margin-bottom: 16px;
     }
 
-    /* divider */
     .sertif-divider {
         border: none;
         border-top: 1px solid #eee;
@@ -166,10 +151,8 @@
         width: 80%;
     }
 
-    /* Diberikan kepada */
     .sertif-diberikan { font-size: 11px; color: #999; margin-bottom: 6px; }
 
-    /* Nama penerima */
     .sertif-nama {
         font-size: 22px;
         font-style: italic;
@@ -179,7 +162,6 @@
         line-height: 1.2;
     }
 
-    /* Kalimat */
     .sertif-kalimat {
         font-size: 11px;
         color: #666;
@@ -187,7 +169,6 @@
         line-height: 1.6;
     }
 
-    /* Nama pelatihan */
     .sertif-pelatihan {
         font-size: 14px;
         font-weight: 700;
@@ -195,7 +176,6 @@
         margin-bottom: 6px;
     }
 
-    /* Meta info: tanggal, kehadiran, kode */
     .sertif-meta {
         font-size: 10px;
         color: #aaa;
@@ -212,7 +192,6 @@
         color: #ddd;
     }
 
-    /* QR placeholder */
     .qr-box {
         width: 48px;
         height: 48px;
@@ -226,7 +205,6 @@
         font-size: 20px;
     }
 
-    /* Footer tiga kolom: penandatangan | kode | instruktur */
     .sertif-footer {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
@@ -248,14 +226,12 @@
         display: inline-block;
     }
 
-    /* copyright kecil */
     .sertif-copy { font-size: 9px; color: #ccc; margin-top: 10px; }
 </style>
 @endpush
 
 @section('content')
 
-{{-- ── Header ── --}}
 <div class="d-flex align-items-center justify-content-between mb-4">
     <div>
         <h5 class="fw-bold mb-1">Riwayat Sertifikat</h5>
@@ -271,7 +247,6 @@
 </div>
 @endif
 
-{{-- ── Tabel Sertifikat ── --}}
 <div class="panel">
     <div class="table-responsive">
         <table class="tabel-sertif">
@@ -298,28 +273,21 @@
                         : '';
                 @endphp
                 <tr>
-                    {{-- Kode --}}
                     <td><span class="kode-sertif">{{ $s->kode_sertifikat }}</span></td>
-
-                    {{-- Peserta --}}
                     <td>
                         <span class="nama-peserta">{{ $peserta?->nama ?? '-' }}</span>
                     </td>
 
-                    {{-- Pelatihan --}}
                     <td style="color:#555;font-size:13px">{{ $pelatihan?->nama_pelatihan ?? '-' }}</td>
 
-                    {{-- Tanggal Terbit --}}
                     <td>
                         <span class="tgl-terbit">
                             {{ \Carbon\Carbon::parse($s->tgl_terbit)->translatedFormat('j M Y') }}
                         </span>
                     </td>
 
-                    {{-- Diterbitkan Oleh --}}
                     <td><span class="diterbitkan">{{ $s->diterbitkan_oleh }}</span></td>
 
-                    {{-- Aksi: Lihat / Preview --}}
                     <td style="text-align:right">
                         <button type="button" class="btn-lihat" onclick="bukaPreview(
                                     '{{ addslashes($s->kode_sertifikat) }}',
@@ -351,7 +319,6 @@
         </table>
     </div>
 
-    {{-- Pagination --}}
     @if($sertifikat->hasPages())
     <div class="d-flex justify-content-between align-items-center px-4 py-3"
          style="border-top:1px solid #f0f0f0">
@@ -364,9 +331,6 @@
     @endif
 </div>
 
-{{-- ══════════════════════════════════════════════════════
-     MODAL PREVIEW SERTIFIKAT
-══════════════════════════════════════════════════════ --}}
 <div class="modal fade modal-preview" id="modalPreview" tabindex="-1"
      aria-labelledby="modalPreviewLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width:540px">
@@ -382,7 +346,6 @@
 
             <div class="modal-body px-3 py-3">
 
-                {{-- iframe PDF --}}
                 <div id="prev-pdf-wrap"
                     style="border:1px solid #dee2e6; border-radius:10px; overflow:hidden;
                             background:#f5f5f5; height:420px; display:none;">
@@ -390,7 +353,6 @@
                             style="width:100%;height:100%;border:0;"></iframe>
                 </div>
 
-                {{-- Fallback kalau belum ada PDF --}}
                 <div id="prev-pdf-fallback"
                     style="height:200px;display:flex;flex-direction:column;
                             align-items:center;justify-content:center;
@@ -400,7 +362,6 @@
                     <div style="font-size:13px;">PDF sertifikat belum tersedia</div>
                 </div>
 
-                {{-- Info strip di bawah iframe --}}
                 <div id="prev-info-strip"
                     style="display:none;margin-top:10px;padding:10px 14px;
                             background:#f9fafb;border:1px solid #f0f0f0;

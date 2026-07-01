@@ -4,11 +4,6 @@
     <meta charset="UTF-8">
     <title>Laporan Pelatihan {{ $tahun }}</title>
     <style>
-        /* ═══════════════════════════════════════════════
-           CATATAN DomPDF: TIDAK ADA flexbox / grid / gap
-           Semua layout samping menggunakan <table>
-        ═══════════════════════════════════════════════ */
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         @page {
@@ -24,7 +19,6 @@
             line-height: 1.5;
         }
 
-        /* ── ACCENT BAR ATAS ── */
         .accent-bar {
             background: #1a2744;
             height: 7px;
@@ -32,7 +26,6 @@
             width: 100%;
         }
 
-        /* ── HEADER ── */
         .header-outer {
             border-bottom: 2px solid #e84e3a;
             padding: 12px 0 10px 0;
@@ -70,7 +63,6 @@
             font-weight: bold;
         }
 
-        /* ── KPI CARDS ── */
         .kpi-table {
             width: 100%;
             border-collapse: collapse;
@@ -111,7 +103,6 @@
         }
         .kpi-desc { font-size: 8px; color: #a0aec0; margin-top: 2px; }
 
-        /* ── RINGKASAN EKSEKUTIF ── */
         .exec-box {
             background: #f7fafc;
             border-left: 4px solid #1a2744;
@@ -134,7 +125,6 @@
         }
         .exec-body strong { color: #1a2744; }
 
-        /* ── SECTION HEADER ── */
         .section-header {
             margin-bottom: 8px;
             margin-top: 4px;
@@ -149,7 +139,6 @@
             letter-spacing: 0.4px;
         }
 
-        /* ── MAIN TABLE ── */
         .main-table {
             width: 100%;
             border-collapse: collapse;
@@ -192,7 +181,6 @@
         }
         .main-table tfoot td.tc { text-align: center; }
 
-        /* ── INLINE ELEMENTS ── */
         .kode {
             background: #edf2f7;
             border-radius: 3px;
@@ -221,7 +209,6 @@
         .text-muted   { color: #94a3b8; }
         .text-bold    { font-weight: bold; }
 
-        /* ── PROGRESS BAR (DomPDF-safe: nested table) ── */
         .pbar-wrap {
             background: #e2e8f0;
             border-radius: 3px;
@@ -234,7 +221,6 @@
         .pbar-yellow { background: #d97706; }
         .pbar-red    { background: #dc2626; }
 
-        /* ── KETERANGAN 2-KOLOM ── */
         .legend-outer {
             width: 100%;
             border-collapse: collapse;
@@ -261,7 +247,6 @@
         .legend-table { width: 100%; border-collapse: collapse; }
         .legend-table td { padding: 2px 0; font-size: 8.5px; color: #555; }
 
-        /* ── TANDA TANGAN / PENUTUP ── */
         .closing-table {
             width: 100%;
             border-collapse: collapse;
@@ -283,7 +268,6 @@
         }
         .sign-name { font-weight: bold; color: #1a2744; font-size: 9.5px; }
 
-        /* ── FOOTER ── */
         .footer-outer {
             border-top: 2px solid #1a2744;
             padding-top: 7px;
@@ -298,7 +282,6 @@
         }
         .footer-right { text-align: right; }
 
-        /* ── PAGE BREAK ── */
         .page-break    { page-break-after: always; }
         .no-break      { page-break-inside: avoid; }
     </style>
@@ -311,7 +294,6 @@
         ? 'data:image/png;base64,' . base64_encode(file_get_contents($logoPath))
         : null;
 
-    // Hitung agregat dari koleksi (hindari N+1 di luar loop)
     $totalMenunggu   = 0;
     $totalDitolak    = 0;
     $totalLayak      = 0;
@@ -335,9 +317,6 @@
         : 0;
 @endphp
 
-{{-- ══════════════════════════════════════════════
-     ACCENT BAR + HEADER
-══════════════════════════════════════════════ --}}
 <div class="accent-bar"></div>
 <div class="header-outer">
     <table class="header-table">
@@ -362,9 +341,6 @@
     </table>
 </div>
 
-{{-- ══════════════════════════════════════════════
-     RINGKASAN EKSEKUTIF
-══════════════════════════════════════════════ --}}
 <div class="exec-box">
     <div class="exec-title">&#9654; Ringkasan Eksekutif</div>
     <div class="exec-body">
@@ -382,9 +358,6 @@
     </div>
 </div>
 
-{{-- ══════════════════════════════════════════════
-     TABEL REKAP PELATIHAN
-══════════════════════════════════════════════ --}}
 <div class="section-header">
     <div class="section-title">Rekap Detail Per Pelatihan</div>
 </div>
@@ -422,7 +395,7 @@
                 ->count();
             $lulus    = \App\Models\KualifikasiSertifikasiModel
                 ::whereHas('pendaftaran', fn($q) => $q->where('pelatihan_id', $item->id_pelatihan))
-                ->where('memenuhi_syarat', 'lulus')  // ← string, BUKAN boolean
+                ->where('memenuhi_syarat', 'lulus')  
                 ->count();
 
             $persen = $diterima > 0 ? round(($lulus / $diterima) * 100, 1) : null;
@@ -504,9 +477,6 @@
     </tfoot>
 </table>
 
-{{-- ══════════════════════════════════════════════
-     KPI CARDS (di bawah tabel)
-══════════════════════════════════════════════ --}}
 <div class="section-header" style="margin-top:16px">
     <div class="section-title">Ringkasan Statistik</div>
 </div>
@@ -543,9 +513,6 @@
     </tr>
 </table>
 
-{{-- ══════════════════════════════════════════════
-     KETERANGAN (2 KOLOM)
-══════════════════════════════════════════════ --}}
 <table class="legend-outer">
     <tr>
         <td style="width:48%;padding-right:6px">
@@ -591,9 +558,6 @@
     </tr>
 </table>
 
-{{-- ══════════════════════════════════════════════
-     TANDA TANGAN / PENGESAHAN
-══════════════════════════════════════════════ --}}
 <table class="closing-table">
     <tr>
         <td style="width:35%">
@@ -619,9 +583,6 @@
     </tr>
 </table>
 
-{{-- ══════════════════════════════════════════════
-     FOOTER
-══════════════════════════════════════════════ --}}
 <div class="footer-outer">
     <table class="footer-table">
         <tr>

@@ -31,11 +31,6 @@
             width: 100%; height: 100%;
         }
 
-        /*
-         * Nama peserta — italic bold serif besar
-         * Mengikuti gaya "AINUROZAQ ALIF IHSAN" pada template asli Expertindo
-         * DejaVu Serif adalah font serif aman di DomPDF (setara Georgia/Times)
-         */
         .nama-peserta {
             font-family: 'DejaVu Serif', Georgia, serif;
             font-size: 26pt;
@@ -46,10 +41,6 @@
             line-height: 1.1;
         }
 
-        /*
-         * Nama pelatihan — bold uppercase sans-serif medium
-         * Mengikuti gaya "ASCA - ACCREDITED SUPPLY CHAIN ANALYST"
-         */
         .nama-pelatihan {
             font-family: 'DejaVu Sans', Arial, sans-serif;
             font-size: 11pt;
@@ -60,10 +51,6 @@
             line-height: 1.3;
         }
 
-        /*
-         * Nomor sertifikat — kecil, abu-abu gelap, center
-         * Mengikuti gaya "No: 045/EXP/12/III/2019"
-         */
         .nomor-sertifikat {
             font-family: 'DejaVu Sans', Arial, sans-serif;
             font-size: 9pt;
@@ -71,19 +58,12 @@
             letter-spacing: 0.2pt;
         }
 
-        /*
-         * Tanggal terbit — kecil, normal
-         */
         .tgl-terbit {
             font-family: 'DejaVu Sans', Arial, sans-serif;
             font-size: 9pt;
             color: #555555;
         }
 
-        /*
-         * Diterbitkan oleh — bold underline
-         * Mengikuti gaya "Dr. Ir. Elisa Kusrini, MT.,CPIM., CSCP"
-         */
         .diterbitkan {
             font-family: 'DejaVu Sans', Arial, sans-serif;
             font-size: 10pt;
@@ -92,9 +72,6 @@
             text-decoration: underline;
         }
 
-        /*
-         * Kode verifikasi — monospace kecil abu-abu
-         */
         .kode {
             font-family: 'DejaVu Sans Mono', 'Courier New', monospace;
             font-size: 8pt;
@@ -105,11 +82,7 @@
 </head>
 <body>
 @php
-    /*
-     * Lebar kotak teks per field (mm).
-     * Dipakai untuk menghitung posisi left/right dari titik klik editor posisi.
-     * Sesuaikan jika teks terlalu panjang / terpotong.
-     */
+    
     $boxWidth = [
         'nama_peserta'     => 200,
         'nama_pelatihan'   => 180,
@@ -138,7 +111,6 @@
         return $style;
     };
 
-    /* Posisi tanda tangan — selalu center horizontal dari titik klik */
     $ttdStyle = null;
     if (isset($posisi['tanda_tangan'])) {
         $p     = $posisi['tanda_tangan'];
@@ -149,7 +121,6 @@
         $ttdStyle = "position:absolute; top:{$yMm}mm; left:{$left}mm; width:{$w}mm;";
     }
 
-    /* Nama peserta: prioritas first_name+last_name dari pendaftaran, fallback ke peserta->nama */
     $namaPeserta = trim(($pendaftaran->first_name ?? '') . ' ' . ($pendaftaran->last_name ?? ''));
     if (!$namaPeserta) {
         $namaPeserta = $peserta->nama ?? '-';
@@ -158,7 +129,6 @@
 
 <div class="wrap">
 
-    {{-- Background: gambar template yang diupload admin --}}
     @if($templateBase64)
         <div class="bg-template">
             <img src="{{ $templateBase64 }}"
@@ -166,44 +136,35 @@
                  style="width:297mm; height:210mm; display:block;">
         </div>
     @else
-        {{-- Fallback jika belum ada template: kotak putih dengan border merah --}}
         <div class="bg-template" style="background:#ffffff; border:4px solid #e84e3a;"></div>
     @endif
 
-    {{-- Overlay data dinamis --}}
     <div class="overlay">
 
-        {{-- Nama peserta: italic bold serif besar --}}
         <div class="nama-peserta" style="{{ $styleFor('nama_peserta') }}">
             {{ $namaPeserta }}
         </div>
 
-        {{-- Nama pelatihan: bold uppercase --}}
         <div class="nama-pelatihan" style="{{ $styleFor('nama_pelatihan') }}">
             {{ $pelatihan->nama_pelatihan ?? '-' }}
         </div>
 
-        {{-- Nomor sertifikat dengan prefix "No:" --}}
         <div class="nomor-sertifikat" style="{{ $styleFor('nomor_sertifikat') }}">
             No: {{ $nomor_sertifikat }}
         </div>
 
-        {{-- Tanggal terbit --}}
         <div class="tgl-terbit" style="{{ $styleFor('tgl_terbit') }}">
             {{ \Carbon\Carbon::parse($tgl_terbit)->translatedFormat('j F Y') }}
         </div>
 
-        {{-- Diterbitkan oleh: bold underline seperti nama direktur --}}
         <div class="diterbitkan" style="{{ $styleFor('diterbitkan_oleh') }}">
             {{ $diterbitkan_oleh }}
         </div>
 
-        {{-- Kode verifikasi: monospace kecil --}}
         <div class="kode" style="{{ $styleFor('kode') }}">
             {{ $kode }}
         </div>
 
-        {{-- Tanda tangan (gambar) --}}
         @if(!empty($ttdBase64) && $ttdStyle)
         <div style="{{ $ttdStyle }}">
             <img src="{{ $ttdBase64 }}"

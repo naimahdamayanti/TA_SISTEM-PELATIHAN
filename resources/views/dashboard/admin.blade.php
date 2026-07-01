@@ -4,21 +4,14 @@
 
 @section('content')
 
-{{-- ══════════════════════════════════════
-     PAGE HEADER
-══════════════════════════════════════ --}}
 <div class="d-flex align-items-start justify-content-between mb-4">
     <div>
         <h4 class="fw-bold mb-1">Dashboard</h4>
     </div>
 </div>
 
-{{-- ══════════════════════════════════════
-     STAT CARDS
-══════════════════════════════════════ --}}
 <div class="row g-3 mb-4">
 
-    {{-- Total Peserta --}}
     <div class="col-6 col-xl-auto flex-xl-fill">
         <div class="stat-card card border-0 shadow-sm rounded-3 h-100">
             <div class="card-body d-flex align-items-center gap-3 py-3 px-4">
@@ -36,7 +29,6 @@
         </div>
     </div>
 
-    {{-- Total Instruktur --}}
     <div class="col-6 col-xl-auto flex-xl-fill">
         <div class="stat-card card border-0 shadow-sm rounded-3 h-100">
             <div class="card-body d-flex align-items-center gap-3 py-3 px-4">
@@ -54,7 +46,6 @@
         </div>
     </div>
 
-    {{-- Pelatihan Berlangsung --}}
     <div class="col-6 col-xl-auto flex-xl-fill">
         <div class="stat-card card border-0 shadow-sm rounded-3 h-100">
             <div class="card-body d-flex align-items-center gap-3 py-3 px-4">
@@ -72,7 +63,6 @@
         </div>
     </div>
 
-    {{-- Pelatihan Selesai --}}
     <div class="col-6 col-xl-auto flex-xl-fill">
         <div class="stat-card card border-0 shadow-sm rounded-3 h-100">
             <div class="card-body d-flex align-items-center gap-3 py-3 px-4">
@@ -90,7 +80,6 @@
         </div>
     </div>
 
-    {{-- Pendaftar Baru --}}
     <div class="col-6 col-xl-auto flex-xl-fill">
         <div class="stat-card card border-0 shadow-sm rounded-3 h-100">
             <div class="card-body d-flex align-items-center gap-3 py-3 px-4">
@@ -110,12 +99,8 @@
 
 </div>
 
-{{-- ══════════════════════════════════════
-     GRAFIK  +  TOP PELATIHAN
-══════════════════════════════════════ --}}
 <div class="row g-4 mb-4">
 
-    {{-- Grafik Bulanan --}}
     <div class="col-lg-8">
         <div class="card border-0 shadow-sm rounded-3 h-100">
             <div class="card-header bg-white border-bottom py-3 px-4 d-flex align-items-center justify-content-between">
@@ -135,7 +120,6 @@
         </div>
     </div>
 
-    {{-- Top Pelatihan --}}
     <div class="col-lg-4">
         <div class="card border-0 shadow-sm rounded-3 h-100">
             <div class="card-header bg-white border-bottom py-3 px-4">
@@ -168,10 +152,6 @@
 
 </div>
 
-
-{{-- ══════════════════════════════════════
-     MODAL PROFIL
-══════════════════════════════════════ --}}
 <div class="modal fade" id="modalProfil" tabindex="-1" aria-labelledby="modalProfilLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow rounded-4">
@@ -181,7 +161,6 @@
             </div>
             <div class="modal-body px-4 pb-0">
 
-                {{-- Avatar --}}
                 <div class="text-center mb-4">
                     <div class="avatar-circle mx-auto mb-2 d-flex align-items-center justify-content-center
                                 rounded-circle text-white fw-bold position-relative"
@@ -302,8 +281,7 @@
 
     const ctx = document.getElementById('grafikBulanan').getContext('2d');
 
-    // Highlight bulan ini
-    const bulanIni = new Date().getMonth(); // 0-based
+    const bulanIni = new Date().getMonth(); 
     const bgColors = grafikData.map((_, i) =>
         i === bulanIni ? '#e84e3a' : 'rgba(255, 107, 61, 0.55)'
     );
@@ -355,7 +333,6 @@
         }
     });
 
-    // ── Modal Profil: buka dari topbar & sidebar ──
     const modalProfil = new bootstrap.Modal(document.getElementById('modalProfil'));
 
     document.querySelectorAll('[data-open-profil]').forEach(el => {
@@ -365,12 +342,10 @@
         });
     });
 
-    // Auto-buka jika ada error validasi profil
     @if($errors->any())
         modalProfil.show();
     @endif
 
-    // Auto-buka jika ada pesan sukses profil
     @if(session('profil_success'))
         modalProfil.show();
     @endif

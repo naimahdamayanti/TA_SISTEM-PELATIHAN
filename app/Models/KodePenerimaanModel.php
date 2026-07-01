@@ -36,7 +36,6 @@ class KodePenerimaanModel extends Model
         return !$this->is_used && !$this->isExpired();
     }
 
-    // Generate kode unik format: EXP-INSTR-XXXXXX
     public static function generateKode(): string
     {
         do {

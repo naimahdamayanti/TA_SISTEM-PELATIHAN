@@ -93,11 +93,9 @@
     $noPd = 'PD-' . str_pad($pendaftaran->id_pendaftaran ?? $pendaftaran->id, 3, '0', STR_PAD_LEFT);
 @endphp
 
-{{-- ══ HEADER: 2 kolom — kiri: logo+judul, kanan: no.pendaftaran ══ --}}
 <div class="doc-header">
     <table style="width:100%; border-collapse:collapse; table-layout:fixed;">
         <tr>
-            {{-- Kiri: Logo di atas, judul+subtitle di bawah --}}
             <td style="vertical-align:top;">
                 @if($logoBase64)
                     <img src="{{ $logoBase64 }}"
@@ -108,7 +106,6 @@
                 <div class="dh-sub">Sistem Informasi Manajemen Pelatihan &amp; Sertifikasi</div>
             </td>
 
-            {{-- Kanan: No. Pendaftaran, rata kanan, vertikal tengah --}}
             <td style="width:46mm; vertical-align:middle; text-align:right;">
                 <div class="dh-no-lbl">No. Pendaftaran</div>
                 <div class="dh-no-val">{{ $noPd }}</div>
@@ -117,7 +114,6 @@
     </table>
 </div>
 
-{{-- ══ CONTENT ══ --}}
 <div class="content-wrap">
 <div class="doc-body">
 

@@ -5,10 +5,6 @@
 
 @section('content')
 
-{{-- ══════════════════════════════════════════════════════════════════════════
-     NOTICE STATUS VERIFIKASI
-     Ditampilkan jika instruktur belum/tidak terverifikasi
-══════════════════════════════════════════════════════════════════════════ --}}
 @if(Auth::user()->status_verifikasi === 'menunggu')
     <div class="alert d-flex align-items-start gap-3 rounded-3 mb-4 border-0"
          style="background:#fffbeb;border-left:4px solid #f59e0b!important;border-left-width:4px;">
@@ -40,7 +36,6 @@
     </div>
 @endif
 
-{{-- ── Greeting ─────────────────────────────────────────────────────────────── --}}
 <div class="d-flex align-items-center justify-content-between mb-4">
     <div>
         <h5 class="fw-bold mb-1">Dashboard Instruktur</h5>
@@ -50,10 +45,8 @@
     </div>
 </div>
 
-{{-- ── STAT CARDS ─────────────────────────────────────────────────────────────── --}}
 <div class="row g-3 mb-4">
 
-    {{-- Pelatihan Berlangsung --}}
     <div class="col-6 col-lg-3">
         <div class="stat-card">
             <div class="stat-icon" style="background:#fff4f0">
@@ -66,7 +59,6 @@
         </div>
     </div>
 
-    {{-- Pelatihan Selesai --}}
     <div class="col-6 col-lg-3">
         <div class="stat-card">
             <div class="stat-icon" style="background:#f0fdf4">
@@ -79,7 +71,6 @@
         </div>
     </div>
 
-    {{-- Total Peserta --}}
     <div class="col-6 col-lg-3">
         <div class="stat-card">
             <div class="stat-icon" style="background:#eff6ff">
@@ -92,7 +83,6 @@
         </div>
     </div>
 
-    {{-- Sertifikat Diterbitkan --}}
     <div class="col-6 col-lg-3">
         <div class="stat-card">
             <div class="stat-icon" style="background:#fefce8">
@@ -107,10 +97,8 @@
 
 </div>
 
-{{-- ── GRID: Tabel + Kolom Kanan ───────────────────────────────────────────── --}}
 <div class="row g-4">
 
-    {{-- Tabel Pelatihan Saya --}}
     <div class="col-lg-8">
         <div class="panel">
             <div class="panel-header">
@@ -157,10 +145,8 @@
         </div>
     </div>
 
-    {{-- Kolom Kanan --}}
     <div class="col-lg-4 d-flex flex-column gap-3">
 
-        {{-- Aksi Cepat --}}
         <div class="panel">
             <div class="panel-header"><h6>Aksi Cepat</h6></div>
             <div style="padding:16px 16px 8px">
@@ -185,7 +171,6 @@
             </div>
         </div>
 
-        {{-- Sesi Mendatang --}}
         @if($sesiMendatang->isNotEmpty())
         <div class="panel">
             <div class="panel-header"><h6>Sesi Mendatang</h6></div>

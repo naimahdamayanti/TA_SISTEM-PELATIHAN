@@ -39,10 +39,8 @@
     </div>
 @endif
 
-{{-- Filter + Tabel --}}
 <div class="card border-0 shadow-sm rounded-3">
 
-    {{-- Filter --}}
     <div class="card-body border-bottom py-3 px-4">
         <form method="GET" action="{{ route('admin.akun.index') }}" class="row g-2 align-items-center">
             <div class="col-12 col-md-5">
@@ -72,7 +70,6 @@
         </form>
     </div>
 
-    {{-- Tabel --}}
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
@@ -167,7 +164,6 @@
         </div>
     </div>
 
-    {{-- Pagination --}}
     @if($users->hasPages())
     <div class="card-footer bg-white border-top py-3 px-4 d-flex justify-content-between align-items-center">
         <small class="text-muted">
@@ -179,10 +175,6 @@
     @endif
 </div>
 
-
-{{-- ══════════════════════════════════════
-     MODAL EDIT AKUN
-══════════════════════════════════════ --}}
 <div class="modal fade" id="modalEdit" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow rounded-4">
@@ -250,9 +242,6 @@
     </div>
 </div>
 
-{{-- ══════════════════════════════════════
-     MODAL TAMBAH AKUN
-══════════════════════════════════════ --}}
 <div class="modal fade" id="modalTambah" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow rounded-4">

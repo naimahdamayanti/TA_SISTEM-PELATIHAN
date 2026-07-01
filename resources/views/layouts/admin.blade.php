@@ -29,7 +29,6 @@
             min-height: 100vh;
         }
 
-        /* ─── SIDEBAR ─── */
         #sidebar {
             position: fixed;
             top: 0; left: 0;
@@ -87,7 +86,6 @@
         .sidebar-link:hover { background: var(--brand-light); color: var(--brand); }
         .sidebar-link.active { background: var(--brand-light); color: var(--brand); font-weight: 600; }
 
-        /* badge notifikasi di sidebar */
         .sidebar-badge {
             margin-left: auto;
             background: var(--brand);
@@ -100,7 +98,6 @@
             flex-shrink: 0;
         }
 
-        /* ─── SIDEBAR FOOTER ─── */
         .sidebar-footer {
             padding: 14px 16px;
             border-top: 1px solid #eee;
@@ -126,7 +123,6 @@
         .sidebar-footer .sf-name { font-weight: 600; font-size: 13px; line-height: 1.2; }
         .sidebar-footer .sf-role { font-size: 11px; color: #aaa; }
 
-        /* ─── TOPBAR ─── */
         #topbar {
             position: fixed;
             top: 0;
@@ -202,7 +198,6 @@
         }
         .btn-keluar:hover { background: var(--brand); color: #fff; }
 
-        /* ─── MAIN CONTENT ─── */
         #main-content {
             margin-left: var(--sidebar-w);
             margin-top: var(--topbar-h);
@@ -210,7 +205,6 @@
             min-height: calc(100vh - var(--topbar-h));
         }
 
-        /* ─── RESPONSIVE ─── */
         @media (max-width: 991.98px) {
             #sidebar { transform: translateX(calc(-1 * var(--sidebar-w))); }
             #sidebar.open { transform: translateX(0); box-shadow: 4px 0 20px rgba(0,0,0,.12); }
@@ -237,7 +231,6 @@
             #topbar, #main-content { transition: left .25s ease, margin-left .25s ease; }
         }
 
-        /* ─── BRAND COLOR OVERRIDES ─── */
         .btn-primary { background-color: var(--brand); border-color: var(--brand); }
         .btn-primary:hover, .btn-primary:focus { background-color: var(--brand-dark); border-color: var(--brand-dark); }
         .btn-outline-primary { color: var(--brand); border-color: var(--brand); }
@@ -255,9 +248,6 @@
 </head>
 <body>
 
-{{-- ══════════════════════════════════
-     SIDEBAR
-══════════════════════════════════ --}}
 <aside id="sidebar">
     <div class="sidebar-brand">
         <img src="{{ asset('template/assets/img/logo/logo-expertindo.png') }}"
@@ -266,7 +256,6 @@
 
     <nav class="sidebar-nav">
 
-        {{-- ── Utama ── --}}
         <div class="nav-section-label">Utama</div>
         <a href="{{ route('dashboard') }}"
            class="sidebar-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"
@@ -275,7 +264,6 @@
             <span class="link-text">Dashboard</span>
         </a>
 
-        {{-- ── Manajemen ── --}}
         <div class="nav-section-label">Manajemen</div>
 
         <a href="{{ route('admin.pelatihan.index') }}"
@@ -299,7 +287,6 @@
             <span class="link-text">Kelola Instruktur</span>
         </a>
 
-        {{-- ↓ BARU: Kode Penerimaan Instruktur --}}
         <a href="{{ route('admin.kode-penerimaan.index') }}"
            class="sidebar-link {{ request()->routeIs('admin.kode-penerimaan.*') ? 'active' : '' }}"
            title="Kode Penerimaan Instruktur">
@@ -329,7 +316,6 @@
             <span class="link-text">Laporan</span>
         </a>
 
-        {{-- ── Sistem ── --}}
         <div class="nav-section-label">Sistem</div>
 
         <a href="{{ route('admin.akun.index') }}"
@@ -341,7 +327,6 @@
 
     </nav>
 
-    {{-- Footer --}}
     <div class="sidebar-footer" data-open-profil title="Edit Profil">
         <div class="sf-avatar">
             {{ strtoupper(substr(Auth::user()->nama ?? 'U', 0, 1)) }}
@@ -354,9 +339,6 @@
     </div>
 </aside>
 
-{{-- ══════════════════════════════════
-     TOPBAR
-══════════════════════════════════ --}}
 <header id="topbar">
     <button class="topbar-toggle" id="sidebarToggle" aria-label="Toggle Sidebar">
         <i class="bi bi-list"></i>
@@ -382,21 +364,14 @@
     </div>
 </header>
 
-{{-- Overlay mobile --}}
 <div id="sidebarOverlay"
      style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1039"
      onclick="closeSidebar()"></div>
 
-{{-- ══════════════════════════════════
-     MAIN CONTENT
-══════════════════════════════════ --}}
 <main id="main-content">
     @yield('content')
 </main>
 
-{{-- ══════════════════════════════════════════════════════
-     MODAL DETAIL PROFIL
-══════════════════════════════════════════════════════ --}}
 <div class="modal fade" id="modalProfil" tabindex="-1"
      aria-labelledby="modalProfilLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -409,7 +384,6 @@
 
             <div class="modal-body px-4 pb-0">
 
-                {{-- Avatar --}}
                 <div class="text-center mb-4">
                     <div class="position-relative d-inline-block">
                         <div class="d-flex align-items-center justify-content-center rounded-circle text-white fw-bold mx-auto"
@@ -517,7 +491,6 @@
 
     const modalProfilEl = document.getElementById('modalProfil');
 
-    // getOrCreateInstance — mencegah duplikasi instance pada elemen yang sama
     function getModalProfil() {
         return bootstrap.Modal.getOrCreateInstance(modalProfilEl);
     }
@@ -537,7 +510,6 @@
         getModalProfil().show();
     @endif
 
-    // Safety net: paksa bersihkan backdrop yang tertinggal setelah modal benar-benar tertutup
     modalProfilEl.addEventListener('hidden.bs.modal', function () {
         document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
         document.body.classList.remove('modal-open');

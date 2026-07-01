@@ -5,7 +5,6 @@
 
 @push('styles')
 <style>
-    /* ─── BREADCRUMB ─── */
     .breadcrumb-bar {
         display: flex;
         align-items: center;
@@ -19,12 +18,10 @@
     .breadcrumb-bar .sep { font-size: 11px; }
     .breadcrumb-bar .current { color: #555; font-weight: 500; }
 
-    /* ─── PAGE HEADING ─── */
     .page-heading { margin-bottom: 20px; }
     .page-heading h5 { font-size: 17px; font-weight: 700; color: #1a1a2e; margin-bottom: 2px; }
     .page-heading p  { font-size: 12.5px; color: #aaa; margin: 0; }
 
-    /* ─── INFO BANNER PELATIHAN ─── */
     .pelatihan-banner {
         background: var(--brand-light);
         border: 1px solid #fcd0c4;
@@ -80,7 +77,6 @@
         white-space: nowrap;
     }
 
-    /* ─── FORM WRAPPER ─── */
     .form-wrapper {
         background: #fff;
         border: 1px solid #eee;
@@ -88,7 +84,6 @@
         overflow: hidden;
     }
 
-    /* ─── SECTION HEADER ─── */
     .form-section-header {
         display: flex;
         align-items: center;
@@ -102,7 +97,6 @@
     }
     .form-section-header i { font-size: 15px; }
 
-    /* ─── FORM BODY ─── */
     .form-body { padding: 22px 24px; }
 
     .form-row {
@@ -151,10 +145,8 @@
         margin-top: 3px;
     }
 
-    /* ─── SECTION DIVIDER ─── */
     .section-divider { border: none; border-top: 1px solid #f0f0f0; margin: 0; }
 
-    /* ─── FOOTER TOMBOL ─── */
     .form-footer {
         display: flex;
         align-items: center;
@@ -206,20 +198,17 @@
 
 @section('content')
 
-{{-- ── Breadcrumb ── --}}
 <div class="breadcrumb-bar">
     <a href="{{ route('peserta.pelatihan.index') }}">Katalog Pelatihan</a>
     <span class="sep"><i class="bi bi-chevron-right"></i></span>
     <span class="current">Formulir Pendaftaran</span>
 </div>
 
-{{-- ── Heading ── --}}
 <div class="page-heading">
     <h5>Formulir Pendaftaran</h5>
     <p>Isi data dengan lengkap dan benar</p>
 </div>
 
-{{-- ── Banner Info Pelatihan ── --}}
 @php
     $kuota  = $pelatihan->kuota ?? 0;
     $terisi = $pelatihan->pendaftaran()->where('status', 'diterima')->count();
@@ -254,21 +243,18 @@
     </div>
 </div>
 
-{{-- ── Form Pendaftaran ── --}}
 <form action="{{ route('peserta.pendaftaran.kirim', $pelatihan->id_pelatihan) }}"
       method="POST" id="formPendaftaran">
     @csrf
 
     <div class="form-wrapper">
 
-        {{-- ══ SEKSI 1: Data Diri ══ --}}
         <div class="form-section-header">
             <i class="bi bi-person-lines-fill"></i> Data Diri Peserta
         </div>
 
         <div class="form-body">
 
-            {{-- Nama Depan & Nama Belakang --}}
             <div class="form-row">
                 <div class="form-group">
                     <label for="first_name">Nama Depan <span class="required">*</span></label>
@@ -294,7 +280,6 @@
                 </div>
             </div>
 
-            {{-- Email & No. HP --}}
             <div class="form-row">
                 <div class="form-group">
                     <label for="email">Email <span class="required">*</span></label>
@@ -320,7 +305,6 @@
                 </div>
             </div>
 
-            {{-- Alamat --}}
             <div class="form-row single">
                 <div class="form-group">
                     <label for="alamat">Alamat</label>
@@ -333,18 +317,16 @@
                 </div>
             </div>
 
-        </div>{{-- /form-body --}}
+        </div>
 
         <hr class="section-divider">
 
-        {{-- ══ SEKSI 2: Data Pekerjaan ══ --}}
         <div class="form-section-header">
             <i class="bi bi-briefcase-fill"></i> Data Pekerjaan &amp; Perusahaan
         </div>
 
         <div class="form-body">
 
-            {{-- Pekerjaan & Nama Perusahaan --}}
             <div class="form-row">
                 <div class="form-group">
                     <label for="pekerjaan">Pekerjaan / Jabatan</label>
@@ -369,7 +351,6 @@
                 </div>
             </div>
 
-            {{-- No. Telp Perusahaan --}}
             <div class="form-row" style="grid-template-columns: 1fr 1fr;">
                 <div class="form-group">
                     <label for="tlp_perusahaan">No. Telp Perusahaan</label>
@@ -381,15 +362,13 @@
                         <div class="invalid-feedback-custom">{{ $message }}</div>
                     @enderror
                 </div>
-                {{-- kolom kosong untuk alignment 2 kolom --}}
                 <div></div>
             </div>
 
-        </div>{{-- /form-body --}}
+        </div>
 
         <hr class="section-divider">
 
-        {{-- ══ SEKSI 3: Pesan Tambahan ══ --}}
         <div class="form-section-header">
             <i class="bi bi-chat-left-text-fill"></i> Pesan Tambahan
         </div>
@@ -407,9 +386,8 @@
                     @enderror
                 </div>
             </div>
-        </div>{{-- /form-body --}}
+        </div>
 
-        {{-- ══ FOOTER TOMBOL ══ --}}
         <div class="form-footer">
             <a href="{{ route('peserta.pelatihan.index') }}" class="btn-kembali">
                 <i class="bi bi-arrow-left"></i> Kembali
@@ -419,7 +397,7 @@
             </button>
         </div>
 
-    </div>{{-- /form-wrapper --}}
+    </div>
 
 </form>
 

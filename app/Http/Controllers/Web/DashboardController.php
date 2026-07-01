@@ -56,7 +56,6 @@ class DashboardController extends Controller
             $grafikData[$i] = $grafikBulanan[$i] ?? 0;
         }
 
-        // Top pelatihan berdasarkan jumlah pendaftar
         $topPelatihan = PelatihanModel::withCount(['pendaftaran' => function ($q) {
             $q->where('status', 'diterima');
         }])
@@ -96,7 +95,6 @@ class DashboardController extends Controller
         $pelatihanAktif   = $pelatihan->where('status', 'tersedia')->count();
         $pelatihanSelesai = $pelatihan->where('status', 'selesai')->count();
 
-        // Sesi terdekat yang akan datang
         $sesiMendatang = SesiPelatihanModel::whereHas('pelatihan', fn($q) =>
             $q->where('instruktur_id', $instruktur->id_user)
         )
@@ -133,7 +131,6 @@ class DashboardController extends Controller
     {
         $peserta = Auth::user();
 
-        // Pendaftaran peserta beserta status
         $pendaftaran = PendaftaranModel::with(['pelatihan'])
             ->where('peserta_id', $peserta->id_user)
             ->latest('tgl_daftar')

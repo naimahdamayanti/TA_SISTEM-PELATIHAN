@@ -33,12 +33,10 @@
             min-height: 100vh;
         }
 
-        /* ─── SCROLLBAR ─── */
         ::-webkit-scrollbar { width: 4px; height: 4px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: #ddd; border-radius: 4px; }
 
-        /* ─── SIDEBAR ─── */
         #sidebar {
             position: fixed;
             top: 0; left: 0;
@@ -94,7 +92,6 @@
         .sidebar-link:hover  { background: var(--brand-light); color: var(--brand); }
         .sidebar-link.active { background: var(--brand-light); color: var(--brand); font-weight: 600; }
 
-        /* ─── SIDEBAR FOOTER ─── */
         .sidebar-footer {
             padding: 14px 16px;
             border-top: 1px solid #eee;
@@ -121,7 +118,6 @@
         .sf-name { font-weight: 600; font-size: 13px; line-height: 1.2; }
         .sf-role { font-size: 11px; color: #aaa; }
 
-        /* ─── TOPBAR ─── */
         #topbar {
             position: fixed;
             top: 0;
@@ -198,7 +194,6 @@
         }
         .btn-keluar:hover { background: var(--brand); color: #fff; }
 
-        /* ─── MAIN CONTENT ─── */
         #main-content {
             margin-left: var(--sidebar-w);
             margin-top: var(--topbar-h);
@@ -206,7 +201,6 @@
             min-height: calc(100vh - var(--topbar-h));
         }
 
-        /* ─── RESPONSIVE ─── */
         @media (max-width: 991.98px) {
             #sidebar { transform: translateX(calc(-1 * var(--sidebar-w))); }
             #sidebar.open { transform: translateX(0); box-shadow: 4px 0 20px rgba(0,0,0,.12); }
@@ -214,7 +208,6 @@
             #main-content { margin-left: 0; padding: 20px 16px 32px; }
         }
 
-        /* ─── SIDEBAR COLLAPSED (desktop) ─── */
         #sidebar {
             transition: transform .25s ease, width .25s ease;
         }
@@ -259,7 +252,6 @@
             }
         }
 
-        /* ─── BRAND OVERRIDES ─── */
         .btn-primary { background-color: var(--brand); border-color: var(--brand); }
         .btn-primary:hover, .btn-primary:focus { background-color: var(--brand-dark); border-color: var(--brand-dark); }
         .btn-outline-primary { color: var(--brand); border-color: var(--brand); }
@@ -272,7 +264,6 @@
         .page-link { color: var(--brand); }
         .page-link:hover { color: var(--brand-dark); }
 
-        /* ─── STAT CARDS ─── */
         .stat-card {
             background: #fff;
             border: 1px solid #eee;
@@ -298,19 +289,16 @@
         .stat-value { font-size: 28px; font-weight: 700; color: #222; line-height: 1; }
         .stat-sub   { font-size: 11px; color: #bbb; margin-top: 2px; }
 
-        /* ─── BADGE STATUS ─── */
         .badge-tersedia { background: #dcfce7; color: #15803d; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; }
         .badge-selesai  { background: #f3f4f6; color: #374151; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; }
         .badge-menunggu { background: #fef9c3; color: #854d0e; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; }
         .badge-diterima { background: #dcfce7; color: #15803d; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; }
         .badge-ditolak  { background: #fee2e2; color: #991b1b; padding: 3px 10px; border-radius: 999px; font-size: 11px; font-weight: 600; white-space: nowrap; }
 
-        /* ─── PANEL ─── */
         .panel { background: #fff; border: 1px solid #eee; border-radius: 12px; overflow: hidden; }
         .panel-header { padding: 14px 20px; border-bottom: 1px solid #f0f0f0; display: flex; align-items: center; justify-content: space-between; }
         .panel-header h6 { margin: 0; font-size: 14px; font-weight: 600; color: #333; }
 
-        /* ─── TABLE ─── */
         .table-custom { width: 100%; font-size: 13px; border-collapse: collapse; margin: 0; }
         .table-custom thead th {
             padding: 10px 16px;
@@ -330,7 +318,6 @@
         .empty-state { padding: 40px 16px; text-align: center; color: #bbb; font-size: 13px; }
         .empty-state i { font-size: 32px; display: block; margin-bottom: 8px; }
 
-        /* ─── MINI CALENDAR ─── */
         .mini-cal {
             width: 40px;
             flex-shrink: 0;
@@ -342,7 +329,6 @@
         .mc-month { font-size: 9px;  font-weight: 700; color: var(--brand); text-transform: uppercase; line-height: 1; }
         .mc-day   { font-size: 16px; font-weight: 700; color: var(--brand); line-height: 1.2; }
 
-        /* ─── SERTIFIKAT PREVIEW ─── */
         .sertifikat-preview {
             border: 2px dashed #fca58a;
             border-radius: 10px;
@@ -359,9 +345,6 @@
 
 <body>
 
-{{-- ══════════════════════════════
-     SIDEBAR
-══════════════════════════════ --}}
 <aside id="sidebar">
     <div class="sidebar-brand">
         <img src="{{ asset('template/assets/img/logo/logo-expertindo.png') }}" alt="Expertindo">
@@ -403,7 +386,6 @@
         </a>
     </nav>
 
-    {{-- Footer sidebar → buka modal profil --}}
     <div class="sidebar-footer" data-open-profil title="Edit Profil">
         <div class="sf-avatar">
             {{ strtoupper(substr(Auth::user()->nama ?? 'U', 0, 1)) }}
@@ -416,9 +398,6 @@
     </div>
 </aside>
 
-{{-- ══════════════════════════════
-     TOPBAR
-══════════════════════════════ --}}
 <header id="topbar">
     <button class="topbar-toggle" id="sidebarToggle" aria-label="Toggle Sidebar">
         <i class="bi bi-list"></i>
@@ -426,7 +405,6 @@
     <span class="topbar-title d-none d-sm-inline">@yield('page-title', 'Dashboard')</span>
 
     <div class="topbar-right">
-        {{-- Profil --}}
         <button type="button" class="topbar-profile" data-open-profil title="Edit Profil">
             <div class="tp-avatar">
                 {{ strtoupper(substr(Auth::user()->nama ?? 'U', 0, 1)) }}
@@ -435,7 +413,6 @@
             <i class="bi bi-chevron-down tp-caret"></i>
         </button>
 
-        {{-- Logout --}}
         <form action="{{ route('logout') }}" method="POST" class="d-inline m-0">
             @csrf
             <button type="submit" class="btn-keluar">
@@ -446,14 +423,10 @@
     </div>
 </header>
 
-{{-- Overlay mobile --}}
 <div id="sidebarOverlay"
      style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1039"
      onclick="closeSidebar()"></div>
 
-{{-- ══════════════════════════════
-     MAIN CONTENT
-══════════════════════════════ --}}
 <main id="main-content">
 
     @if(session('success'))
@@ -472,9 +445,6 @@
     @yield('content')
 </main>
 
-{{-- ══════════════════════════════════════════════════════
-     MODAL DETAIL PROFIL
-══════════════════════════════════════════════════════ --}}
 <div class="modal fade" id="modalProfil" tabindex="-1"
      aria-labelledby="modalProfilLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
@@ -487,7 +457,6 @@
 
             <div class="modal-body px-4 pb-0">
 
-                {{-- Avatar --}}
                 <div class="text-center mb-4">
                     <div class="position-relative d-inline-block">
                         <div class="d-flex align-items-center justify-content-center rounded-circle text-white fw-bold mx-auto"
@@ -574,11 +543,9 @@
     </div>
 </div>
 
-{{-- Bootstrap JS --}}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    // ── Sidebar toggle (mobile) ──────────────────────────
     const sidebar = document.getElementById('sidebar');
     const overlay = document.getElementById('sidebarOverlay');
 
@@ -596,7 +563,6 @@
         overlay.style.display = 'none';
     }
 
-    // ── Modal Profil ─────────────────────────────────────
     const modalProfil = new bootstrap.Modal(document.getElementById('modalProfil'));
 
     document.querySelectorAll('[data-open-profil]').forEach(el => {
@@ -606,12 +572,10 @@
         });
     });
 
-    // Auto-buka jika ada error validasi
     @if($errors->any())
         modalProfil.show();
     @endif
 
-    // Auto-buka jika ada pesan sukses profil
     @if(session('profil_success'))
         modalProfil.show();
     @endif

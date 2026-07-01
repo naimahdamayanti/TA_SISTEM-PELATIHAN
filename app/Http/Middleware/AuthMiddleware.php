@@ -8,10 +8,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class AuthMiddleware
 {
-    /**
-     * Cek apakah user sudah login (ada token di session).
-     * Jika belum → redirect ke halaman login.
-     */
     public function handle(Request $request, Closure $next): Response
     {
         if (! session('token')) {

@@ -5,7 +5,6 @@
 
 @push('styles')
 <style>
-    /* ─── FILTER BAR ─── */
     .filter-bar {
         background: #fff;
         border: 1px solid #eee;
@@ -32,7 +31,6 @@
         box-shadow: 0 0 0 3px rgba(232,78,58,.1);
     }
 
-    /* ─── TABEL KELAYAKAN ─── */
     .tabel-kelayakan {
         background: #fff;
         border: 1px solid #eee;
@@ -67,10 +65,8 @@
         vertical-align: middle;
     }
 
-    /* ─── PESERTA ─── */
     .peserta-name  { font-weight: 600; color: #1a1a1a; font-size: 13px; }
 
-    /* ─── PROGRESS BAR ─── */
     .persen-wrap {
         display: flex;
         align-items: center;
@@ -100,7 +96,6 @@
         text-align: right;
     }
 
-    /* ─── BADGE STATUS KELULUSAN ─── */
     .badge-status {
         display: inline-flex;
         align-items: center;
@@ -122,7 +117,6 @@
         border: 1px solid #fecaca;
     }
 
-    /* ─── INPUT CATATAN ─── */
     .input-catatan {
         width: 100%;
         max-width: 240px;
@@ -167,7 +161,6 @@
         cursor: not-allowed;
     }
 
-    /* ─── EMPTY STATE ─── */
     .empty-box {
         background: #fff;
         border: 1px solid #eee;
@@ -179,7 +172,6 @@
     .empty-box i { font-size: 40px; display: block; margin-bottom: 12px; }
     .empty-box p { font-size: 14px; margin: 0; }
 
-    /* ─── ALERT ─── */
     .alert-custom {
         display: flex;
         align-items: center;
@@ -195,7 +187,6 @@
         color: #15803d;
     }
 
-    /* ─── INFO PELATIHAN DIPILIH ─── */
     .info-pelatihan {
         display: flex;
         align-items: center;
@@ -210,7 +201,6 @@
 
 @section('content')
 
-{{-- ── Header ── --}}
 <div class="d-flex align-items-center justify-content-between mb-4">
     <div>
         <h5 class="fw-bold mb-1">Status Kelayakan Peserta</h5>
@@ -218,7 +208,6 @@
     </div>
 </div>
 
-{{-- ── Alert sukses ── --}}
 @if(session('success'))
 <div class="alert-custom alert-success-custom">
     <i class="bi bi-check-circle-fill"></i>
@@ -226,13 +215,11 @@
 </div>
 @endif
 
-{{-- ══ FORM tunggal — filter + tabel ══ --}}
 <form method="POST"
       action="{{ $pelatihanDipilih ? route('instruktur.kelayakan.simpanmassal', $pelatihanDipilih->id_pelatihan) : '#' }}"
       id="form-kelayakan">
 @csrf
 
-    {{-- ── Filter Bar + Tombol Simpan ── --}}
     <div class="card p-4 mb-3">
         <div class="d-flex align-items-center gap-3 flex-wrap">
             <i class="bi bi-journal-bookmark text-muted" style="font-size:16px;flex-shrink:0"></i>
@@ -261,7 +248,6 @@
         </div>
     </div>
 
-    {{-- ══ Tabel atau Empty State ══ --}}
     @if(!$pelatihanDipilih)
 
         <div class="empty-box">
@@ -298,18 +284,15 @@
                     $fillClass   = $lulus ? 'fill-green' : 'fill-red';
                 @endphp
                 <tr>
-                    {{-- Hidden: pendaftaran_id per baris --}}
                     <input type="hidden"
                            name="kelayakan[{{ $i }}][pendaftaran_id]"
                            value="{{ $item['pendaftaran']->id_pendaftaran }}">
 
-                    {{-- Nama Peserta --}}
                     <td>
                         <div class="peserta-name">{{ $item['peserta']->nama }}</div>
                         <div style="font-size:11px;color:#aaa">{{ $item['peserta']->email }}</div>
                     </td>
 
-                    {{-- Persen Hadir + Progress Bar --}}
                     <td>
                         <div class="persen-wrap">
                             <div class="progress-track">
@@ -323,7 +306,6 @@
                         </div>
                     </td>
 
-                    {{-- Status Kelulusan --}}
                     <td>
                         <span class="badge-status {{ $lulus ? 'badge-lulus' : 'badge-tidak-lulus' }}">
                             <i class="bi {{ $lulus ? 'bi-check-circle-fill' : 'bi-x-circle-fill' }}"></i>
@@ -331,7 +313,6 @@
                         </span>
                     </td>
 
-                    {{-- Catatan --}}
                     <td>
                         <input type="text"
                                name="kelayakan[{{ $i }}][catatan]"

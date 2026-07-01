@@ -8,11 +8,6 @@ use Symfony\Component\HttpFoundation\Response;
 
 class GuestMiddleware
 {
-    /**
-     * Jika user sudah login, jangan biarkan akses halaman guest
-     * (login, register, forgot password).
-     * Redirect langsung ke dashboard sesuai role.
-     */
     public function handle(Request $request, Closure $next): Response
     {
         if (session('token')) {

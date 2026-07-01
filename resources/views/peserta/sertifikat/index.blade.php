@@ -74,7 +74,6 @@
     .empty-state i { font-size: 52px; display: block; margin-bottom: 14px; opacity: .3; }
     .empty-state p { font-size: 14px; margin: 0; }
 
-    /* ── Modal ── */
     .modal-sertif-wrap {
         border: 2px dashed #fca58a;
         border-radius: 10px;
@@ -249,7 +248,6 @@
 
 @endif
 
-{{-- ── Modal Preview ── --}}
 <div class="modal fade" id="modalPreviewSertifikat" tabindex="-1"
      aria-labelledby="modalPreviewLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-lg">
@@ -271,14 +269,12 @@
             <div class="modal-body px-4 pb-0 pt-3">
                 <div class="modal-body px-3 pb-0 pt-3">
 
-                    {{-- Iframe PDF --}}
                     <div id="prev-pdf-wrap"
                         style="border:1px solid #dee2e6; border-radius:10px; overflow:hidden;
                                 background:#f5f5f5; height:460px; display:none;">
                         <iframe id="prev-pdf-iframe" src="" style="width:100%;height:100%;border:0;"></iframe>
                     </div>
 
-                    {{-- Fallback kalau PDF belum ada --}}
                     <div id="prev-pdf-fallback"
                         style="height:200px;display:flex;flex-direction:column;
                                 align-items:center;justify-content:center;
@@ -288,7 +284,6 @@
                         <div style="font-size:13px;">PDF sertifikat belum tersedia</div>
                     </div>
 
-                    {{-- Info ringkas di bawah PDF --}}
                     <div id="prev-info-strip"
                         style="display:none; margin-top:12px; padding:10px 14px;
                                 background:#fffaf8; border:1px solid #fde8dd;

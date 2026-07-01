@@ -16,7 +16,6 @@
     </div>
 </div>
 
-{{-- ── Alert ──────────────────────────────────────────────────────────────── --}}
 @foreach(['success','error','warning','info'] as $type)
     @if(session($type))
         <div class="alert alert-{{ $type === 'error' ? 'danger' : $type }} alert-dismissible fade show rounded-3 mb-4" role="alert">
@@ -27,7 +26,6 @@
     @endif
 @endforeach
 
-{{-- ── Banner instruktur menunggu verifikasi ──────────────────────────────── --}}
 @php $menunggu = $instruktur->where('status_verifikasi', 'menunggu')->count(); @endphp
 @if($menunggu > 0)
     <div class="alert alert-warning d-flex align-items-center gap-2 rounded-3 mb-4">
@@ -39,7 +37,6 @@
     </div>
 @endif
 
-{{-- ── Search ──────────────────────────────────────────────────────────────── --}}
 <div class="card border-0 shadow-sm rounded-3 mb-4">
     <div class="card-body py-3">
         <form method="GET" action="{{ route('admin.instruktur.index') }}" class="row g-2 align-items-center">
@@ -63,7 +60,6 @@
     </div>
 </div>
 
-{{-- ── Grid Instruktur ─────────────────────────────────────────────────────── --}}
 @php
     $avatarColors = [
         'linear-gradient(135deg,#e84e3a,#c0392b)',
@@ -88,7 +84,6 @@
                     {{ $status === 'menunggu' ? 'border border-warning border-2' : '' }}"
              style="{{ $status === 'menunggu' ? 'border-color:#f59e0b!important' : '' }}">
 
-            {{-- Ribbon menunggu --}}
             @if($status === 'menunggu')
             <div class="position-absolute top-0 start-0 m-2">
                 <span class="badge rounded-pill px-2 py-1"
@@ -98,18 +93,15 @@
             </div>
             @endif
 
-            {{-- Avatar --}}
             <div class="mx-auto mb-3 mt-2 rounded-circle d-flex align-items-center justify-content-center
                         text-white fw-bold"
                  style="width:72px;height:72px;font-size:1.5rem;background:{{ $color }}">
                 {{ strtoupper(substr($ins->nama, 0, 2)) }}
             </div>
 
-            {{-- Info --}}
             <div class="fw-bold fs-6 mb-1">{{ $ins->nama }}</div>
             <div class="text-muted small mb-2">{{ $ins->email }}</div>
 
-            {{-- Badge status aktif mengajar --}}
             @if($isActive)
                 <span class="badge rounded-pill mb-1 px-3 py-1"
                       style="background:#fff0ee;color:#e84e3a;border:1px solid #f5c6c0;font-size:12px">
@@ -122,7 +114,6 @@
                 </span>
             @endif
 
-            {{-- Badge status verifikasi --}}
             <div class="mb-3">
                 @if($status === 'terverifikasi' || is_null($status))
                     <span class="badge rounded-pill px-2 py-1"
@@ -147,7 +138,6 @@
                 @endif
             </div>
 
-            {{-- Statistik --}}
             <div class="d-flex justify-content-center gap-4 mb-3">
                 <div>
                     <div class="fw-bold fs-5 lh-1">{{ $pelCount }}</div>
@@ -167,15 +157,12 @@
                 </div>
             </div>
 
-            {{-- No HP --}}
             <div class="text-muted small mb-3">
                 {{ $ins->no_hp ?? 'No HP belum diisi' }}
             </div>
 
-            {{-- ── Aksi ───────────────────────────────────────────────────── --}}
             <div class="d-flex justify-content-center gap-2 mt-auto flex-wrap">
 
-                {{-- Tombol Verifikasi — hanya muncul jika status menunggu --}}
                 @if($status === 'menunggu')
                 <button type="button"
                     class="btn btn-warning btn-sm px-3 rounded-3 fw-semibold"
@@ -188,7 +175,6 @@
                 </button>
                 @endif
 
-                {{-- Tombol Tugaskan — nonaktif jika belum terverifikasi --}}
                 @if($status === 'terverifikasi' || is_null($status))
                 <button type="button"
                     class="btn btn-primary btn-sm px-3 rounded-3"
@@ -202,7 +188,6 @@
                 </button>
                 @endif
 
-                {{-- Hapus --}}
                 <form action="{{ route('admin.instruktur.destroy', $ins->id_user) }}"
                       method="POST"
                       onsubmit="return confirm('Hapus instruktur {{ addslashes($ins->nama) }}?')">
@@ -228,7 +213,6 @@
     @endforelse
 </div>
 
-{{-- Pagination --}}
 @if($instruktur->hasPages())
 <div class="d-flex justify-content-between align-items-center mt-4">
     <small class="text-muted">
@@ -240,9 +224,6 @@
 @endif
 
 
-{{-- ══════════════════════════════════════════════════════════════════════════
-     MODAL VERIFIKASI INSTRUKTUR
-══════════════════════════════════════════════════════════════════════════ --}}
 <div class="modal fade" id="modalVerifikasi" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow rounded-4">
@@ -303,10 +284,6 @@
     </div>
 </div>
 
-
-{{-- ══════════════════════════════════════════════════════════════════════════
-     MODAL TUGASKAN KE PELATIHAN
-══════════════════════════════════════════════════════════════════════════ --}}
 <div class="modal fade" id="modalTugaskan" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow rounded-4">
@@ -353,18 +330,16 @@
 
 @push('scripts')
 <script>
-    // ── Modal Verifikasi ───────────────────────────────────────────────────
+    
     function openModalVerifikasi(id, nama, actionUrl) {
         document.getElementById('namaInstrukturVerif').textContent = nama;
         document.getElementById('formVerifikasi').action           = actionUrl;
-        // Reset radio
         document.querySelectorAll('#formVerifikasi input[type=radio]')
                 .forEach(r => r.checked = false);
         document.querySelector('#formVerifikasi textarea').value = '';
         new bootstrap.Modal(document.getElementById('modalVerifikasi')).show();
     }
 
-    // ── Modal Tugaskan ─────────────────────────────────────────────────────
     function openModalTugaskan(id, nama) {
         document.getElementById('tugaskan_instruktur_id').value   = id;
         document.getElementById('tugaskan_instruktur_nama').value = nama;

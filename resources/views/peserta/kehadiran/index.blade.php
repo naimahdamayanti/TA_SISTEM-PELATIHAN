@@ -5,7 +5,6 @@
 
 @push('styles')
 <style>
-    /* ─── PAGE HEADING ─── */
     .page-heading {
         margin-bottom: 24px;
     }
@@ -16,7 +15,6 @@
         margin: 0;
     }
 
-    /* ─── KEHADIRAN CARD ─── */
     .kehadiran-card {
         background: #fff;
         border: 1px solid #eee;
@@ -28,7 +26,6 @@
     .kehadiran-card:hover { box-shadow: 0 6px 24px rgba(0,0,0,.07); }
     .kehadiran-card:last-child { margin-bottom: 0; }
 
-    /* Card header */
     .kc-header { margin-bottom: 16px; }
     .kc-nama {
         font-size: 15px;
@@ -45,7 +42,6 @@
     }
     .kc-meta .sep { opacity: .4; }
 
-    /* ─── CHIP SESI ─── */
     .sesi-chips {
         display: flex;
         flex-wrap: wrap;
@@ -68,7 +64,6 @@
     }
     .sesi-chip:hover { transform: translateY(-2px); }
 
-    /* Tooltip tanggal */
     .sesi-chip::after {
         content: attr(data-tooltip);
         position: absolute;
@@ -89,7 +84,6 @@
     }
     .sesi-chip:hover::after { opacity: 1; }
 
-    /* Warna per status */
     .chip-hadir {
         background: #dcfce7;
         color: #15803d;
@@ -116,7 +110,6 @@
         border: 1.5px solid #e5e7eb;
     }
 
-    /* ─── PROGRESS BAR ─── */
     .progress-row {
         display: flex;
         align-items: center;
@@ -148,7 +141,6 @@
     .pct-medium { color: #b45309; }
     .pct-low    { color: #991b1b; }
 
-    /* ─── LEGENDA ─── */
     .legenda {
         display: flex;
         flex-wrap: wrap;
@@ -169,7 +161,6 @@
     .leg-alpha  { background: #fee2e2; color: #991b1b; border: 1px solid #fecaca; }
     .leg-belum  { background: #f3f4f6; color: #9ca3af; border: 1px solid #e5e7eb; }
 
-    /* ─── EMPTY STATE ─── */
     .empty-state {
         text-align: center;
         padding: 60px 20px;
@@ -202,12 +193,10 @@
 
 @section('content')
 
-{{-- ── Heading ── --}}
 <div class="page-heading">
     <h5>Status Kehadiran</h5>
 </div>
 
-{{-- ── Konten ── --}}
 @if($dataKehadiran->isEmpty())
 
     <div class="empty-state">
@@ -228,17 +217,14 @@
             $total     = $item['total'];
             $persen    = $item['persen'];
 
-            // Warna progress sesuai persentase
             $progressClass = $persen >= 75 ? '' : ($persen >= 50 ? 'medium' : 'low');
             $pctClass      = $persen >= 75 ? 'pct-high' : ($persen >= 50 ? 'pct-medium' : 'pct-low');
 
-            // Hitung per-status untuk legenda
             $jmlIzin  = $sesiList->where('status', 'izin')->count();
             $jmlSakit = $sesiList->where('status', 'sakit')->count();
             $jmlAlpha = $sesiList->where('status', 'alpha')->count();
             $jmlBelum = $sesiList->where('status', 'belum dicatat')->count();
 
-            // Singkatan chip per status
             $chipLabel = [
                 'hadir'        => 'H',
                 'izin'         => 'I',
@@ -257,7 +243,6 @@
 
         <div class="kehadiran-card">
 
-            {{-- Header --}}
             <div class="kc-header">
                 <div class="kc-nama">{{ $pelatihan->nama_pelatihan }}</div>
                 <div class="kc-meta">
@@ -273,7 +258,6 @@
                 </div>
             </div>
 
-            {{-- Chips sesi --}}
             @if($sesiList->isNotEmpty())
                 <div class="sesi-chips">
                     @foreach($sesiList as $s)
@@ -297,7 +281,6 @@
                 </p>
             @endif
 
-            {{-- Progress bar --}}
             <div class="progress-row">
                 <div class="progress-track">
                     <div class="progress-fill {{ $progressClass }}"
@@ -306,7 +289,6 @@
                 <span class="progress-pct {{ $pctClass }}">{{ $persen }}%</span>
             </div>
 
-            {{-- Legenda --}}
             <div class="legenda">
                 @if($hadir > 0)
                     <span class="legenda-item leg-hadir">H = Hadir ({{ $hadir }})</span>
@@ -328,7 +310,7 @@
                 @endif
             </div>
 
-        </div>{{-- /kehadiran-card --}}
+        </div>
     @endforeach
 
 @endif

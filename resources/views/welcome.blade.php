@@ -8,7 +8,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="shortcut icon" href="{{ asset('template/assets/img/logo/logo-expertindo.png') }}">
 
-    <!-- ========================= CSS here ========================= -->
     <link rel="stylesheet" href="{{ asset('template/assets/css/bootstrap-5.0.0-beta2.min.css') }}">
     <link rel="stylesheet" href="{{ asset('template/assets/css/LineIcons.2.0.css') }}">
     <link rel="stylesheet" href="{{ asset('template/assets/css/tiny-slider.css') }}">
@@ -147,7 +146,6 @@
 
   <body>
 
-    <!-- ========================= header start ========================= -->
     <header class="header">
       <div class="navbar-area">
         <div class="container">
@@ -164,14 +162,11 @@
         </div>
       </div>
     </header>
-    <!-- ========================= header end ========================= -->
 
-    <!-- ========================= hero-section start ========================= -->
     <section id="home" class="hero-section">
       <div class="container">
         <div class="row align-items-center">
 
-          <!-- Teks -->
           <div class="col-lg-6 order-1 order-lg-1">
             <div class="hero-content">
               <span>Selamat Datang di Expertindo</span>
@@ -186,7 +181,6 @@
             </div>
           </div>
 
-          <!-- Logo -->
           <div class="col-lg-6 text-center order-2 order-lg-2">
             <div class="hero-img">
               <img src="{{ asset('template/assets/img/logo/logo-expertindo.png') }}"
@@ -194,7 +188,6 @@
             </div>
           </div>
 
-          <!-- Tombol -->
           <div class="col-12 order-3 mt-3">
             <a href="{{ route('login') }}" class="main-btn">
               Login
@@ -208,7 +201,5 @@
         </div>
       </div>
     </section>
-    <!-- ========================= hero-section end ========================= -->
-
   </body>
 </html>

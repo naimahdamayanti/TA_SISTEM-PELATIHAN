@@ -319,10 +319,7 @@
         </div>
         <div class="right-section">
             <h2>Lupa Kata Sandi</h2>
-            <p class="subtitle">Masukkan email terdaftar. Kami kirimkan tautan reset password.
-
-            </p>
-            {{-- Alert --}}
+            <p class="subtitle">Masukkan email terdaftar. Kami kirimkan tautan reset password.</p>
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
                     <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}

@@ -45,7 +45,6 @@
             padding: 24px 16px;
         }
 
-        /* ── Card Wrapper ── */
         .card {
             width: 100%;
             max-width: 560px;
@@ -61,7 +60,6 @@
             to   { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        /* ── Header oranye ── */
         .card-header {
             background: linear-gradient(135deg, var(--orange) 0%, var(--orange-lt) 100%);
             padding: 40px 40px 36px;
@@ -70,7 +68,6 @@
             overflow: hidden;
         }
 
-        /* Lingkaran dekoratif di background header */
         .card-header::before,
         .card-header::after {
             content: '';
@@ -124,12 +121,10 @@
             z-index: 1;
         }
 
-        /* ── Body form ── */
         .card-body {
             padding: 36px 40px 32px;
         }
 
-        /* Alert sukses / error */
         .alert {
             display: flex;
             align-items: flex-start;
@@ -155,7 +150,6 @@
 
         .alert-error svg { flex-shrink: 0; margin-top: 1px; }
 
-        /* ── Form group ── */
         .form-group {
             margin-bottom: 20px;
         }
@@ -221,7 +215,6 @@
             color: var(--gray-500);
         }
 
-        /* ── Submit button ── */
         .btn-verify {
             width: 100%;
             padding: 14px;
@@ -260,7 +253,6 @@
             flex-shrink: 0;
         }
 
-        /* ── Back link ── */
         .back-link {
             display: block;
             text-align: center;
@@ -272,10 +264,6 @@
         }
 
         .back-link:hover { color: var(--orange-dk); text-decoration: underline; }
-
-        /* ══════════════════════════════════════════
-         |  RESULT CARD — muncul setelah verifikasi
-         ══════════════════════════════════════════ */
 
         .result-card {
             margin-top: 28px;
@@ -370,7 +358,6 @@
             border-radius: 50%;
         }
 
-        /* ── Responsive ── */
         @media (max-width: 480px) {
             .card-header  { padding: 32px 24px 28px; }
             .card-body    { padding: 28px 24px 24px; }
@@ -382,10 +369,8 @@
 
 <div class="card">
 
-    {{-- ── Header oranye ── --}}
     <div class="card-header">
         <div class="header-icon">
-            {{-- Ikon badge centang --}}
             <img src="{{ asset('template/assets/img/logo/logo-expertindo.png') }}"
                 alt="Expertindo"
                 style="height:34px; width:auto; object-fit:contain;">
@@ -394,10 +379,8 @@
         <p>Masukkan kode sertifikat untuk memverifikasi keaslian dokumen</p>
     </div>
 
-    {{-- ── Body ── --}}
     <div class="card-body">
 
-        {{-- Alert error --}}
         @if(session('error'))
         <div class="alert alert-error">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -407,7 +390,6 @@
         </div>
         @endif
 
-        {{-- Form verifikasi --}}
         <form action="{{ route('sertifikat.cek.kode') }}" method="POST">
             @csrf
 
@@ -425,7 +407,6 @@
                         autofocus
                         style="text-transform: uppercase;"
                     >
-                    {{-- Icon search di dalam input --}}
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
                         <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35" stroke-linecap="round"/>
                     </svg>
@@ -448,7 +429,6 @@
 
         <a href="{{ route('welcome') }}" class="back-link">← Kembali ke Beranda</a>
 
-        {{-- ══ Hasil Verifikasi ══ --}}
         @isset($sertifikat)
         <div class="result-card">
 
@@ -483,7 +463,6 @@
                 <div class="result-row">
                     <span class="result-label">Nama Peserta</span>
                     <span class="result-value">
-                        {{-- Prioritaskan nama dari akun, fallback ke nama di formulir pendaftaran --}}
                         {{ $sertifikat->pendaftaran->peserta?->nama
                             ?? trim($sertifikat->pendaftaran->first_name . ' ' . $sertifikat->pendaftaran->last_name) }}
                     </span>
@@ -524,12 +503,11 @@
         </div>
         @endisset
 
-    </div>{{-- /card-body --}}
+    </div>
 
-</div>{{-- /card --}}
+</div>
 
 <script>
-    // Auto-uppercase input kode sertifikat saat user mengetik
     document.getElementById('kode_sertifikat').addEventListener('input', function () {
         const pos = this.selectionStart;
         this.value = this.value.toUpperCase();

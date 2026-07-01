@@ -26,15 +26,12 @@
     </div>
 </div>
 
-{{-- ── Tabel Laporan Utama ── --}}
 <div class="card border-0 shadow-sm rounded-3">
 
-    {{-- Filter bar --}}
     <div class="card-body border-bottom py-3 px-4">
         <form method="GET" action="{{ route('admin.laporan.index') }}"
               class="row g-2 align-items-center" id="formFilter">
 
-            {{-- Pilih Pelatihan --}}
             <div class="col-12 col-md-3">
                 <select name="pelatihan_id" class="form-select">
                     <option value="">Semua Pelatihan</option>
@@ -47,19 +44,16 @@
                 </select>
             </div>
 
-            {{-- Tanggal Mulai --}}
             <div class="col-6 col-md-2">
                 <input type="date" name="tgl_dari" class="form-control"
                        value="{{ request('tgl_dari', $tahun . '-01-01') }}">
             </div>
 
-            {{-- Tanggal Selesai --}}
             <div class="col-6 col-md-2">
                 <input type="date" name="tgl_sampai" class="form-control"
                        value="{{ request('tgl_sampai', $tahun . '-12-31') }}">
             </div>
 
-            {{-- Tahun --}}
             <div class="col-6 col-md-2">
                 <select name="tahun" class="form-select">
                     @foreach($tahunTersedia->count() ? $tahunTersedia : [\Carbon\Carbon::now()->year] as $y)
@@ -77,7 +71,6 @@
                 </a>
             </div>
 
-            {{-- Export dropdown --}}
             <div class="col-auto ms-auto">
                 <div class="dropdown">
                     <button class="btn btn-outline-secondary dropdown-toggle" type="button"
@@ -118,7 +111,6 @@
         </form>
     </div>
 
-    {{-- Tabel Pelatihan --}}
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
@@ -139,7 +131,6 @@
                 </thead>
                 <tbody>
                     @php
-                        // Filter topPelatihan berdasarkan request jika ada
                         $pelatihanFilter = request('pelatihan_id')
                             ? $topPelatihan->where('id_pelatihan', request('pelatihan_id'))
                             : $topPelatihan;
@@ -238,7 +229,6 @@
     </div>
 </div>
 
-{{-- Form export hidden --}}
 <form id="formExport" method="GET" action="{{ route('admin.laporan.export') }}" style="display:none">
     <input type="hidden" name="jenis"  id="export_jenis">
     <input type="hidden" name="format" value="csv">
@@ -248,7 +238,6 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-    // ── Grafik Bulanan ──
     const bulanLabel  = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
     const grafikData  = @json(array_values($grafikBulanan));
     const bulanIni    = new Date().getMonth();
@@ -278,7 +267,6 @@
         }
     });
 
-    // ── Grafik Donut Status Pendaftaran ──
     const statusData = @json($pendaftaranPerStatus);
     new Chart(document.getElementById('grafikStatus'), {
         type: 'doughnut',
@@ -305,7 +293,6 @@
         }
     });
 
-    // ── Export CSV ──
     function exportCSV(jenis, tahun) {
         document.getElementById('export_jenis').value = jenis;
         document.getElementById('export_tahun').value = tahun;

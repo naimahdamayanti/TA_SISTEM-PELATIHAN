@@ -13,6 +13,7 @@ use Carbon\Carbon;
 
 class PendaftaranController extends Controller
 {
+
     public function index(Request $request)
     {
         $this->authorizeRole(['admin']);

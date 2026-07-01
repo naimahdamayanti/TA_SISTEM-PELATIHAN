@@ -5,7 +5,6 @@
 
 @push('styles')
 <style>
-    /* ─── PELATIHAN CARD ─── */
     .pelatihan-card {
         background: #fff;
         border: 1px solid #eee;
@@ -21,7 +20,6 @@
         transform: translateY(-2px);
     }
 
-    /* ─── Card header ─── */
     .card-top {
         display: flex;
         align-items: flex-start;
@@ -40,18 +38,15 @@
         white-space: nowrap;
     }
 
-    /* ─── Badge status ─── */
     .badge-tersedia { background:#dcfce7; color:#15803d; padding:4px 12px; border-radius:999px; font-size:11px; font-weight:700; white-space:nowrap; }
     .badge-selesai  { background:#f3f4f6; color:#374151; padding:4px 12px; border-radius:999px; font-size:11px; font-weight:700; white-space:nowrap; }
     .badge-menunggu { background:#fef9c3; color:#854d0e; padding:4px 12px; border-radius:999px; font-size:11px; font-weight:700; white-space:nowrap; }
     .badge-penuh    { background:#fee2e2; color:#b91c1c; padding:4px 12px; border-radius:999px; font-size:11px; font-weight:700; white-space:nowrap; }
 
-    /* ─── Card body text ─── */
     .card-title { font-size: 17px; font-weight: 700; color: #1a1a1a; margin: 0 0 4px; line-height: 1.3; }
     .card-meta  { font-size: 12px; color: #999; margin-bottom: 18px; }
     .card-meta span + span::before { content: '·'; margin: 0 5px; }
 
-    /* ─── Stats row ─── */
     .card-stats {
         display: flex;
         gap: 24px;
@@ -61,10 +56,8 @@
     .cs-label { font-size: 11px; color: #aaa; }
     .cs-value { font-size: 20px; font-weight: 700; color: #222; line-height: 1; }
 
-    /* ─── Divider ─── */
     .card-divider { border: none; border-top: 1px solid #f0f0f0; margin: 0 0 16px; }
 
-    /* ─── Buka Logbook button ─── */
     .btn-logbook {
         display: flex;
         align-items: center;
@@ -85,7 +78,6 @@
     .btn-logbook:hover { background: var(--brand); color: #fff; }
     .btn-logbook i { font-size: 15px; }
 
-    /* ─── Filter bar ─── */
     .filter-bar {
         background: #fff;
         border: 1px solid #eee;
@@ -147,7 +139,6 @@
     }
     .btn-filter-reset:hover { background: #f5f5f5; color: #333; }
 
-    /* ─── Empty state ─── */
     .empty-box {
         background: #fff;
         border: 1px solid #eee;
@@ -163,7 +154,6 @@
 
 @section('content')
 
-{{-- ── Header ── --}}
 <div class="d-flex align-items-center justify-content-between mb-4">
     <div>
         <h5 class="fw-bold mb-1">Pelatihan Saya</h5>
@@ -171,7 +161,6 @@
     </div>
 </div>
 
-{{-- ── Filter Bar ── --}}
 <form method="GET" action="{{ route('instruktur.pelatihan.index') }}" class="filter-bar">
     <i class="bi bi-funnel text-muted" style="font-size:16px;flex-shrink:0"></i>
 
@@ -197,7 +186,6 @@
     </span>
 </form>
 
-{{-- ── Card Grid ── --}}
 @if($pelatihan->isEmpty())
     <div class="empty-box">
         <i class="bi bi-journal-x"></i>
@@ -209,13 +197,11 @@
     <div class="col-12 col-md-6 col-xl-4">
         <div class="pelatihan-card">
 
-            {{-- Top: kode + badge status --}}
             <div class="card-top">
                 <span class="kode-pill">{{ $p->kode_pelatihan }}</span>
                 <span class="badge-{{ $p->status }}">{{ ucfirst($p->status) }}</span>
             </div>
 
-            {{-- Nama & meta --}}
             <h6 class="card-title">{{ $p->nama_pelatihan }}</h6>
             <div class="card-meta">
                 <span>{{ $p->kategori?->nama_kategori ?? '-' }}</span>
@@ -228,7 +214,6 @@
                 @endif
             </div>
 
-            {{-- Stats: Sesi / Peserta / Sertif --}}
             <div class="card-stats">
                 <div class="cs-item">
                     <span class="cs-label">Sesi</span>
@@ -248,7 +233,6 @@
 
             <hr class="card-divider">
 
-            {{-- Tombol Buka Logbook --}}
             <a href="{{ route('instruktur.logbook.index', ['pelatihan' => $p->id_pelatihan]) }}"
                class="btn-logbook">
                 <i class="bi bi-clipboard-check"></i>
@@ -260,7 +244,6 @@
     @endforeach
 </div>
 
-{{-- ── Pagination ── --}}
 @if($pelatihan->hasPages())
 <div class="d-flex justify-content-center mt-4">
     {{ $pelatihan->links('pagination::bootstrap-5') }}

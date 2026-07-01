@@ -19,7 +19,6 @@
     </button>
 </div>
 
-{{-- Alert --}}
 @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show rounded-3 mb-4" role="alert">
         <i class="bi bi-check-circle-fill me-2"></i>{{ session('success') }}
@@ -33,7 +32,6 @@
     </div>
 @endif
 
-{{-- Stat Cards --}}
 <div class="row g-3 mb-4">
     <div class="col-6 col-xl-3">
         <div class="card border-0 shadow-sm rounded-3 h-100">
@@ -101,10 +99,8 @@
     </div>
 </div>
 
-{{-- Filter + Tabel --}}
 <div class="card border-0 shadow-sm rounded-3">
 
-    {{-- Filter --}}
     <div class="card-body border-bottom py-3 px-4">
         <form method="GET" action="{{ route('admin.sertifikat.index') }}" class="row g-2 align-items-center">
             <div class="col-12 col-md-5">
@@ -137,7 +133,6 @@
         </form>
     </div>
 
-    {{-- Tabel --}}
     <div class="card-body p-0">
         <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
@@ -183,7 +178,6 @@
                         <td class="small text-muted">{{ $item->diterbitkan_oleh ?? '-' }}</td>
                         <td class="text-center pe-4">
                             <div class="d-flex justify-content-center gap-1">
-                                {{-- Preview --}}
                                 <button type="button"
                                     class="btn btn-sm btn-outline-secondary rounded-3"
                                     title="Preview"
@@ -200,7 +194,6 @@
                                     ]) }})">
                                     <i class="bi bi-eye"></i>
                                 </button>
-                                {{-- Download --}}
                                 @if($item->file && \Illuminate\Support\Facades\Storage::disk('public')->exists($item->file))
                                 <a href="{{ asset('storage/'.$item->file) }}"
                                    download="{{ $item->kode_sertifikat }}.pdf"
@@ -213,7 +206,6 @@
                                     <i class="bi bi-download"></i>
                                 </button>
                                 @endif
-                                {{-- Hapus --}}
                                 <form action="{{ route('admin.sertifikat.destroy', $item->id_sertifikat) }}"
                                       method="POST"
                                       onsubmit="return confirm('Hapus sertifikat {{ $item->kode_sertifikat }}?')">
@@ -239,7 +231,6 @@
         </div>
     </div>
 
-    {{-- Pagination --}}
     @if($sertifikat->hasPages())
     <div class="card-footer bg-white border-top py-3 px-4 d-flex justify-content-between align-items-center">
         <small class="text-muted">
@@ -251,10 +242,6 @@
     @endif
 </div>
 
-
-{{-- ══════════════════════════════════════════════
-     MODAL TERBITKAN & GENERATE SERTIFIKAT
-══════════════════════════════════════════════ --}}
 <div class="modal fade" id="modalTerbitkan" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
         <div class="modal-content border-0 shadow rounded-4">
@@ -270,7 +257,6 @@
                     Peserta berikut memenuhi syarat kehadiran &ge; 60%. Pilih untuk diterbitkan sertifikat.
                 </p>
 
-                {{-- Filter dalam modal --}}
                 <div class="d-flex gap-2 mb-3">
                     <input type="text" id="searchKandidatInput"
                         class="form-control rounded-3 flex-fill"
@@ -289,7 +275,6 @@
                     </select>
                 </div>
 
-                {{-- Tabel kandidat --}}
                 <div class="table-responsive rounded-3 border mb-4" style="max-height:260px;overflow-y:auto">
                     <table class="table table-sm align-middle mb-0" id="tabelKandidat">
                         <thead class="table-light sticky-top">
@@ -355,14 +340,12 @@
                     </table>
                 </div>
 
-                {{-- Upload Template --}}
                 <div class="mb-3">
                     <label class="form-label fw-semibold small">
                         Template Sertifikat
                         <span class="text-muted fw-normal">(PNG/JPG · Landscape A4)</span>
                     </label>
 
-                    {{-- Preview template yang sudah ada untuk pelatihan terpilih --}}
                     <div id="previewTemplateAda" class="rounded-3 border p-2 text-center bg-light mb-2" style="display:none">
                         <img id="imgTemplateAda" src="" style="max-height:80px;object-fit:contain" alt="template">
                         <div class="small text-success mt-1">
@@ -393,7 +376,6 @@
                     </form>
                 </div>
 
-                {{-- Upload Tanda Tangan --}}
                 <div class="mb-3">
                     <label class="form-label fw-semibold small">
                         Tanda Tangan
@@ -418,7 +400,6 @@
                     </form>
                 </div>
 
-                {{-- Tanggal & Diterbitkan Oleh --}}
                 <div class="row g-3 mb-4">
                     <div class="col-md-6">
                         <label class="form-label fw-semibold small">Tanggal Terbit</label>
@@ -494,16 +475,11 @@
   </div>
 </div>
 
-{{-- Form hidden untuk generate massal --}}
 <form id="formGenerateMassal" method="POST" style="display:none">
     @csrf
     <input type="hidden" name="diterbitkan_oleh" id="hidden_diterbitkan_oleh">
 </form>
 
-
-{{-- ══════════════════════════════════════════════
-     MODAL PREVIEW SERTIFIKAT
-══════════════════════════════════════════════ --}}
 <div class="modal fade" id="modalPreview" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
         <div class="modal-content border-0 shadow rounded-4">
@@ -518,15 +494,12 @@
                     Tampilan sertifikat yang akan di-generate. Kode unik masing-masing peserta tercantum di bagian bawah.
                 </p>
 
-                {{-- Preview Card --}}
                 <div class="rounded-3 border mb-4 overflow-hidden position-relative"
                     style="min-height:340px;background:#f9f9f9">
 
-                    {{-- Gambar template sebagai background --}}
                     <img id="prev_template_img" src="" alt="template"
                         style="width:100%;max-height:400px;object-fit:contain;display:none">
 
-                    {{-- Fallback kalau tidak ada template --}}
                     <div id="prev_fallback"
                         style="min-height:340px;display:flex;align-items:center;justify-content:center;flex-direction:column">
                         <i class="bi bi-image fs-1 text-muted d-block mb-2"></i>
@@ -538,7 +511,6 @@
                         <iframe id="prev_pdf_iframe" src="" style="width:100%;height:100%;border:0;"></iframe>
                     </div>
 
-                    {{-- Info overlay di bawah gambar --}}
                     <div class="p-3 border-top bg-white" id="prev_info_box" style="display:none">
                         <div class="row text-center g-2">
                             <div class="col-4">
@@ -572,7 +544,6 @@
                     </div>
                 </div>
 
-                {{-- Link file jika sudah ada --}}
                 <div id="prev_download_section" class="d-none mb-3 text-center">
                     <a id="prev_download_link" href="#" target="_blank"
                        class="btn btn-sm btn-outline-primary rounded-3">
@@ -608,11 +579,11 @@
     const routeGetPosisi  = "{{ route('admin.sertifikat.getPosisi', ['pelatihan' => '__ID__']) }}";
     const routeSavePosisi = "{{ route('admin.sertifikat.savePosisi', ['pelatihan' => '__ID__']) }}";
     const ALIGN_PER_FIELD = {
-    nama_peserta: 'center', nama_pelatihan: 'center', nomor_sertifikat: 'center', // ← ganti persen_hadir
+    nama_peserta: 'center', nama_pelatihan: 'center', nomor_sertifikat: 'center', 
     tgl_terbit: 'left', diterbitkan_oleh: 'right', kode: 'center', tanda_tangan: 'center',
     };
     const LABEL_PER_FIELD = {
-        nama_peserta: 'Nama', nama_pelatihan: 'Pelatihan', nomor_sertifikat: 'No. Sertifikat', // ← ganti
+        nama_peserta: 'Nama', nama_pelatihan: 'Pelatihan', nomor_sertifikat: 'No. Sertifikat', 
         tgl_terbit: 'Tgl Terbit', diterbitkan_oleh: 'Diterbitkan Oleh', kode: 'Kode', tanda_tangan: 'Tanda Tangan',
     };
     const routeUploadTandaTangan = "{{ route('admin.sertifikat.uploadTandaTangan', ['pelatihan' => '__ID__']) }}";
@@ -720,12 +691,10 @@
                 bootstrap.Modal.getInstance(document.getElementById('modalPosisi')).hide();
             });
     }
-    // ── Buka modal terbitkan ──
     function openModalTerbitkan() {
         new bootstrap.Modal(document.getElementById('modalTerbitkan')).show();
     }
 
-    // ── Upload template untuk pelatihan terpilih ──
     function submitUploadTemplate() {
         const pelId = document.getElementById('filterPelatihanKandidat').value;
         if (!pelId) {
@@ -761,15 +730,12 @@
         const tglFmt = tgl ? new Date(tgl).toLocaleDateString('id-ID',
             { day:'numeric', month:'long', year:'numeric' }) : '—';
 
-        // Ambil template URL dari PELATIHAN MILIK KANDIDAT YANG DICEK,
-        // bukan dari pelatihan yang sedang dipilih di filter.
         const candidatePelId = row.dataset.pelatihan;
         const select  = document.getElementById('filterPelatihanKandidat');
         const matchOpt = Array.from(select.options)
             .find(o => o.value === candidatePelId);
         const templateUrl = matchOpt?.dataset.templateUrl ?? '';
 
-        // Tampilkan gambar template atau fallback
         const templateImg = document.getElementById('prev_template_img');
         const fallback    = document.getElementById('prev_fallback');
         const infoBox     = document.getElementById('prev_info_box');
@@ -848,7 +814,6 @@
         new bootstrap.Modal(document.getElementById('modalPreview')).show();
     }
 
-    // ── Submit generate massal ──
     function submitGenerateMassal() {
         const checked = document.querySelectorAll('.kandidat-check:checked');
         if (checked.length === 0) {
@@ -879,13 +844,11 @@
         form.submit();
     }
 
-    // ── Check all ──
     function toggleCheckAll(el) {
         document.querySelectorAll('.kandidat-check:not([disabled])')
             .forEach(cb => cb.checked = el.checked);
     }
 
-    // ── Filter kandidat + update preview template ──
     function filterKandidat() {
         const search = document.getElementById('searchKandidatInput').value.toLowerCase();
         const pelId  = document.getElementById('filterPelatihanKandidat').value;
@@ -901,7 +864,6 @@
         updatePreviewTemplate();
     }
 
-    // ── Update preview template berdasarkan pelatihan dipilih (untuk seksi upload) ──
     function updatePreviewTemplate() {
         const select = document.getElementById('filterPelatihanKandidat');
         const opt    = select.options[select.selectedIndex];
@@ -919,7 +881,6 @@
         }
     }
 
-    // ── Tampilkan nama file yang diupload ──
     function tampilkanNamaFile(input) {
         document.getElementById('namaFileTemplate').textContent =
             input.files.length ? input.files[0].name : '';

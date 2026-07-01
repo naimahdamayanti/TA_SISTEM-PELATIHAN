@@ -5,11 +5,9 @@
 
 @push('styles')
 <style>
-    /* ─── PAGE HEADING ─── */
     .page-heading { margin-bottom: 24px; }
     .page-heading h5 { font-size: 17px; font-weight: 700; color: #1a1a2e; margin: 0; }
 
-    /* ─── PANEL ─── */
     .panel { background: #fff; border: 1px solid #eee; border-radius: 14px; overflow: hidden; }
     .panel-header {
         padding: 14px 20px;
@@ -22,7 +20,6 @@
     }
     .panel-header h6 { margin: 0; font-size: 14px; font-weight: 600; color: #333; }
 
-    /* ─── TABLE ─── */
     .table-custom { width: 100%; font-size: 13px; border-collapse: collapse; margin: 0; }
     .table-custom thead th {
         padding: 10px 16px;
@@ -64,7 +61,6 @@
     }
     .no-data { font-size: 12px; color: #d1d5db; font-style: italic; }
 
-    /* Tombol aksi di tabel */
     .btn-aksi-pdf {
         display: inline-flex; align-items: center; gap: 5px;
         padding: 6px 13px;
@@ -80,7 +76,6 @@
     }
     .btn-aksi-pdf:hover { background: var(--brand); color: #fff; }
 
-    /* ─── EMPTY STATE ─── */
     .empty-state { padding: 52px 20px; text-align: center; color: #bbb; font-size: 13.5px; }
     .empty-state i { font-size: 40px; display: block; margin-bottom: 10px; opacity: .35; }
     .empty-state a {
@@ -92,14 +87,8 @@
     }
     .empty-state a:hover { background: var(--brand-dark); color: #fff; }
 
-    /* ─── PAGINATION ─── */
     .paginasi { padding: 14px 20px; border-top: 1px solid #f0f0f0; }
 
-    /* ══════════════════════════════════════
-       MODAL FORMULIR PENDAFTARAN
-    ══════════════════════════════════════ */
-
-    /* Header modal merah */
     .modal-form-header {
         background: var(--brand);
         padding: 16px 20px;
@@ -131,7 +120,6 @@
         font-family: monospace; letter-spacing: .04em;
     }
 
-    /* Info pelatihan box */
     .info-pelatihan-box {
         background: #fff0ee;
         border: 1px solid #fcd0c4;
@@ -147,7 +135,6 @@
     .ipb-item .ipb-label { font-size: 10px; color: #aaa; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; margin-bottom: 2px; }
     .ipb-item .ipb-value { font-size: 13px; font-weight: 600; color: #1a1a2e; }
 
-    /* Section label */
     .form-section-lbl {
         display: flex; align-items: center; gap: 6px;
         font-size: 11px; font-weight: 700;
@@ -164,7 +151,6 @@
         margin-left: 6px;
     }
 
-    /* Data grid di modal */
     .data-grid {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -182,7 +168,6 @@
         min-height: 34px;
     }
 
-    /* Status pendaftaran di modal */
     .modal-status-row {
         display: flex;
         align-items: center;
@@ -200,7 +185,6 @@
         font-style: italic;
     }
 
-    /* Footer kecil di modal */
     .modal-doc-footer {
         text-align: center;
         font-size: 10px;
@@ -210,7 +194,6 @@
         border-top: 1px dashed #eee;
     }
 
-    /* Spinner loading */
     .modal-loading {
         text-align: center;
         padding: 40px 20px;
@@ -222,12 +205,10 @@
 
 @section('content')
 
-{{-- ── Heading ── --}}
 <div class="page-heading">
     <h5>Riwayat Pelatihan</h5>
 </div>
 
-{{-- ── Panel Tabel ── --}}
 <div class="panel">
 
     <div class="panel-header">
@@ -281,7 +262,6 @@
                         @endif
                     </td>
                     <td>
-                        {{-- Klik → buka modal formulir --}}
                         <button type="button"
                                 class="btn-aksi-pdf"
                                 onclick="bukaFormulir({{ $p->id_pendaftaran ?? $p->id }})">
@@ -314,15 +294,11 @@
 
 </div>
 
-{{-- ══════════════════════════════════════════════════════
-     MODAL FORMULIR PENDAFTARAN
-══════════════════════════════════════════════════════ --}}
 <div class="modal fade" id="modalFormulir" tabindex="-1"
      aria-labelledby="modalFormulirLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content border-0 shadow rounded-4 overflow-hidden">
 
-            {{-- Header merah --}}
             <div class="modal-form-header">
                 <div class="mfh-left">
                     <div class="mfh-icon"><i class="bi bi-file-earmark-text-fill"></i></div>
@@ -337,16 +313,13 @@
                 </div>
             </div>
 
-            {{-- Tombol tutup pojok kanan atas --}}
             <button type="button"
                     class="btn-close position-absolute"
                     style="top:12px;right:12px;filter:invert(1);opacity:.7;z-index:10"
                     data-bs-dismiss="modal"></button>
 
-            {{-- Body --}}
             <div class="modal-body px-4 pb-2 pt-3" id="modalFormulirBody">
 
-                {{-- Loading state --}}
                 <div class="modal-loading" id="modalLoading">
                     <div class="spinner-border" role="status" style="width:2rem;height:2rem">
                         <span class="visually-hidden">Loading…</span>
@@ -354,10 +327,8 @@
                     <div style="margin-top:10px;font-size:13px">Memuat data…</div>
                 </div>
 
-                {{-- Konten (tersembunyi saat loading) --}}
                 <div id="modalKonten" style="display:none">
 
-                    {{-- Info Pelatihan --}}
                     <div class="form-section-lbl">
                         <i class="bi bi-journal-bookmark-fill"></i> Informasi Pelatihan
                     </div>
@@ -382,7 +353,6 @@
                         </div>
                     </div>
 
-                    {{-- Data Diri --}}
                     <div class="form-section-lbl">
                         <i class="bi bi-person-lines-fill"></i> Data Diri Peserta
                     </div>
@@ -411,7 +381,6 @@
                         </div>
                     </div>
 
-                    {{-- Data Pekerjaan --}}
                     <div class="form-section-lbl" style="margin-top:14px">
                         <i class="bi bi-briefcase-fill"></i> Data Pekerjaan &amp; Perusahaan
                     </div>
@@ -432,7 +401,6 @@
                         </div>
                     </div>
 
-                    {{-- Pesan --}}
                     <div class="form-section-lbl" style="margin-top:14px">
                         <i class="bi bi-chat-left-text-fill"></i> Pesan / Keterangan
                     </div>
@@ -442,7 +410,6 @@
                         </div>
                     </div>
 
-                    {{-- Status & TTD --}}
                     <div class="modal-status-row">
                         <div>
                             <div class="modal-status-label" style="margin-bottom:5px">Status Pendaftaran</div>
@@ -451,16 +418,14 @@
                         <div class="modal-ttd">Tanda Tangan Peserta</div>
                     </div>
 
-                    {{-- Footer dokumen --}}
                     <div class="modal-doc-footer">
                         Sistem Informasi Manajemen Pelatihan &amp; Sertifikasi
                         &nbsp;|&nbsp; Dicetak: {{ now()->translatedFormat('j M Y') }}
                     </div>
 
-                </div>{{-- /modalKonten --}}
-            </div>{{-- /modal-body --}}
+                </div>
+            </div>
 
-            {{-- Footer modal --}}
             <div class="modal-footer border-0 px-4 pb-4 pt-2 gap-2">
                 <button type="button"
                         class="btn btn-outline-secondary rounded-3 px-4"
@@ -485,7 +450,6 @@
     const modalEl = document.getElementById('modalFormulir');
     const modalBS = new bootstrap.Modal(modalEl);
 
-    // Badge status HTML
     const badgeMap = {
         diterima: '<span class="badge-diterima">Diterima</span>',
         menunggu: '<span class="badge-menunggu">Menunggu</span>',
@@ -498,14 +462,12 @@
     }
 
     function bukaFormulir(idPendaftaran) {
-        // Reset & tampilkan loading
         document.getElementById('modalLoading').style.display  = 'block';
         document.getElementById('modalKonten').style.display   = 'none';
         document.getElementById('modal-no-pendaftaran').textContent = '—';
         document.getElementById('btn-unduh-pdf-modal').href    = '#';
         modalBS.show();
 
-        // Fetch JSON via AJAX
         fetch(`/peserta/riwayat/${idPendaftaran}/detail`, {
             headers: {
                 'Accept': 'application/json',
@@ -517,7 +479,6 @@
             return res.json();
         })
         .then(d => {
-            // Isi semua field
             document.getElementById('modal-no-pendaftaran').textContent = d.id_label;
             set('m-nama-pelatihan', d.pelatihan.nama);
             set('m-kode-pelatihan', d.pelatihan.kode);
@@ -533,14 +494,11 @@
             set('m-tlp-perusahaan', d.tlp_perusahaan);
             set('m-pesan',          d.pesan);
 
-            // Badge status
             document.getElementById('m-status-badge').innerHTML =
                 badgeMap[d.status] ?? `<span>${d.status}</span>`;
 
-            // Tombol unduh PDF
             document.getElementById('btn-unduh-pdf-modal').href = d.url_pdf;
 
-            // Tampilkan konten, sembunyikan loading
             document.getElementById('modalLoading').style.display = 'none';
             document.getElementById('modalKonten').style.display  = 'block';
         })

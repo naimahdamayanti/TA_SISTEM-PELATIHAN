@@ -32,7 +32,6 @@
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
 
-        /* ── Left panel ─────────────────────────── */
         .left-section {
             background: #ff0000ff;
             color: white;
@@ -86,7 +85,6 @@
         .illustration { width: 100%; max-width: 350px; margin: 0 auto; }
         .illustration img { width: 100%; height: auto; }
 
-        /* ── Right panel ────────────────────────── */
         .right-section {
             flex: 1;
             padding: 50px 40px;
@@ -108,7 +106,6 @@
             font-size: 14px;
         }
 
-        /* ── Form elements ──────────────────────── */
         .form-group { margin-bottom: 16px; }
 
         label {
@@ -140,7 +137,6 @@
             box-shadow: 0 0 0 3px rgba(231, 60, 60, 0.1);
         }
 
-        /* ── File input ─────────────────────────── */
         .file-input-wrapper {
             position: relative;
         }
@@ -164,7 +160,6 @@
             box-shadow: 0 0 0 3px rgba(231, 60, 60, 0.1);
         }
 
-        /* ── Radio group ────────────────────────── */
         .radio-group {
             display: flex;
             gap: 24px;
@@ -204,7 +199,6 @@
             font-weight: 600;
         }
 
-        /* ── Info box instruktur ────────────────── */
         .instruktur-info {
             background: #fff8e1;
             border-left: 4px solid #f59e0b;
@@ -214,20 +208,18 @@
             font-size: 13px;
             color: #78350f;
             line-height: 1.6;
-            display: none; /* ditampilkan via JS */
+            display: none; 
         }
 
         .instruktur-info i { margin-right: 6px; }
 
-        /* ── Instruktur extra fields ────────────── */
         #instruktur-fields {
-            display: none; /* ditampilkan via JS */
+            display: none; 
             border-top: 1px dashed #e0e0e0;
             padding-top: 14px;
             margin-top: 4px;
         }
 
-        /* ── Error / help text ──────────────────── */
         .text-danger {
             color: #c33;
             font-size: 12px;
@@ -241,7 +233,6 @@
             margin-top: 4px;
         }
 
-        /* ── Alert ──────────────────────────────── */
         .alert {
             padding: 10px 14px;
             border-radius: 8px;
@@ -253,7 +244,6 @@
         .alert-danger  { background: #fee; color: #c33; }
         .alert-info    { background: #e8f4fd; color: #1a6fa8; }
 
-        /* ── Submit button ──────────────────────── */
         .btn-submit {
             width: 100%;
             padding: 13px;
@@ -273,7 +263,6 @@
             box-shadow: 0 5px 15px rgba(231, 60, 60, 0.3);
         }
 
-        /* ── Login link ─────────────────────────── */
         .login-link {
             text-align: center;
             margin-top: 18px;
@@ -289,7 +278,6 @@
 
         .login-link a:hover { text-decoration: underline; }
 
-        /* ── Responsive ─────────────────────────── */
         @media (max-width: 768px) {
             .container { flex-direction: column; }
             .left-section { padding: 40px 30px; }
@@ -302,7 +290,6 @@
 <body>
 <div class="container">
 
-    {{-- ── Left panel ──────────────────────────────── --}}
     <div class="left-section">
         <div class="logo">
             <img src="{{ asset('template/assets/img/logo/logo-expertindo.png') }}" alt="logo" />
@@ -313,12 +300,10 @@
         </div>
     </div>
 
-    {{-- ── Right panel ─────────────────────────────── --}}
     <div class="right-section">
         <h2>Daftar</h2>
         <p class="subtitle">Silahkan lengkapi data di bawah ini!</p>
 
-        {{-- Flash messages --}}
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
@@ -329,11 +314,9 @@
             <div class="alert alert-info">{{ session('info') }}</div>
         @endif
 
-        {{-- ── Form ──────────────────────────────────── --}}
         <form action="{{ route('register.post') }}" method="POST" enctype="multipart/form-data">
             @csrf
 
-            {{-- Nama --}}
             <div class="form-group">
                 <label for="nama">Nama Lengkap</label>
                 <input type="text" id="nama" name="nama"
@@ -344,7 +327,6 @@
                 @enderror
             </div>
 
-            {{-- Username --}}
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username"
@@ -355,7 +337,6 @@
                 @enderror
             </div>
 
-            {{-- Email --}}
             <div class="form-group">
                 <label for="email">Email</label>
                 <input type="email" id="email" name="email"
@@ -366,7 +347,6 @@
                 @enderror
             </div>
 
-            {{-- Password --}}
             <div class="form-group">
                 <label for="password">Kata Sandi</label>
                 <input type="password" id="password" name="password"
@@ -376,7 +356,6 @@
                 @enderror
             </div>
 
-            {{-- No HP --}}
             <div class="form-group">
                 <label for="no_hp">No. HP</label>
                 <input type="text" id="no_hp" name="no_hp"
@@ -387,7 +366,6 @@
                 @enderror
             </div>
 
-            {{-- Role --}}
             <div class="form-group">
                 <label>Daftar sebagai</label>
                 <div class="radio-group">
@@ -407,7 +385,6 @@
                 @enderror
             </div>
 
-            {{-- ── Field khusus instruktur ──────────────── --}}
             <div class="instruktur-info" id="instruktur-info">
                 <i class="fas fa-info-circle"></i>
                 Registrasi instruktur hanya tersedia bagi yang telah diterima melalui proses seleksi
@@ -418,7 +395,6 @@
 
             <div id="instruktur-fields">
 
-                {{-- Kode penerimaan --}}
                 <div class="form-group">
                     <label for="kode_penerimaan">
                         Kode Penerimaan <span style="color:#e73c3c;">*</span>
@@ -433,7 +409,6 @@
                     @enderror
                 </div>
 
-                {{-- Bukti penerimaan --}}
                 <div class="form-group">
                     <label for="bukti_penerimaan">
                         Bukti Penerimaan <span style="color:#e73c3c;">*</span>
@@ -453,7 +428,6 @@
                 </div>
 
             </div>
-            {{-- ── End field instruktur ────────────────── --}}
 
             <button type="submit" class="btn-submit">
                 <i class="fas fa-user-plus"></i> Daftar
@@ -478,28 +452,23 @@
     function toggleInstrukturFields() {
         const isInstruktur = document.querySelector('input[name="role"]:checked')?.value === 'instruktur';
 
-        // Show/hide extra fields
         instrFields.style.display = isInstruktur ? 'block' : 'none';
         instrInfo.style.display   = isInstruktur ? 'block' : 'none';
 
-        // Required hanya saat instruktur dipilih
         kodeInput.required  = isInstruktur;
         buktiInput.required = isInstruktur;
 
-        // Clear nilai jika beralih ke peserta
         if (!isInstruktur) {
             kodeInput.value  = '';
             buktiInput.value = '';
         }
 
-        // Update tampilan label radio (selected state)
         radioLabels.forEach(label => {
             const radio = label.querySelector('input[type="radio"]');
             label.classList.toggle('selected', radio.checked);
         });
     }
 
-    // Auto-uppercase kode penerimaan
     kodeInput.addEventListener('input', function () {
         const pos = this.selectionStart;
         this.value = this.value.toUpperCase();
